@@ -1,5 +1,10 @@
-import { useAccount, useDisconnect, useEnsAvatar, useEnsName } from 'wagmi'
-import { useChainId } from 'wagmi'
+import {
+  useAccount,
+  useDisconnect,
+  useEnsAvatar,
+  useEnsName,
+  useChainId,
+} from 'wagmi'
 
 const Account = () => {
   const chainId = useChainId()
@@ -19,6 +24,7 @@ const Account = () => {
       {/* Network */}
       {chainId && (
         <div className="flex flex-col items-center">
+          <div>chainId: {chainId}</div>
           <div>Network:</div> {chainMap[chainId] ?? 'Unknown Network'}
         </div>
       )}
