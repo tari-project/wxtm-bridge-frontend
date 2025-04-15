@@ -8,7 +8,7 @@ export default function Home() {
 
   return (
     <main className="flex flex-col items-center justify-center">
-      <MainModal />
+      {modalOpen && <MainModal setModalOpen={setModalOpen} />}
     </main>
   )
 }
