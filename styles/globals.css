@@ -1,15 +1,8 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
-:root {
+/* :root {
   --background: #ffffff;
   --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,4 +16,23 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+} */
+
+:root {
+  --foreground: #171717;
+}
+
+body {
+  color: var(--foreground);
+}
+
+.custom-bg {
+  background: radial-gradient(
+    56.45% 56.45% at 56.2% 43.55%,
+    #fafbff 0%,
+    #b9bac3 100%
+  );
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
 }

@@ -1,9 +1,14 @@
-import Bridge from '@/components/bridge'
+'use client'
+
+import React, { useState } from 'react'
+import MainModal from '@/components/main-modal'
 
 export default function Home() {
+  const [modalOpen, setModalOpen] = useState<boolean>(true)
+
   return (
-    <main className="flex flex-col items-center px-4">
-      <Bridge />
+    <main className="flex flex-col items-center justify-center">
+      <MainModal />
     </main>
   )
 }
