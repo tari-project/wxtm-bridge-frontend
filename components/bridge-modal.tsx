@@ -11,13 +11,10 @@ import { truncateAddress } from '@/utils/truncate'
 
 type BridgeModalProps = {
   closeModal: () => void
-  goToNextStep: () => void
+  nextStep: () => void
 }
 
-const BridgeModal: React.FC<BridgeModalProps> = ({
-  closeModal,
-  goToNextStep,
-}) => {
+const BridgeModal: React.FC<BridgeModalProps> = ({ closeModal, nextStep }) => {
   const chainId = useChainId()
   const { address } = useAccount()
 
@@ -50,10 +47,10 @@ const BridgeModal: React.FC<BridgeModalProps> = ({
 
         {/* Section 1 */}
         <div className="flex justify-between items-center mt-4">
-          <div className="flex flex-col">
-            <div className="font-semibold text-lg">Enter amount</div>
-            <div className="text-xs mt-[-4px]">
-              Step <span className="font-semibold">1</span>/2
+          <div className="flex flex-col font-semibold">
+            <div className=" text-lg">Enter amount</div>
+            <div className="text-xs mt-[-4px] text-gray-500">
+              Step <span className="text-[#171717]">1</span>/2
             </div>
           </div>
           <div className="flex gap-2 p-2 rounded-lg bg-white/25">
@@ -126,7 +123,7 @@ const BridgeModal: React.FC<BridgeModalProps> = ({
             <div className="font-medium text-[32px]">
               {(1000).toLocaleString()}
             </div>
-            <div className="text-[10px] text-gray-500">
+            <div className="font-semibold text-[10px] text-gray-500">
               {(1023451.931).toLocaleString()} XTM
             </div>
           </div>
@@ -189,14 +186,14 @@ const BridgeModal: React.FC<BridgeModalProps> = ({
           <div className="py-[0.5px] w-full bg-gray-200 mt-3 mb-2"></div>
 
           <div className="flex justify-between">
-            <div className="text-gray-500 text-xs font-medium">
+            <div className="text-gray-500 text-xs font-medium space-y-2">
               <div>Rate</div>
               <div>Bridge Fee</div>
               <div>Est. Gas</div>
               <div>Duration</div>
             </div>
 
-            <div className="text-right text-gray-500 text-xs font-medium">
+            <div className="text-right text-gray-500 text-xs font-medium space-y-2">
               <div>1000</div>
               <div>0.02%</div>
               <div>8.12</div>
@@ -213,7 +210,7 @@ const BridgeModal: React.FC<BridgeModalProps> = ({
         {/* Button */}
         <Button
           label="Continue to Confirmation"
-          onClick={goToNextStep}
+          onClick={nextStep}
           disabled={false}
         />
 
