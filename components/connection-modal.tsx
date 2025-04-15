@@ -3,7 +3,7 @@
 import { useConnect } from 'wagmi'
 import { IoCloseOutline } from 'react-icons/io5'
 
-interface ConnectionModalProps {
+type ConnectionModalProps = {
   closeModal: () => void
 }
 
