@@ -135,7 +135,7 @@ const BridgeModal: React.FC<BridgeModalProps> = ({ closeModal, nextStep }) => {
                   src="/icons/tari.png"
                   fill
                   sizes="38px"
-                  alt="Picture of the author"
+                  alt="Tari icon"
                   className="rounded-full object-cover"
                 />
               </div>

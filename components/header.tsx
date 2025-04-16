@@ -1,6 +1,4 @@
-'use client'
-
-const Navbar = () => {
+const Header = () => {
   return (
     <header className="flex flex-col h-20 items-center justify-between py-6 gap-4 bg-transparent">
       <h2 className="text-sm font-semibold p-2 bg-black rounded-3xl text-white">
@@ -14,4 +12,4 @@ const Navbar = () => {
   )
 }
 
-export default Navbar
+export default Header

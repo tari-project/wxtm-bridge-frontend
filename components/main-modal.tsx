@@ -4,15 +4,18 @@ import ConnectionModal from '@/components/connection-modal'
 import BridgeModal from '@/components/bridge-modal'
 import ReviewModal from '@/components/review-modal'
 import WrappingModal from './wrapping-modal'
+import SuccessModal from '@/components/success-modal'
 import React, { useRef, useState } from 'react'
 import { useAccount } from 'wagmi'
 
 type MainModalProps = {
   setModalOpen: (open: boolean) => void
+  success: boolean
 }
 
-const MainModal: React.FC<MainModalProps> = ({ setModalOpen }) => {
+const MainModal: React.FC<MainModalProps> = ({ setModalOpen, success }) => {
   const [step, setStep] = useState<number>(1)
+  /** @dev We need to track tx status and update it accordingly */
   const { isConnected } = useAccount()
   const modalRef = useRef<HTMLDivElement>(null)
 
@@ -30,7 +33,10 @@ const MainModal: React.FC<MainModalProps> = ({ setModalOpen }) => {
   }
 
   const renderModal = () => {
+    if (success) return <SuccessModal closeModal={closeModal} />
+
     if (!isConnected) return <ConnectionModal closeModal={closeModal} />
+
     if (step === 1)
       return <BridgeModal closeModal={closeModal} nextStep={nextStep} />
     if (step === 2)

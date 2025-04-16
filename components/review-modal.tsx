@@ -49,12 +49,12 @@ const ReviewModal: React.FC<ReviewModalProps> = ({ closeModal, nextStep }) => {
                   src="/icons/tari.png"
                   fill
                   sizes="25.63px"
-                  alt="Picture of the author"
+                  alt="Tari icon"
                   className="rounded-full object-cover"
                 />
               </div>
               <div className="flex items-center font-semibold text-3xl">
-                {(1000).toLocaleString()}{' '}
+                {(1000).toLocaleString()}
                 <div className="text-gray-500 text-xs font-medium ml-1">
                   XTM
                 </div>
