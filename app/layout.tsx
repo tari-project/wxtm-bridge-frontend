@@ -34,7 +34,8 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col items-center justify-center custom-bg`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col items-center justify-center bg-[url('/background.png')]
+        bg-no-repeat bg-cover bg-center min-h-screen`}
       >
         <Providers initialState={initialState}>
           <Header />
