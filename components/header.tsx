@@ -1,13 +1,11 @@
 const Header = () => {
+  const handleConnectWallet = () => {}
+
   return (
-    <header className="flex flex-col h-20 items-center justify-between py-6 gap-4 bg-transparent">
-      <h2 className="text-sm font-semibold p-2 bg-black rounded-3xl text-white">
-        Tari Bridge
-      </h2>
-      <div className="max-w-[35rem] text-wrap text-center">
-        Move your XTM with infinite possibilities. We&apos;ll wrap your XTM
-        allowing you to exchange your XTM any way you&apos;d like
-      </div>
+    <header className="absolute top-8 right-8 z-50">
+      <button className="px-8.5 py-4 bg-[#090719] text-white font-semibold text-[12px] rounded-full hover:bg-gray-800 hover:cursor-pointer transition">
+        Connect Wallet
+      </button>
     </header>
   )
 }
