@@ -1,21 +1,25 @@
 'use client'
 
+import React, { useRef } from 'react'
 import ConnectionModal from '@/components/connection-modal'
-import BridgeModal from '@/components/bridge-modal'
 import ReviewModal from '@/components/review-modal'
-import WrappingModal from './wrapping-modal'
+import WrapModal from './wrap-modal'
 import SuccessModal from '@/components/success-modal'
-import React, { useRef, useState } from 'react'
 import { useAccount } from 'wagmi'
 
 type MainModalProps = {
   setModalOpen: (open: boolean) => void
   success: boolean
+  step: number
+  setStep: (step: number) => void
 }
 
-const MainModal: React.FC<MainModalProps> = ({ setModalOpen, success }) => {
-  const [step, setStep] = useState<number>(1)
-  /** @dev We need to track tx status and update it accordingly */
+const MainModal: React.FC<MainModalProps> = ({
+  setModalOpen,
+  success,
+  step,
+  setStep,
+}) => {
   const { isConnected } = useAccount()
   const modalRef = useRef<HTMLDivElement>(null)
 
@@ -24,7 +28,7 @@ const MainModal: React.FC<MainModalProps> = ({ setModalOpen, success }) => {
     setStep(1)
   }
 
-  const nextStep = () => setStep((prev) => prev + 1)
+  const nextStep = () => setStep(step + 1)
 
   const handleOutsideClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
@@ -32,31 +36,34 @@ const MainModal: React.FC<MainModalProps> = ({ setModalOpen, success }) => {
     }
   }
 
+  // Only render overlay/modal if needed
+  if (step === 0 && isConnected) return null
+
   const renderModal = () => {
     if (success) return <SuccessModal closeModal={closeModal} />
 
-    if (!isConnected) return <ConnectionModal closeModal={closeModal} />
-
+    if (!isConnected && step === 0)
+      return <ConnectionModal closeModal={closeModal} />
     if (step === 1)
-      return <BridgeModal closeModal={closeModal} nextStep={nextStep} />
-    if (step === 2)
       return <ReviewModal closeModal={closeModal} nextStep={nextStep} />
-    if (step === 3) return <WrappingModal closeModal={closeModal} />
+    if (step === 2) return <WrapModal closeModal={closeModal} />
+    return null
   }
 
-  return step !== -1 ? (
+  return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-[0px]"
-      onClick={step === 3 ? handleOutsideClick : undefined} // Enable modal close on click outside modal for last step only
+      onClick={handleOutsideClick}
     >
       <section
         ref={modalRef}
         className="w-full max-w-md mx-4 bg-gray-200 backdrop-blur-3xl rounded-3xl overflow-hidden flex flex-col justify-center items-center"
+        onClick={(e) => e.stopPropagation()}
       >
         {renderModal()}
       </section>
     </div>
-  ) : null
+  )
 }
 
 export default MainModal
