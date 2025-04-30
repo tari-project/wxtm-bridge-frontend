@@ -1,17 +1,10 @@
-import {
-  useAccount,
-  useDisconnect,
-  useEnsAvatar,
-  useEnsName,
-  useChainId,
-} from 'wagmi'
+import { useAccount, useDisconnect, useEnsName, useChainId } from 'wagmi'
 
 const Account = () => {
   const chainId = useChainId()
   const { address } = useAccount()
   const { disconnect } = useDisconnect()
   const { data: ensName } = useEnsName({ address })
-  const { data: ensAvatar } = useEnsAvatar({ name: ensName! })
 
   const chainMap: Record<number, string> = {
     1: 'Ethereum',

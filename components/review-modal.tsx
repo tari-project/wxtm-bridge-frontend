@@ -20,12 +20,7 @@ const ReviewModal: React.FC<ReviewModalProps> = ({ closeModal, nextStep }) => {
       <div className="mt-2">
         {/* Top Section */}
         <div className="flex justify-between items-center">
-          <div className="flex flex-col font-semibold">
-            <div className=" text-lg">Review transaction</div>
-            <div className="text-xs mt-[-4px] text-gray-500">
-              Step <span className="text-[#171717]">2</span>/2
-            </div>
-          </div>
+          <div className="font-semibold text-lg">Review transaction</div>
 
           <button
             className="text-black font-bold hover:cursor-pointer
