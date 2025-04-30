@@ -9,7 +9,7 @@ type TmpProps = {
 
 const Tmp: React.FC<TmpProps> = ({ onSuccess }) => {
   return (
-    <section className="mt-20 w-40">
+    <section className="mt-20 w-40 flex justify-center items-center">
       <Button
         label="Success!"
         onClick={() => {

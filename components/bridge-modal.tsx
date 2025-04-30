@@ -7,6 +7,7 @@ import { useAccount, useChainId } from 'wagmi'
 import { IoCloseOutline } from 'react-icons/io5'
 import { FaEthereum } from 'react-icons/fa'
 import { FaArrowRight } from 'react-icons/fa6'
+import { chainMap } from '@/utils/chainMap'
 import { truncateAddress } from '@/utils/truncate'
 
 type BridgeModalProps = {
@@ -17,12 +18,6 @@ type BridgeModalProps = {
 const BridgeModal: React.FC<BridgeModalProps> = ({ closeModal, nextStep }) => {
   const chainId = useChainId()
   const { address } = useAccount()
-
-  const chainMap: Record<number, string> = {
-    1: 'ETH MAINNET',
-    11155111: 'SEPOLIA',
-    84532: 'BASE SEPOLIA',
-  }
 
   return (
     <div className="w-full flex flex-col p-5">
