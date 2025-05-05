@@ -4,5 +4,7 @@ export type MainModalProps = {
   step: number
   setStep: (step: number) => void
   handleBridgeToEthereum: () => void
-  amount: number
+  amount: string
+  ethereumAddress?: string
+  tariWalletAddress?: string
 }

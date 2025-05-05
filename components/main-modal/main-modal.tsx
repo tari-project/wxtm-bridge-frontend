@@ -7,7 +7,7 @@ import ConnectionModal from '@/components/connection-modal'
 import { ReviewModal } from '@/components/review-modal'
 import SuccessModal from '@/components/success-modal'
 import { MainModalProps } from './main-modal.types'
-import WrapModal from '../wrap-modal'
+import { WrapModal } from '@/components/wrap-modal'
 
 export const MainModal: React.FC<MainModalProps> = ({
   setModalOpen,
@@ -16,6 +16,8 @@ export const MainModal: React.FC<MainModalProps> = ({
   setStep,
   handleBridgeToEthereum,
   amount,
+  tariWalletAddress,
+  ethereumAddress,
 }) => {
   const { isConnected } = useAccount()
   const modalRef = useRef<HTMLDivElement>(null)
@@ -45,9 +47,14 @@ export const MainModal: React.FC<MainModalProps> = ({
           amount={amount}
           closeModal={closeModal}
           handleBridgeToEthereum={handleBridgeToEthereum}
+          ethereumAddress={ethereumAddress}
+          tariWalletAddress={tariWalletAddress}
         />
       )
-    if (step === 2) return <WrapModal closeModal={closeModal} />
+    if (step === 2)
+      return (
+        <WrapModal closeModal={closeModal} ethereumAddress={ethereumAddress} />
+      )
     return null
   }
 

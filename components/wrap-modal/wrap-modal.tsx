@@ -1,13 +1,13 @@
 import React from 'react'
 import Image from 'next/image'
-import Button from './button'
+import Button from '../button'
 import { HiArrowRightOnRectangle } from 'react-icons/hi2'
+import { WrapModalProps } from './wrap-modal.types'
 
-type WrapModalProps = {
-  closeModal: () => void
-}
-
-const WrapModal: React.FC<WrapModalProps> = ({ closeModal }) => {
+export const WrapModal: React.FC<WrapModalProps> = ({
+  closeModal,
+  ethereumAddress,
+}) => {
   /** @dev Tmp hardcoded address */
   const address =
     '0x0bec7941a37c07ec7cd408b3478c66ac7a26c4e48c2fd22577bb2c9c44cb4ae8'
@@ -47,9 +47,7 @@ const WrapModal: React.FC<WrapModalProps> = ({ closeModal }) => {
 
           <div className="font-medium">
             <div className="text-xs text-gray-500">Destination address</div>
-            <div className="text-sm">
-              0x1F8934h12kj34j15h12k3k5j1j32h123ffaalla939234
-            </div>
+            <div className="text-sm">{ethereumAddress || '-'}</div>
           </div>
 
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
@@ -83,5 +81,3 @@ const WrapModal: React.FC<WrapModalProps> = ({ closeModal }) => {
     </div>
   )
 }
-
-export default WrapModal
