@@ -1,18 +1,38 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import Image from 'next/image'
 import { useAccount } from 'wagmi'
 
 import { FaArrowRight } from 'react-icons/fa6'
 import { MainComponentProps } from './main.types'
+import { NetworkBox } from '../network-box'
+import { networks } from '../../utils/networks'
 
 export const MainComponent: React.FC<MainComponentProps> = ({
   onConnectClick,
   onContinueClick,
   register,
 }) => {
+  const [openDropdown, setOpenDropdown] = useState<'from' | 'to' | null>(null)
+
+  const [fromNetwork, setFromNetwork] = useState({
+    name: 'Tari',
+    icon: '/icons/tari.png',
+  })
+
+  const [toNetwork, setToNetwork] = useState({
+    name: 'Ethereum',
+    icon: '/icons/eth.png',
+  })
+
   const { isConnected } = useAccount()
+
+  const handleNetworkSelect = (network: any, type: 'from' | 'to') => {
+    if (type === 'from') setFromNetwork(network)
+    else setToNetwork(network)
+    setOpenDropdown(null)
+  }
 
   return (
     <section className="w-[90%] max-w-[83rem] mx-auto mt-40">
@@ -45,88 +65,85 @@ export const MainComponent: React.FC<MainComponentProps> = ({
             <div className="w-full flex flex-col p-1">
               <div className="relative">
                 <div className="flex items-center">
-                  <div className="flex gap-[2px] w-full">
-                    {/* Box 1 */}
-                    <div className="flex flex-1 gap-3 items-center p-2 px-4 rounded-xl bg-white border border-gray-200 relative">
-                      <div className="w-[38px] h-[38px] rounded-full overflow-hidden relative">
-                        <Image
-                          src="/icons/tari.png"
-                          fill
-                          sizes="38px"
-                          alt="Tari icon"
-                          className="rounded-full object-cover"
-                        />
-                      </div>
-                      <div className="text-gray-500 flex flex-col text-xs font-medium">
-                        <div>From</div>
-                        <div className="text-xl text-[#171717] font-bold my-[-4px]">
-                          XTM
-                        </div>
-                        <div>Tari</div>
-                      </div>
+                  <div className="flex gap-[2px] w-full items-stretch">
+                    {/* Box 1 & Arrow & Box 2 */}
 
-                      {/* Arrow - positioned between box 1 and 2 */}
-                      <div className="absolute top-1/2 right-0 translate-x-10/18 -translate-y-1/2 z-10">
-                        <div className="w-8 h-8 rounded-md border-2 border-gray-300 bg-white flex items-center justify-center shadow-sm">
-                          <FaArrowRight className="text-[15px] text-[#171717]" />
-                        </div>
+                    <div className="flex-1">
+                      <NetworkBox
+                        type="from"
+                        selected={fromNetwork}
+                        isOpen={openDropdown === 'from'}
+                        networks={networks.filter(
+                          (n) => n.name === 'Ethereum' || n.name === 'Tari',
+                        )}
+                        onToggle={() =>
+                          setOpenDropdown(
+                            openDropdown === 'from' ? null : 'from',
+                          )
+                        }
+                        onSelect={(network) =>
+                          handleNetworkSelect(network, 'from')
+                        }
+                      />
+                    </div>
+
+                    <div className="absolute top-1/2 right-713/1000 translate-x-10/18 -translate-y-1/2 z-10">
+                      <div className="w-8 h-8 rounded-md border-2 border-gray-300 bg-white flex items-center justify-center shadow-sm">
+                        <FaArrowRight className="text-[15px] text-[#171717]" />
                       </div>
                     </div>
 
-                    {/* Box 2 */}
-                    <div className="flex flex-1 gap-3 items-center p-2 px-4 rounded-xl bg-white border border-gray-200">
-                      <div className="w-[38px] h-[38px] rounded-full overflow-hidden relative">
-                        <Image
-                          src="/icons/eth.png"
-                          fill
-                          sizes="38px"
-                          alt="ETH icon"
-                          className="rounded-full object-cover"
-                        />
-                      </div>
-                      <div className="text-gray-500 flex flex-col text-xs font-medium">
-                        <div>To</div>
-                        <div className="text-xl text-[#171717] font-bold my-[-4px]">
-                          wXTM
-                        </div>
-                        <div>Ethereum</div>
-                      </div>
+                    <div className="flex-1">
+                      <NetworkBox
+                        type="to"
+                        selected={toNetwork}
+                        isOpen={openDropdown === 'to'}
+                        networks={networks}
+                        onToggle={() =>
+                          setOpenDropdown(openDropdown === 'to' ? null : 'to')
+                        }
+                        onSelect={(network) =>
+                          handleNetworkSelect(network, 'to')
+                        }
+                      />
                     </div>
 
                     {/* Box 3 */}
-                    <div className="flex flex-1 justify-between gap-2 items-center p-2 px-4 rounded-xl bg-white border border-gray-200">
-                      <div className="space-y-[-10px]">
-                        <div className="font-medium text-xs text-gray-500">
-                          Amount to Bridge
+                    <div className="flex-1">
+                      <div className="flex justify-between gap-2 items-center p-2 px-4 rounded-xl bg-white border border-gray-200">
+                        <div className="space-y-[-10px]">
+                          <div className="font-medium text-xs text-gray-500">
+                            Amount to Bridge
+                          </div>
+
+                          <input
+                            {...register('amount')}
+                            type="number"
+                            className="font-medium text-[32px] outline-none bg-transparent border-none w-[130px] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          />
                         </div>
 
-                        <input
-                          {...register('amount')}
-                          type="number"
-                          className="font-medium text-[32px] outline-none bg-transparent border-none w-[130px] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                        />
-                      </div>
-
-                      <div className="flex flex-col">
-                        <div className="w-fit flex py-2 px-3 bg-gray-200 items-center rounded-3xl justify-center self-end">
-                          <div className="w-5 h-5 rounded-full overflow-hidden -ml-1 mr-2 relative">
-                            <Image
-                              src="/icons/tari.png"
-                              fill
-                              sizes="20px"
-                              alt="Tari icon"
-                              className="rounded-full object-cover"
-                            />
+                        <div className="flex flex-col">
+                          <div className="w-fit flex py-2 px-3 bg-gray-200 items-center rounded-3xl justify-center self-end">
+                            <div className="w-5 h-5 rounded-full overflow-hidden -ml-1 mr-2 relative">
+                              <Image
+                                src="/icons/tari.png"
+                                fill
+                                sizes="20px"
+                                alt="Tari icon"
+                                className="rounded-full object-cover"
+                              />
+                            </div>
+                            <div className="font-bold text-[12.85px]">XTM</div>
                           </div>
-                          <div className="font-bold text-[12.85px]">XTM</div>
-                        </div>
 
-                        <div className="flex justify-end mt-2 gap-1 items-center">
-                          <div className="font-semibold text-xs text-gray-500">
-                            {(1023451.931).toLocaleString()} XTM
-                          </div>
-                          <div className="border border-gray-500/50 rounded-3xl text-xs font-medium px-1.5">
-                            MAX
+                          <div className="flex justify-end mt-2 gap-1 items-center">
+                            <div className="font-semibold text-xs text-gray-500">
+                              {(1023451.931).toLocaleString()} XTM
+                            </div>
+                            <div className="border border-gray-500/50 rounded-3xl text-xs font-medium px-1.5">
+                              MAX
+                            </div>
                           </div>
                         </div>
                       </div>
