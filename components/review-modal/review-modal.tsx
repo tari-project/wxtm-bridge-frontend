@@ -1,20 +1,15 @@
 import React from 'react'
 import Image from 'next/image'
-import Button from './button'
 import { IoCloseOutline } from 'react-icons/io5'
 
-type ReviewModalProps = {
-  closeModal: () => void
-  nextStep: () => void
-}
+import { ReviewModalProps } from './review-modal.types'
+import Button from '../button'
 
-const ReviewModal: React.FC<ReviewModalProps> = ({ closeModal, nextStep }) => {
-  const handleBridge = () => {
-    console.log('Bridge in progress...')
-
-    nextStep()
-  }
-
+export const ReviewModal: React.FC<ReviewModalProps> = ({
+  closeModal,
+  handleBridgeToEthereum,
+  amount,
+}) => {
   return (
     <div className="w-full flex flex-col p-6">
       <div className="mt-2">
@@ -49,7 +44,7 @@ const ReviewModal: React.FC<ReviewModalProps> = ({ closeModal, nextStep }) => {
                 />
               </div>
               <div className="flex items-center font-semibold text-3xl">
-                {(1000).toLocaleString()}
+                {amount.toLocaleString()}
                 <div className="text-gray-500 text-xs font-medium ml-1">
                   XTM
                 </div>
@@ -115,15 +110,12 @@ const ReviewModal: React.FC<ReviewModalProps> = ({ closeModal, nextStep }) => {
           </div>
         </div>
 
-        {/* Button */}
         <Button
           label="Confirm & Bridge"
-          onClick={handleBridge}
+          onClick={handleBridgeToEthereum}
           disabled={false}
         />
       </div>
     </div>
   )
 }
-
-export default ReviewModal

@@ -1,24 +1,21 @@
 'use client'
 
 import React, { useRef } from 'react'
-import ConnectionModal from '@/components/connection-modal'
-import ReviewModal from '@/components/review-modal'
-import WrapModal from './wrap-modal'
-import SuccessModal from '@/components/success-modal'
 import { useAccount } from 'wagmi'
 
-type MainModalProps = {
-  setModalOpen: (open: boolean) => void
-  success: boolean
-  step: number
-  setStep: (step: number) => void
-}
+import ConnectionModal from '@/components/connection-modal'
+import { ReviewModal } from '@/components/review-modal'
+import SuccessModal from '@/components/success-modal'
+import { MainModalProps } from './main-modal.types'
+import WrapModal from '../wrap-modal'
 
-const MainModal: React.FC<MainModalProps> = ({
+export const MainModal: React.FC<MainModalProps> = ({
   setModalOpen,
   success,
   step,
   setStep,
+  handleBridgeToEthereum,
+  amount,
 }) => {
   const { isConnected } = useAccount()
   const modalRef = useRef<HTMLDivElement>(null)
@@ -27,8 +24,6 @@ const MainModal: React.FC<MainModalProps> = ({
     setModalOpen(false)
     setStep(1)
   }
-
-  const nextStep = () => setStep(step + 1)
 
   const handleOutsideClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
@@ -45,7 +40,13 @@ const MainModal: React.FC<MainModalProps> = ({
     if (!isConnected && step === 0)
       return <ConnectionModal closeModal={closeModal} />
     if (step === 1)
-      return <ReviewModal closeModal={closeModal} nextStep={nextStep} />
+      return (
+        <ReviewModal
+          amount={amount}
+          closeModal={closeModal}
+          handleBridgeToEthereum={handleBridgeToEthereum}
+        />
+      )
     if (step === 2) return <WrapModal closeModal={closeModal} />
     return null
   }
@@ -65,5 +66,3 @@ const MainModal: React.FC<MainModalProps> = ({
     </div>
   )
 }
-
-export default MainModal

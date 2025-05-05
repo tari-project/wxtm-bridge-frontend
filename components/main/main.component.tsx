@@ -3,15 +3,15 @@
 import React from 'react'
 import Image from 'next/image'
 import { useAccount } from 'wagmi'
+
 import { FaArrowRight } from 'react-icons/fa6'
+import { MainComponentProps } from './main.types'
 
-type MainProps = {
-  onConnectClick: () => void
-  onContinueClick: () => void
-}
-
-/** @dev Example function usage */
-const Main: React.FC<MainProps> = ({ onConnectClick, onContinueClick }) => {
+export const MainComponent: React.FC<MainComponentProps> = ({
+  onConnectClick,
+  onContinueClick,
+  register,
+}) => {
   const { isConnected } = useAccount()
 
   return (
@@ -99,9 +99,12 @@ const Main: React.FC<MainProps> = ({ onConnectClick, onContinueClick }) => {
                         <div className="font-medium text-xs text-gray-500">
                           Amount to Bridge
                         </div>
-                        <div className="font-medium text-[32px] mt-1">
-                          {(1000).toLocaleString()}
-                        </div>
+
+                        <input
+                          {...register('amount')}
+                          type="number"
+                          className="font-medium text-[32px] outline-none bg-transparent border-none w-[130px] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        />
                       </div>
 
                       <div className="flex flex-col">
@@ -157,5 +160,3 @@ const Main: React.FC<MainProps> = ({ onConnectClick, onContinueClick }) => {
     </section>
   )
 }
-
-export default Main
