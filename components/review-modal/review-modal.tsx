@@ -9,6 +9,8 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
   closeModal,
   handleBridgeToEthereum,
   amount,
+  tariWalletAddress,
+  ethereumAddress,
 }) => {
   return (
     <div className="w-full flex flex-col p-6">
@@ -59,9 +61,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
             <div className="text-xs text-gray-500">
               {'Source wallet (Tari)'}
             </div>
-            <div className="text-sm">
-              3a1F8934h12kj34j15h12k3k5j1j32h123ffaalla9392BC
-            </div>
+            <div className="text-sm">{tariWalletAddress || '-'}</div>
           </div>
 
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
@@ -70,9 +70,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
             <div className="text-xs text-gray-500">
               {'Destination address (Ethereum)'}
             </div>
-            <div className="text-sm">
-              0x1234h12kj34j15h12k3k5j1j32h123ffaalla56789
-            </div>
+            <div className="text-sm">{ethereumAddress || '-'}</div>
           </div>
 
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
