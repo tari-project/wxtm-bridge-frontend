@@ -6,20 +6,26 @@ import { useForm } from 'react-hook-form'
 
 import { MainModal } from '@/components/main-modal'
 import Header from '@/components/header'
-import { MainComponent, MainFormValues } from '@/components/main'
+import { MainComponent } from '@/components/main'
 import { useBridgeToEthereum } from '@/hooks/use-bridge-to-ethereum'
 import { useTariWalletAddress } from '@/hooks/use-tari-wallet-address'
+import { TariToEthFormValues } from '@/components/tari-to-eth-input'
 
 export default function Home() {
   const { isConnected, address } = useAccount()
   const [modalOpen, setModalOpen] = useState(false)
   const [modalStep, setModalStep] = useState<number>(1) // 0: connect, 2: review, etc.
   const [success] = useState(false)
-  const { bridgeToEthereum } = useBridgeToEthereum()
+  const { bridgeToEthereum, isBridging } = useBridgeToEthereum()
   const { tariWalletAddress } = useTariWalletAddress()
 
-  const { register, watch } = useForm<MainFormValues>({
-    defaultValues: { amount: '1.000001' },
+  const {
+    watch,
+    control,
+    formState: { errors, isValid },
+  } = useForm<TariToEthFormValues>({
+    defaultValues: { amount: '1' },
+    mode: 'onChange',
   })
 
   const amount = watch('amount')
@@ -41,10 +47,8 @@ export default function Home() {
   }
 
   const handleContinueClick = () => {
-    if (isConnected) {
-      setModalStep(1)
-      setModalOpen(true)
-    }
+    setModalStep(1)
+    setModalOpen(true)
   }
 
   const handleBridgeToEthereum = useCallback(() => {
@@ -63,11 +67,14 @@ export default function Home() {
       <MainComponent
         onConnectClick={handleConnectClick}
         onContinueClick={handleContinueClick}
-        register={register}
+        control={control}
+        errors={errors}
+        isValid={isValid}
       />
       {modalOpen && (
         <MainModal
           handleBridgeToEthereum={handleBridgeToEthereum}
+          isBridging={isBridging}
           amount={amount}
           setModalOpen={setModalOpen}
           success={success}

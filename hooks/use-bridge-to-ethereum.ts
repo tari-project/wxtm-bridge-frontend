@@ -1,5 +1,6 @@
 import { config } from '@/config'
 import { useMutation } from '@tanstack/react-query'
+import { useState } from 'react'
 
 import {
   WrapTokenService,
@@ -20,6 +21,7 @@ export const useBridgeToEthereum = () => {
     mutationFn: WrapTokenService.updateToTokensSent,
   })
   const { tariWalletAddress } = useTariWalletAddress()
+  const [isBridging, setIsBridging] = useState(false)
 
   const bridgeToEthereum = async ({
     amount,
@@ -28,6 +30,7 @@ export const useBridgeToEthereum = () => {
     amount: string
     address: `0x${string}`
   }) => {
+    setIsBridging(true)
     const tokenAmount = parseWxtmTokenAmount(amount)
 
     const { paymentId } = await createTransaction.mutateAsync({
@@ -42,9 +45,12 @@ export const useBridgeToEthereum = () => {
     })
 
     await confirmTokenSent.mutateAsync(paymentId)
+
+    setIsBridging(false)
   }
 
   return {
     bridgeToEthereum,
+    isBridging,
   }
 }

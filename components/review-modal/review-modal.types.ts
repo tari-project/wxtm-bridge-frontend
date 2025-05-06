@@ -4,5 +4,9 @@ export type ReviewModalProps = {
   closeModal: () => void
 } & Pick<
   MainModalProps,
-  'handleBridgeToEthereum' | 'amount' | 'ethereumAddress' | 'tariWalletAddress'
+  | 'handleBridgeToEthereum'
+  | 'amount'
+  | 'ethereumAddress'
+  | 'tariWalletAddress'
+  | 'isBridging'
 >

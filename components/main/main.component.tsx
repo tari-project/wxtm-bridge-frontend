@@ -9,11 +9,14 @@ import { MainComponentProps } from './main.types'
 import { Network, NetworkBox } from '../network-box'
 import { networks } from '../../utils/networks'
 import { MainButton } from '../main-button/main-button'
+import { TariToEthInput } from '../tari-to-eth-input'
 
 export const MainComponent: React.FC<MainComponentProps> = ({
   onConnectClick,
   onContinueClick,
-  register,
+  control,
+  errors,
+  isValid,
 }) => {
   const [openDropdown, setOpenDropdown] = useState<'from' | 'to' | null>(null)
 
@@ -110,11 +113,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
                           <div className="font-medium text-xs text-gray-500">
                             Amount to Bridge
                           </div>
-                          <input
-                            {...register('amount')}
-                            type="number"
-                            className="font-medium text-[32px] outline-none bg-transparent border-none w-[130px] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                          />
+                          <TariToEthInput control={control} errors={errors} />
                         </div>
                         <div className="flex flex-col">
                           <div className="w-fit flex py-2 px-3 bg-gray-200 items-center rounded-3xl justify-center self-end">
@@ -157,7 +156,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
                     <MainButton
                       endIcon={<FaArrowRight />}
                       onClick={onContinueClick}
-                      disabled={false}
+                      disabled={!isValid}
                     >
                       Continue
                     </MainButton>

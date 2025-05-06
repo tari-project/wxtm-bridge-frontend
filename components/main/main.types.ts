@@ -1,9 +1,7 @@
-import { UseFormRegister } from 'react-hook-form'
-
-export type MainFormValues = { amount: string }
+import { TariToEthInputProps } from '../tari-to-eth-input'
 
 export type MainComponentProps = {
   onConnectClick: () => void
   onContinueClick: () => void
-  register: UseFormRegister<MainFormValues>
-}
+  isValid: boolean
+} & Pick<TariToEthInputProps, 'control' | 'errors'>
