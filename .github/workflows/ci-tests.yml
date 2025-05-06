@@ -4,6 +4,7 @@ on: [push]
 
 env:
   NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  NODE_VERSION: 18.19.0
 
 jobs:
   tests:
@@ -16,9 +17,10 @@ jobs:
           persist-credentials: false
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@master
         with:
-          node-version: '20.19'
+          node-version: ${{ env.NODE_VERSION }}
+          registry-url: 'https://npm.pkg.github.com'
 
       - name: Cache NPM dependencies
         uses: pat-s/always-upload-cache@v2.1.5
