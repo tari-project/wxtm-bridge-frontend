@@ -15,10 +15,13 @@ export const MainModal: React.FC<MainModalProps> = ({
   step,
   setStep,
   handleBridgeToEthereum,
+  handleBridgeToTari,
   isBridging,
   amount,
   tariWalletAddress,
   ethereumAddress,
+  fromNetwork,
+  toNetwork,
 }) => {
   const { isConnected } = useAccount()
   const modalRef = useRef<HTMLDivElement>(null)
@@ -34,7 +37,6 @@ export const MainModal: React.FC<MainModalProps> = ({
     }
   }
 
-  // Only render overlay/modal if needed
   if (step === 0 && isConnected) return null
 
   const renderModal = () => {
@@ -48,9 +50,12 @@ export const MainModal: React.FC<MainModalProps> = ({
           amount={amount}
           closeModal={closeModal}
           handleBridgeToEthereum={handleBridgeToEthereum}
+          handleBridgeToTari={handleBridgeToTari}
           isBridging={isBridging}
           ethereumAddress={ethereumAddress}
           tariWalletAddress={tariWalletAddress}
+          fromNetwork={fromNetwork}
+          toNetwork={toNetwork}
         />
       )
     if (step === 2)

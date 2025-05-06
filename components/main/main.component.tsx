@@ -10,6 +10,7 @@ import { Network, NetworkBox } from '../network-box'
 import { networks } from '../../utils/networks'
 import { MainButton } from '../main-button/main-button'
 import { TariToEthInput } from '../tari-to-eth-input'
+import { useForm } from 'react-hook-form'
 
 export const MainComponent: React.FC<MainComponentProps> = ({
   onConnectClick,
@@ -17,18 +18,12 @@ export const MainComponent: React.FC<MainComponentProps> = ({
   control,
   errors,
   isValid,
+  fromNetwork,
+  setFromNetwork,
+  toNetwork,
+  setToNetwork,
 }) => {
   const [openDropdown, setOpenDropdown] = useState<'from' | 'to' | null>(null)
-
-  const [fromNetwork, setFromNetwork] = useState<Network>({
-    name: 'Tari',
-    icon: '/icons/tari.png',
-  })
-
-  const [toNetwork, setToNetwork] = useState<Network>({
-    name: 'Ethereum',
-    icon: '/icons/eth.png',
-  })
 
   const { isConnected } = useAccount()
 
@@ -63,6 +58,11 @@ export const MainComponent: React.FC<MainComponentProps> = ({
       }
     }
     setOpenDropdown(null)
+  }
+
+  const handleContinue = () => {
+    const amount = control._formValues.amount
+    onContinueClick({ amount, fromNetwork, toNetwork })
   }
 
   /** @dev TODO fetch balances dynamically */
@@ -194,7 +194,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
                   ) : (
                     <MainButton
                       endIcon={<FaArrowRight />}
-                      onClick={onContinueClick}
+                      onClick={handleContinue}
                       disabled={!isValid}
                     >
                       Continue
