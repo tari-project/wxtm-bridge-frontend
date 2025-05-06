@@ -17,22 +17,60 @@ export const MainComponent: React.FC<MainComponentProps> = ({
 }) => {
   const [openDropdown, setOpenDropdown] = useState<'from' | 'to' | null>(null)
 
-  const [fromNetwork, setFromNetwork] = useState({
+  const [fromNetwork, setFromNetwork] = useState<Network>({
     name: 'Tari',
     icon: '/icons/tari.png',
   })
 
-  const [toNetwork, setToNetwork] = useState({
+  const [toNetwork, setToNetwork] = useState<Network>({
     name: 'Ethereum',
     icon: '/icons/eth.png',
   })
 
   const { isConnected } = useAccount()
 
+  const fromNetworks = networks.filter(
+    (n) => n.name === 'Ethereum' || n.name === 'Tari',
+  )
+
   const handleNetworkSelect = (network: Network, type: 'from' | 'to') => {
-    if (type === 'from') setFromNetwork(network)
-    else setToNetwork(network)
+    if (type === 'from') {
+      // If selecting same network that's already in "To", swap them
+      if (network.name === toNetwork.name) {
+        const otherNetwork = fromNetworks.find((n) => n.name !== network.name)
+
+        if (otherNetwork) {
+          setFromNetwork(network)
+          setToNetwork(otherNetwork)
+        }
+      } else {
+        setFromNetwork(network)
+      }
+    } else {
+      // If selecting same network that's already in "From", swap them
+      if (network.name === fromNetwork.name) {
+        const otherNetwork = fromNetworks.find((n) => n.name !== network.name)
+
+        if (otherNetwork) {
+          setToNetwork(network)
+          setFromNetwork(otherNetwork)
+        }
+      } else {
+        setToNetwork(network)
+      }
+    }
     setOpenDropdown(null)
+  }
+
+  /** @dev TODO fetch balances dynamically */
+  const getAmount = () => {
+    return fromNetwork.name === 'Tari'
+      ? (1023451.931).toLocaleString()
+      : (328.22).toLocaleString()
+  }
+
+  const getAmountTokenSymbol = () => {
+    return fromNetwork.name === 'Tari' ? 'XTM' : 'wXTM'
   }
 
   return (
@@ -67,15 +105,13 @@ export const MainComponent: React.FC<MainComponentProps> = ({
               <div className="relative">
                 <div className="flex items-center">
                   <div className="relative flex gap-[2px] w-full items-stretch">
-                    {/* Box 1 */}
+                    {/* Box 1 - From */}
                     <div className="flex-1">
                       <NetworkBox
                         type="from"
                         selected={fromNetwork}
                         isOpen={openDropdown === 'from'}
-                        networks={networks.filter(
-                          (n) => n.name === 'Ethereum' || n.name === 'Tari',
-                        )}
+                        networks={fromNetworks}
                         onToggle={() =>
                           setOpenDropdown(
                             openDropdown === 'from' ? null : 'from',
@@ -87,7 +123,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
                       />
                     </div>
 
-                    {/* Box 2 */}
+                    {/* Box 2 - To */}
                     <div className="flex-1">
                       <NetworkBox
                         type="to"
@@ -100,10 +136,11 @@ export const MainComponent: React.FC<MainComponentProps> = ({
                         onSelect={(network) =>
                           handleNetworkSelect(network, 'to')
                         }
+                        fromNetwork={fromNetwork}
                       />
                     </div>
 
-                    {/* Box 3 */}
+                    {/* Box 3 - Amount */}
                     <div className="flex-1">
                       <div className="flex justify-between gap-2 items-center p-2 px-4 rounded-xl bg-white border border-gray-200">
                         <div className="space-y-[-10px]">
@@ -120,18 +157,20 @@ export const MainComponent: React.FC<MainComponentProps> = ({
                           <div className="w-fit flex py-2 px-3 bg-gray-200 items-center rounded-3xl justify-center self-end">
                             <div className="w-5 h-5 rounded-full overflow-hidden -ml-1 mr-2 relative">
                               <Image
-                                src="/icons/tari.png"
+                                src={fromNetwork.icon}
                                 fill
                                 sizes="20px"
-                                alt="Tari icon"
+                                alt={`${fromNetwork.name} icon`}
                                 className="rounded-full object-cover"
                               />
                             </div>
-                            <div className="font-bold text-[12.85px]">XTM</div>
+                            <div className="font-bold text-[12.85px]">
+                              {getAmountTokenSymbol()}
+                            </div>
                           </div>
                           <div className="flex justify-end mt-2 gap-1 items-center">
                             <div className="font-semibold text-xs text-gray-500">
-                              {(1023451.931).toLocaleString()} XTM
+                              {getAmount()} {getAmountTokenSymbol()}
                             </div>
                             <div className="border border-gray-500/50 rounded-3xl text-xs font-medium px-1.5">
                               MAX
