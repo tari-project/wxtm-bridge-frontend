@@ -2,19 +2,7 @@ import React from 'react'
 import Image from 'next/image'
 import { IoIosArrowUp, IoIosArrowDown } from 'react-icons/io'
 
-interface Network {
-  name: string
-  icon: string
-}
-
-interface NetworkBoxProps {
-  type: 'from' | 'to'
-  selected: Network
-  isOpen: boolean
-  networks: Network[]
-  onToggle: () => void
-  onSelect: (network: Network) => void
-}
+import { NetworkBoxProps } from './network-box.types'
 
 export const NetworkBox: React.FC<NetworkBoxProps> = ({
   type,
