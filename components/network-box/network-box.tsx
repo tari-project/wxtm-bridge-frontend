@@ -12,6 +12,9 @@ export const NetworkBox: React.FC<NetworkBoxProps> = ({
   onToggle,
   onSelect,
 }) => {
+  /** @dev Development */
+  const arrowsDisabled = true
+
   return (
     <div className="relative">
       <div className="flex items-center gap-3 p-2 px-4 bg-white rounded-xl border border-gray-200 h-20">
@@ -31,13 +34,16 @@ export const NetworkBox: React.FC<NetworkBoxProps> = ({
           </div>
           <div>{selected.name}</div>
         </div>
-        <div className="ml-auto cursor-pointer mr-2" onClick={onToggle}>
-          {isOpen ? (
-            <IoIosArrowUp className="text-xl" />
-          ) : (
-            <IoIosArrowDown className="text-xl" />
-          )}
-        </div>
+
+        {arrowsDisabled ? null : (
+          <div className="ml-auto cursor-pointer mr-2" onClick={onToggle}>
+            {isOpen ? (
+              <IoIosArrowUp className="text-xl" />
+            ) : (
+              <IoIosArrowDown className="text-xl" />
+            )}
+          </div>
+        )}
       </div>
 
       {isOpen && (
