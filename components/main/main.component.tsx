@@ -36,7 +36,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
   }
 
   return (
-    <section className="w-[90%] max-w-[83rem] mx-auto mt-40">
+    <section className="w-[90%] max-w-[83rem] mx-auto">
       <div className="flex flex-col gap-9">
         <div className="w-[116px] h-[126.07px] relative">
           <Image
@@ -57,7 +57,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
         </div>
       </div>
 
-      <div className="mt-[8rem]">
+      <div className="mt-[8rem] mt-shrink">
         <div className="mb-4 font-medium text-xl leading-[30px] tracking-[-1px]">
           Start Bridging
         </div>
@@ -66,9 +66,8 @@ export const MainComponent: React.FC<MainComponentProps> = ({
             <div className="w-full flex flex-col p-1">
               <div className="relative">
                 <div className="flex items-center">
-                  <div className="flex gap-[2px] w-full items-stretch">
-                    {/* Box 1 & Arrow & Box 2 */}
-
+                  <div className="relative flex gap-[2px] w-full items-stretch">
+                    {/* Box 1 */}
                     <div className="flex-1">
                       <NetworkBox
                         type="from"
@@ -88,12 +87,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
                       />
                     </div>
 
-                    <div className="absolute top-1/2 right-713/1000 translate-x-10/18 -translate-y-1/2 z-10">
-                      <div className="w-8 h-8 rounded-md border-2 border-gray-300 bg-white flex items-center justify-center shadow-sm">
-                        <FaArrowRight className="text-[15px] text-[#171717]" />
-                      </div>
-                    </div>
-
+                    {/* Box 2 */}
                     <div className="flex-1">
                       <NetworkBox
                         type="to"
@@ -116,14 +110,12 @@ export const MainComponent: React.FC<MainComponentProps> = ({
                           <div className="font-medium text-xs text-gray-500">
                             Amount to Bridge
                           </div>
-
                           <input
                             {...register('amount')}
                             type="number"
                             className="font-medium text-[32px] outline-none bg-transparent border-none w-[130px] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           />
                         </div>
-
                         <div className="flex flex-col">
                           <div className="w-fit flex py-2 px-3 bg-gray-200 items-center rounded-3xl justify-center self-end">
                             <div className="w-5 h-5 rounded-full overflow-hidden -ml-1 mr-2 relative">
@@ -137,7 +129,6 @@ export const MainComponent: React.FC<MainComponentProps> = ({
                             </div>
                             <div className="font-bold text-[12.85px]">XTM</div>
                           </div>
-
                           <div className="flex justify-end mt-2 gap-1 items-center">
                             <div className="font-semibold text-xs text-gray-500">
                               {(1023451.931).toLocaleString()} XTM
@@ -147,6 +138,13 @@ export const MainComponent: React.FC<MainComponentProps> = ({
                             </div>
                           </div>
                         </div>
+                      </div>
+                    </div>
+
+                    {/* Arrow — Between Box 1 and Box 2 */}
+                    <div className="absolute top-1/2 left-1/3 -translate-x-1/2 -translate-y-1/2 z-10">
+                      <div className="w-8 h-8 rounded-md border-2 border-gray-300 bg-white flex items-center justify-center shadow-sm">
+                        <FaArrowRight className="text-[15px] text-[#171717]" />
                       </div>
                     </div>
                   </div>

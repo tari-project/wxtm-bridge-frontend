@@ -36,3 +36,9 @@ body {
   background-size: cover;
   background-attachment: fixed;
 }
+
+@media (max-height: 800px) {
+  .mt-shrink {
+    margin-top: 4rem;
+  }
+}
