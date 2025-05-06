@@ -6,8 +6,9 @@ import { useAccount } from 'wagmi'
 
 import { FaArrowRight } from 'react-icons/fa6'
 import { MainComponentProps } from './main.types'
-import { NetworkBox } from '../network-box'
+import { Network, NetworkBox } from '../network-box'
 import { networks } from '../../utils/networks'
+import { MainButton } from '../main-button/main-button'
 
 export const MainComponent: React.FC<MainComponentProps> = ({
   onConnectClick,
@@ -28,7 +29,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
 
   const { isConnected } = useAccount()
 
-  const handleNetworkSelect = (network: any, type: 'from' | 'to') => {
+  const handleNetworkSelect = (network: Network, type: 'from' | 'to') => {
     if (type === 'from') setFromNetwork(network)
     else setToNetwork(network)
     setOpenDropdown(null)
@@ -150,23 +151,18 @@ export const MainComponent: React.FC<MainComponentProps> = ({
                     </div>
                   </div>
 
-                  {/* Button */}
                   {!isConnected ? (
-                    <button
-                      className="flex items-center justify-center ml-6 bg-[#090719] text-white rounded-xl p-6 px-8 h-full font-semibold hover:bg-gray-900 transition gap-2
-                      whitespace-nowrap hover:cursor-pointer"
-                      onClick={onConnectClick}
-                    >
+                    <MainButton onClick={onConnectClick}>
                       Connect Wallet
-                    </button>
+                    </MainButton>
                   ) : (
-                    <button
-                      className="flex items-center justify-center ml-6 bg-[#090719] text-white rounded-xl p-6 px-6 h-full font-semibold hover:bg-gray-900 transition gap-2 hover:cursor-pointer"
+                    <MainButton
+                      endIcon={<FaArrowRight />}
                       onClick={onContinueClick}
+                      disabled={false}
                     >
-                      <span className="font-semibold text-lg">Continue</span>
-                      <FaArrowRight />
-                    </button>
+                      Continue
+                    </MainButton>
                   )}
                 </div>
               </div>
