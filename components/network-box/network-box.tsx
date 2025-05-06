@@ -12,8 +12,28 @@ export const NetworkBox: React.FC<NetworkBoxProps> = ({
   onToggle,
   onSelect,
 }) => {
-  /** @dev Development */
-  const arrowsDisabled = true
+  const getTokenSymbol = () => {
+    if (type === 'from') {
+      return selected.name === 'Tari' ? 'XTM' : 'wXTM'
+    } else {
+      if (selected.name === 'Tari') return 'XTM'
+      if (selected.name === 'Solana') return 'SOL'
+      return 'wXTM'
+    }
+  }
+
+  const getFilteredNetworks = () => {
+    if (type === 'from') {
+      // For "From" box, only show networks that aren't currently selected
+      return networks.filter((network) => network.name !== selected.name)
+    } else {
+      // For "To" box, show all networks
+      return networks
+    }
+  }
+
+  const tokenSymbol = getTokenSymbol()
+  const filteredNetworks = getFilteredNetworks()
 
   return (
     <div className="relative">
@@ -30,25 +50,23 @@ export const NetworkBox: React.FC<NetworkBoxProps> = ({
         <div className="flex flex-col text-xs text-gray-500 font-medium">
           <div>{type === 'from' ? 'From' : 'To'}</div>
           <div className="text-xl font-bold text-[#171717] -my-1">
-            {type === 'from' ? 'XTM' : 'wXTM'}
+            {tokenSymbol}
           </div>
           <div>{selected.name}</div>
         </div>
 
-        {arrowsDisabled ? null : (
-          <div className="ml-auto cursor-pointer mr-2" onClick={onToggle}>
-            {isOpen ? (
-              <IoIosArrowUp className="text-xl" />
-            ) : (
-              <IoIosArrowDown className="text-xl" />
-            )}
-          </div>
-        )}
+        <div className="ml-auto cursor-pointer mr-2" onClick={onToggle}>
+          {isOpen ? (
+            <IoIosArrowUp className="text-xl" />
+          ) : (
+            <IoIosArrowDown className="text-xl" />
+          )}
+        </div>
       </div>
 
       {isOpen && (
         <div className="absolute bottom-full left-0 mt-2 w-full z-50 bg-white rounded-xl shadow-lg p-3 space-y-2">
-          {networks.map((network) => (
+          {filteredNetworks.map((network) => (
             <div
               key={network.name}
               className="flex items-center gap-2 p-2 rounded-md hover:bg-gray-100 cursor-pointer"
@@ -73,5 +91,3 @@ export const NetworkBox: React.FC<NetworkBoxProps> = ({
     </div>
   )
 }
-
-export default NetworkBox

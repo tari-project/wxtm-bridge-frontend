@@ -10,4 +10,5 @@ export type NetworkBoxProps = {
   networks: Network[]
   onToggle: () => void
   onSelect: (network: Network) => void
+  fromNetwork?: Network
 }
