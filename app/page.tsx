@@ -25,6 +25,7 @@ export default function Home() {
   const amount = watch('amount')
 
   // Auto-close modal when connected and on connect step
+  //TODO
   useEffect(() => {
     if (modalOpen && modalStep === 0 && isConnected) {
       setModalOpen(false)
