@@ -8,6 +8,7 @@ import Button from '../button'
 export const ReviewModal: React.FC<ReviewModalProps> = ({
   closeModal,
   handleBridgeToEthereum,
+  isBridging,
   amount,
   tariWalletAddress,
   ethereumAddress,
@@ -111,7 +112,8 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
         <Button
           label="Confirm & Bridge"
           onClick={handleBridgeToEthereum}
-          disabled={false}
+          //TODO should be loading
+          disabled={isBridging}
         />
       </div>
     </div>
