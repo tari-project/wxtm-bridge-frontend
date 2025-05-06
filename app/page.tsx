@@ -57,7 +57,7 @@ export default function Home() {
   }, [amount, address, bridgeToEthereum])
 
   return (
-    <main className="relative min-h-screen w-full flex flex-col px-20">
+    <main className="relative min-h-screen w-full flex flex-col px-20 items-center justify-center">
       <Header onConnectClick={handleConnectClick} />
       <MainComponent
         onConnectClick={handleConnectClick}
