@@ -9,7 +9,7 @@ import { MainComponentProps } from './main.types'
 import { Network, NetworkBox } from '../network-box'
 import { networks } from '../../utils/networks'
 import { MainButton } from '../main-button/main-button'
-import { TariToEthInput } from '../tari-to-eth-input'
+import { BridgeInput } from '../bridge-input'
 
 export const MainComponent: React.FC<MainComponentProps> = ({
   onConnectClick,
@@ -144,7 +144,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
                           <div className="font-medium text-xs text-gray-500">
                             Amount to Bridge
                           </div>
-                          <TariToEthInput
+                          <BridgeInput
                             fromNetwork={fromNetwork.name}
                             control={control}
                             errors={errors}

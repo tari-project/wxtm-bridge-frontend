@@ -2,9 +2,9 @@ import React, { useMemo } from 'react'
 import { Controller } from 'react-hook-form'
 import { TextField } from '@mui/material'
 
-import { TariToEthInputProps } from './tari-to-eth-input.types'
+import { BridgeInputProps } from './bridge-input.types'
 
-export const TariToEthInput: React.FC<TariToEthInputProps> = ({
+export const BridgeInput: React.FC<BridgeInputProps> = ({
   fromNetwork,
   control,
   errors,
