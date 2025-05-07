@@ -10,7 +10,6 @@ import { Network, NetworkBox } from '../network-box'
 import { networks } from '../../utils/networks'
 import { MainButton } from '../main-button/main-button'
 import { TariToEthInput } from '../tari-to-eth-input'
-import { useForm } from 'react-hook-form'
 
 export const MainComponent: React.FC<MainComponentProps> = ({
   onConnectClick,
@@ -58,11 +57,6 @@ export const MainComponent: React.FC<MainComponentProps> = ({
       }
     }
     setOpenDropdown(null)
-  }
-
-  const handleContinue = () => {
-    const amount = control._formValues.amount
-    onContinueClick({ amount, fromNetwork, toNetwork })
   }
 
   /** @dev TODO fetch balances dynamically */
@@ -194,7 +188,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
                   ) : (
                     <MainButton
                       endIcon={<FaArrowRight />}
-                      onClick={handleContinue}
+                      onClick={onContinueClick}
                       disabled={!isValid}
                     >
                       Continue

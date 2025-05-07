@@ -55,11 +55,7 @@ export default function Home() {
     }
   }
 
-  const handleContinueClick = ({}: {
-    amount: string
-    fromNetwork: Network
-    toNetwork: Network
-  }) => {
+  const handleContinueClick = () => {
     setModalStep(1)
     setModalOpen(true)
   }

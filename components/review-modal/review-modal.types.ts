@@ -1,13 +1,15 @@
-import { Network } from '../network-box/network-box.types'
+import { MainModalProps } from '../main-modal'
 
 export type ReviewModalProps = {
   closeModal: () => void
-  handleBridgeToEthereum: () => void
-  handleBridgeToTari: () => void
-  isBridging: boolean
-  amount: string
-  tariWalletAddress?: string
-  ethereumAddress?: string
-  fromNetwork: Network
-  toNetwork: Network
-}
+} & Pick<
+  MainModalProps,
+  | 'handleBridgeToEthereum'
+  | 'handleBridgeToTari'
+  | 'isBridging'
+  | 'amount'
+  | 'tariWalletAddress'
+  | 'ethereumAddress'
+  | 'fromNetwork'
+  | 'toNetwork'
+>

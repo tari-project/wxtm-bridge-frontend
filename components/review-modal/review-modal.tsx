@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import Image from 'next/image'
 import { IoCloseOutline } from 'react-icons/io5'
 
 import { ReviewModalProps } from './review-modal.types'
-import { MainButton } from '../main-button/main-button'
+import { ModalButton } from '../modal-button'
 
 export const ReviewModal: React.FC<ReviewModalProps> = ({
   closeModal,
@@ -16,9 +16,15 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
   fromNetwork,
   toNetwork,
 }) => {
-  const isFromTari = fromNetwork.name === 'Tari'
-  const tokenSymbol = isFromTari ? 'XTM' : 'wXTM'
-  const bridgeHandler = isFromTari ? handleBridgeToEthereum : handleBridgeToTari
+  const { isFromTari, tokenSymbol, bridgeHandler } = useMemo(() => {
+    const isFromTari = fromNetwork.name === 'Tari'
+    const tokenSymbol = isFromTari ? 'XTM' : 'wXTM'
+    const bridgeHandler = isFromTari
+      ? handleBridgeToEthereum
+      : handleBridgeToTari
+
+    return { isFromTari, tokenSymbol, bridgeHandler }
+  }, [fromNetwork.name, handleBridgeToEthereum, handleBridgeToTari])
 
   return (
     <div className="w-full flex flex-col p-6">
@@ -132,13 +138,11 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
           </div>
         </div>
 
-        <MainButton
-          className="mt-6"
+        <ModalButton
+          label={isBridging ? 'Bridging...' : 'Confirm & Bridge'}
           onClick={bridgeHandler}
           disabled={isBridging}
-        >
-          {isBridging ? 'Bridging...' : 'Confirm & Bridge'}
-        </MainButton>
+        />
       </div>
     </div>
   )
