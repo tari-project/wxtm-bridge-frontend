@@ -1,6 +1,6 @@
 import React from 'react'
 import Image from 'next/image'
-import Button from '../button'
+import { ModalButton } from '../modal-button'
 import { HiArrowRightOnRectangle } from 'react-icons/hi2'
 import { WrapModalProps } from './wrap-modal.types'
 
@@ -75,7 +75,7 @@ export const WrapModal: React.FC<WrapModalProps> = ({
           <div className="py-[0.5px] w-full bg-gray-300 mt-2 mb-4"></div>
 
           {/* Section 1 */}
-          <Button label="Done" onClick={closeModal} disabled={false} />
+          <ModalButton label="Done" onClick={closeModal} disabled={false} />
         </div>
       </div>
     </div>

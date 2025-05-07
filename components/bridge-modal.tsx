@@ -2,7 +2,7 @@
 
 import React from 'react'
 import Image from 'next/image'
-import Button from './button'
+import { ModalButton } from './modal-button'
 import { useAccount, useChainId } from 'wagmi'
 import { IoCloseOutline } from 'react-icons/io5'
 import { FaEthereum } from 'react-icons/fa'
@@ -203,7 +203,7 @@ const BridgeModal: React.FC<BridgeModalProps> = ({ closeModal, nextStep }) => {
         </div>
 
         {/* Button */}
-        <Button
+        <ModalButton
           label="Continue to Confirmation"
           onClick={nextStep}
           disabled={false}
