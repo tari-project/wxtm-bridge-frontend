@@ -3,11 +3,11 @@
 import React, { useRef } from 'react'
 import { useAccount } from 'wagmi'
 
-import ConnectionModal from '@/components/connection-modal'
-import { ReviewModal } from '@/components/review-modal'
-import SuccessModal from '@/components/success-modal'
+import ConnectionModal from '@/components/modals/connection-modal/connection-modal'
+import { ReviewModal } from '@/components/modals/review-modal'
+import SuccessModal from '@/components/modals/success-modal/success-modal'
 import { MainModalProps } from './main-modal.types'
-import { WrapModal } from '@/components/wrap-modal'
+import { WrapModal } from '@/components/modals/wrap-modal'
 
 export const MainModal: React.FC<MainModalProps> = ({
   setModalOpen,

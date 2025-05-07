@@ -1,11 +1,8 @@
 import React from 'react'
 import Image from 'next/image'
-import { ModalButton } from './modal-button'
+import { ModalButton } from '../modal-button'
 import { HiArrowRightOnRectangle } from 'react-icons/hi2'
-
-type SuccessModalProps = {
-  closeModal: () => void
-}
+import { SuccessModalProps } from './success-modal.types'
 
 const SuccessModal: React.FC<SuccessModalProps> = ({ closeModal }) => {
   /** @dev Tmp hardcoded address */

@@ -1,4 +1,4 @@
-import { Network } from '../network-box'
+import { Network } from '../../network-box'
 
 export type MainModalProps = {
   setModalOpen: (open: boolean) => void
