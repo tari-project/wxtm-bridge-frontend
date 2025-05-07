@@ -5,9 +5,9 @@ import { useAccount } from 'wagmi'
 
 import ConnectionModal from '@/components/modals/connection-modal/connection-modal'
 import { ReviewModal } from '@/components/modals/review-modal'
-import SuccessModal from '@/components/modals/success-modal/success-modal'
-import { MainModalProps } from './main-modal.types'
+import { SuccessModal } from '@/components/modals/success-modal'
 import { WrapModal } from '@/components/modals/wrap-modal'
+import { MainModalProps } from './main-modal.types'
 
 export const MainModal: React.FC<MainModalProps> = ({
   setModalOpen,
@@ -40,7 +40,16 @@ export const MainModal: React.FC<MainModalProps> = ({
   if (step === 0 && isConnected) return null
 
   const renderModal = () => {
-    if (success) return <SuccessModal closeModal={closeModal} />
+    if (success)
+      return (
+        <SuccessModal
+          closeModal={closeModal}
+          amount={amount}
+          tariWalletAddress={tariWalletAddress}
+          ethereumAddress={ethereumAddress}
+          fromNetwork={fromNetwork}
+        />
+      )
 
     if (!isConnected && step === 0)
       return <ConnectionModal closeModal={closeModal} />
@@ -60,7 +69,13 @@ export const MainModal: React.FC<MainModalProps> = ({
       )
     if (step === 2)
       return (
-        <WrapModal closeModal={closeModal} ethereumAddress={ethereumAddress} />
+        <WrapModal
+          closeModal={closeModal}
+          amount={amount}
+          tariWalletAddress={tariWalletAddress}
+          ethereumAddress={ethereumAddress}
+          fromNetwork={fromNetwork}
+        />
       )
     return null
   }

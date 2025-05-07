@@ -1,9 +1,10 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import Image from 'next/image'
 import { IoCloseOutline } from 'react-icons/io5'
 
 import { ReviewModalProps } from './review-modal.types'
-import { ModalButton } from '../modal-button'
+import { ModalButton } from '@/components/modals/modal-button'
+import { useBridgeInfo } from '@/hooks/use-bridge-info'
 
 export const ReviewModal: React.FC<ReviewModalProps> = ({
   closeModal,
@@ -16,15 +17,13 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
   fromNetwork,
   toNetwork,
 }) => {
-  const { isFromTari, tokenSymbol, bridgeHandler } = useMemo(() => {
-    const isFromTari = fromNetwork.name === 'Tari'
-    const tokenSymbol = isFromTari ? 'XTM' : 'wXTM'
-    const bridgeHandler = isFromTari
-      ? handleBridgeToEthereum
-      : handleBridgeToTari
-
-    return { isFromTari, tokenSymbol, bridgeHandler }
-  }, [fromNetwork.name, handleBridgeToEthereum, handleBridgeToTari])
+  const { fromToken, toToken, destAddress, bridgeHandler } = useBridgeInfo(
+    fromNetwork,
+    ethereumAddress!,
+    tariWalletAddress!,
+    handleBridgeToEthereum,
+    handleBridgeToTari,
+  )
 
   return (
     <div className="w-full flex flex-col p-6">
@@ -62,7 +61,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
               <div className="flex items-center font-semibold text-3xl">
                 {amount.toLocaleString()}
                 <div className="text-gray-500 text-xs font-medium ml-1">
-                  {tokenSymbol}
+                  {fromToken}
                 </div>
               </div>
             </div>
@@ -75,11 +74,12 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
             <div className="text-xs text-gray-500">
               {'Source wallet'} <span>({fromNetwork.name})</span>
             </div>
-            {isFromTari ? (
-              <div className="text-sm">{tariWalletAddress || '-'}</div>
-            ) : (
-              <div className="text-sm">{ethereumAddress || '-'}</div>
-            )}
+
+            <div className="text-sm">
+              {destAddress === ethereumAddress
+                ? tariWalletAddress
+                : ethereumAddress}
+            </div>
           </div>
 
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
@@ -88,22 +88,18 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
             <div className="text-xs text-gray-500">
               {'Destination address'} <span>({toNetwork.name})</span>
             </div>
-            {isFromTari ? (
-              <div className="text-sm">{ethereumAddress || '-'}</div>
-            ) : (
-              <div className="text-sm">{tariWalletAddress || '-'}</div>
-            )}
+
+            <div className="text-sm">{destAddress}</div>
           </div>
 
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
 
           <div className="font-medium">
             <div className="text-xs text-gray-500">You will receive</div>
-            {isFromTari ? (
-              <div className="text-sm">{0.9982} wXTM</div>
-            ) : (
-              <div className="text-sm">{0.9982} XTM</div>
-            )}
+
+            <div className="text-sm">
+              {0.9982} {toToken}
+            </div>
           </div>
 
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
@@ -111,11 +107,10 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
           <div className="flex justify-between">
             <div className="flex flex-col font-medium">
               <div className="text-xs text-gray-500">Network fee</div>
-              {isFromTari ? (
-                <div className="text-sm">{0.000024} XTM</div>
-              ) : (
-                <div className="text-sm">{0.000024} wXTM</div>
-              )}
+
+              <div className="text-sm">
+                {0.000024} {fromToken}
+              </div>
             </div>
 
             <div className="text-gray-500 text-[10px] text-right self-end">
@@ -140,7 +135,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
 
         <ModalButton
           label={isBridging ? 'Bridging...' : 'Confirm & Bridge'}
-          onClick={bridgeHandler}
+          onClick={bridgeHandler!}
           disabled={isBridging}
         />
       </div>
