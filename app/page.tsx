@@ -10,12 +10,21 @@ import { MainComponent } from '@/components/main'
 import { useBridgeToEthereum } from '@/hooks/use-bridge-to-ethereum'
 import { useTariWalletAddress } from '@/hooks/use-tari-wallet-address'
 import { TariToEthFormValues } from '@/components/tari-to-eth-input'
+import { Network } from '@/components/network-box'
 
 export default function Home() {
   const { isConnected, address } = useAccount()
   const [modalOpen, setModalOpen] = useState(false)
   const [modalStep, setModalStep] = useState<number>(1) // 0: connect, 2: review, etc.
   const [success] = useState(false)
+  const [fromNetwork, setFromNetwork] = useState<Network>({
+    name: 'Tari',
+    icon: '/icons/tari.png',
+  })
+  const [toNetwork, setToNetwork] = useState<Network>({
+    name: 'Ethereum',
+    icon: '/icons/eth.png',
+  })
   const { bridgeToEthereum, isBridging } = useBridgeToEthereum()
   const { tariWalletAddress } = useTariWalletAddress()
 
@@ -61,6 +70,10 @@ export default function Home() {
     })
   }, [amount, address, bridgeToEthereum])
 
+  const handleBridgeToTari = () => {
+    console.log('Bridging to Tari...')
+  }
+
   return (
     <main className="relative min-h-screen w-full flex flex-col px-20 items-center justify-center">
       <Header onConnectClick={handleConnectClick} />
@@ -70,18 +83,25 @@ export default function Home() {
         control={control}
         errors={errors}
         isValid={isValid}
+        fromNetwork={fromNetwork}
+        setFromNetwork={setFromNetwork}
+        toNetwork={toNetwork}
+        setToNetwork={setToNetwork}
       />
       {modalOpen && (
         <MainModal
-          handleBridgeToEthereum={handleBridgeToEthereum}
-          isBridging={isBridging}
-          amount={amount}
           setModalOpen={setModalOpen}
           success={success}
           step={modalStep}
           setStep={setModalStep}
-          tariWalletAddress={tariWalletAddress}
+          handleBridgeToEthereum={handleBridgeToEthereum}
+          handleBridgeToTari={handleBridgeToTari}
+          isBridging={isBridging}
+          amount={amount}
           ethereumAddress={address}
+          tariWalletAddress={tariWalletAddress}
+          fromNetwork={fromNetwork}
+          toNetwork={toNetwork}
         />
       )}
     </main>

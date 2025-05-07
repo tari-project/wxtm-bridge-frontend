@@ -17,18 +17,12 @@ export const MainComponent: React.FC<MainComponentProps> = ({
   control,
   errors,
   isValid,
+  fromNetwork,
+  setFromNetwork,
+  toNetwork,
+  setToNetwork,
 }) => {
   const [openDropdown, setOpenDropdown] = useState<'from' | 'to' | null>(null)
-
-  const [fromNetwork, setFromNetwork] = useState<Network>({
-    name: 'Tari',
-    icon: '/icons/tari.png',
-  })
-
-  const [toNetwork, setToNetwork] = useState<Network>({
-    name: 'Ethereum',
-    icon: '/icons/eth.png',
-  })
 
   const { isConnected } = useAccount()
 

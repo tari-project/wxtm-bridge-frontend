@@ -1,10 +1,10 @@
-type ButtonProps = {
-  label: string
-  onClick: () => void
-  disabled?: boolean
-}
+import { ModalButtonProps } from './modal-button.types'
 
-const Button = ({ label, onClick, disabled }: ButtonProps) => {
+export const ModalButton: React.FC<ModalButtonProps> = ({
+  label,
+  onClick,
+  disabled,
+}) => {
   return (
     <button
       className="group relative text-white flex m-auto justify-center items-center overflow-hidden w-full h-[3.9rem] bg-[#523DF1]
@@ -22,5 +22,3 @@ const Button = ({ label, onClick, disabled }: ButtonProps) => {
     </button>
   )
 }
-
-export default Button

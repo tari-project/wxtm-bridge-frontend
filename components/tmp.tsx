@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import Button from './button'
+import { ModalButton } from './modal-button'
 
 type TmpProps = {
   onSuccess: () => void
@@ -10,7 +10,7 @@ type TmpProps = {
 const Tmp: React.FC<TmpProps> = ({ onSuccess }) => {
   return (
     <section className="mt-20 w-40 flex justify-center items-center">
-      <Button
+      <ModalButton
         label="Success!"
         onClick={() => {
           onSuccess()
