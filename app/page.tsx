@@ -9,13 +9,13 @@ import Header from '@/components/header'
 import { MainComponent } from '@/components/main'
 import { useBridgeToEthereum } from '@/hooks/use-bridge-to-ethereum'
 import { useTariWalletAddress } from '@/hooks/use-tari-wallet-address'
-import { TariToEthFormValues } from '@/components/tari-to-eth-input'
+import { BridgeFormValues } from '@/components/bridge-input'
 import { Network } from '@/components/network-box'
 
 export default function Home() {
   const { isConnected, address } = useAccount()
   const [modalOpen, setModalOpen] = useState(false)
-  const [modalStep, setModalStep] = useState<number>(1) // 0: connect, 2: review, etc.
+  const [modalStep, setModalStep] = useState<number>(1)
   const [success] = useState(false)
   const [fromNetwork, setFromNetwork] = useState<Network>({
     name: 'Tari',
@@ -25,6 +25,7 @@ export default function Home() {
     name: 'Ethereum',
     icon: '/icons/eth.png',
   })
+
   const { bridgeToEthereum, isBridging } = useBridgeToEthereum()
   const { tariWalletAddress } = useTariWalletAddress()
 
@@ -32,7 +33,7 @@ export default function Home() {
     watch,
     control,
     formState: { errors, isValid },
-  } = useForm<TariToEthFormValues>({
+  } = useForm<BridgeFormValues>({
     defaultValues: { amount: '1' },
     mode: 'onChange',
   })
@@ -40,7 +41,6 @@ export default function Home() {
   const amount = watch('amount')
 
   // Auto-close modal when connected and on connect step
-  //TODO
   useEffect(() => {
     if (modalOpen && modalStep === 0 && isConnected) {
       setModalOpen(false)
@@ -72,6 +72,7 @@ export default function Home() {
 
   const handleBridgeToTari = () => {
     console.log('Bridging to Tari...')
+    setModalStep(2)
   }
 
   return (

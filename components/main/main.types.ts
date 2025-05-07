@@ -1,5 +1,5 @@
-import { Network } from '../network-box'
-import { BridgeInputProps } from '../bridge-input'
+import { Network } from '@/components/network-box'
+import { BridgeInputProps } from '@/components/bridge-input'
 
 export type MainComponentProps = {
   onConnectClick: () => void

@@ -6,10 +6,10 @@ import { useAccount } from 'wagmi'
 
 import { FaArrowRight } from 'react-icons/fa6'
 import { MainComponentProps } from './main.types'
-import { Network, NetworkBox } from '../network-box'
-import { networks } from '../../utils/networks'
-import { MainButton } from '../main-button/main-button'
-import { BridgeInput } from '../bridge-input'
+import { Network, NetworkBox } from '@/components/network-box'
+import { networks } from '@/utils/networks'
+import { MainButton } from '@/components/main-button'
+import { BridgeInput } from '@/components/bridge-input'
 
 export const MainComponent: React.FC<MainComponentProps> = ({
   onConnectClick,
