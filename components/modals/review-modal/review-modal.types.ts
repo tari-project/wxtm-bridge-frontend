@@ -1,4 +1,4 @@
-import { MainModalProps } from '../main-modal'
+import { MainModalProps } from '@/components/modals/main-modal'
 
 export type ReviewModalProps = {
   closeModal: () => void

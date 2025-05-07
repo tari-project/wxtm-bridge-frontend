@@ -2,7 +2,7 @@
 
 import React from 'react'
 import Image from 'next/image'
-import { ModalButton } from './modal-button'
+import { ModalButton } from './modals/modal-button'
 import { useAccount, useChainId } from 'wagmi'
 import { IoCloseOutline } from 'react-icons/io5'
 import { FaEthereum } from 'react-icons/fa'

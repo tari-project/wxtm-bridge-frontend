@@ -2,10 +2,7 @@
 
 import { useConnect } from 'wagmi'
 import { IoCloseOutline } from 'react-icons/io5'
-
-type ConnectionModalProps = {
-  closeModal: () => void
-}
+import { ConnectionModalProps } from './connection-modal.types'
 
 const ConnectionModal: React.FC<ConnectionModalProps> = ({ closeModal }) => {
   const { connectors, connect } = useConnect()

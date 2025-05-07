@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { ModalButton } from './modal-button'
+import { ModalButton } from './modals/modal-button'
 
 type TmpProps = {
   onSuccess: () => void

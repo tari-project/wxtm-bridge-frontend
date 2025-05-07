@@ -1,5 +1,5 @@
-import { Network } from '../network-box'
-import { TariToEthInputProps } from '../tari-to-eth-input'
+import { Network } from '@/components/network-box'
+import { BridgeInputProps } from '@/components/bridge-input'
 
 export type MainComponentProps = {
   onConnectClick: () => void
@@ -9,4 +9,4 @@ export type MainComponentProps = {
   setFromNetwork: React.Dispatch<React.SetStateAction<Network>>
   toNetwork: Network
   setToNetwork: React.Dispatch<React.SetStateAction<Network>>
-} & Pick<TariToEthInputProps, 'control' | 'errors'>
+} & Pick<BridgeInputProps, 'control' | 'errors'>

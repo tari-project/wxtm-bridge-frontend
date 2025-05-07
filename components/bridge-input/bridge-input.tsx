@@ -1,13 +1,21 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { Controller } from 'react-hook-form'
 import { TextField } from '@mui/material'
 
-import { TariToEthInputProps } from './tari-to-eth-input.types'
+import { BridgeInputProps } from './bridge-input.types'
 
-export const TariToEthInput: React.FC<TariToEthInputProps> = ({
+export const BridgeInput: React.FC<BridgeInputProps> = ({
+  fromNetwork,
   control,
   errors,
 }) => {
+  const { tokenSymbol } = useMemo(() => {
+    const isFromTari = fromNetwork === 'Tari'
+    const tokenSymbol = isFromTari ? 'XTM' : 'wXTM'
+
+    return { isFromTari, tokenSymbol }
+  }, [fromNetwork])
+
   return (
     <Controller
       name="amount"
@@ -16,11 +24,11 @@ export const TariToEthInput: React.FC<TariToEthInputProps> = ({
         required: 'Amount is required',
         min: {
           value: 1,
-          message: 'Amount must be at least 1 wXTM',
+          message: `Amount must be at least 1 ${tokenSymbol}`,
         },
         max: {
           value: 1000,
-          message: 'Maximum amount is 1000 wXTM',
+          message: `Maximum amount is 1000 ${tokenSymbol}`,
         },
         pattern: {
           value: /^\d+(\.\d{0,6})?$/,

@@ -1,16 +1,26 @@
 import React from 'react'
 import Image from 'next/image'
-import { ModalButton } from '../modal-button'
 import { HiArrowRightOnRectangle } from 'react-icons/hi2'
 import { WrapModalProps } from './wrap-modal.types'
+import { ModalButton } from '@/components/modals/modal-button'
+import { useBridgeInfo } from '@/hooks/use-bridge-info'
 
 export const WrapModal: React.FC<WrapModalProps> = ({
   closeModal,
+  amount,
+  tariWalletAddress,
   ethereumAddress,
+  fromNetwork,
 }) => {
-  /** @dev Tmp hardcoded address */
-  const address =
+  /** @dev Tmp hardcoded tx hash */
+  const txhash =
     '0x0bec7941a37c07ec7cd408b3478c66ac7a26c4e48c2fd22577bb2c9c44cb4ae8'
+
+  const { fromToken, toToken, destAddress } = useBridgeInfo(
+    fromNetwork,
+    ethereumAddress!,
+    tariWalletAddress!,
+  )
 
   return (
     <div className="w-full flex flex-col p-6">
@@ -27,12 +37,12 @@ export const WrapModal: React.FC<WrapModalProps> = ({
             />
           </div>
           <div className="font-semibold text-lg mt-2">
-            We&apos;re wrapping your {(1000).toLocaleString()} XTM
+            We&apos;re wrapping your {amount.toLocaleString()} {fromToken}
           </div>
           <div className="font-normal text-xs mt-2 text-center px-5">
-            You&apos;ll receive {0.9982} wXTM in no more than 12h. Funds are
-            automatically transferred from your linked Tari Universe wallet. You
-            don&apos;t need to do anything else.
+            You&apos;ll receive {0.9982} {toToken} in no more than 12h. Funds
+            are automatically transferred from your linked Tari Universe wallet.
+            You don&apos;t need to do anything else.
           </div>
         </div>
 
@@ -40,14 +50,16 @@ export const WrapModal: React.FC<WrapModalProps> = ({
         <div className="flex flex-col my-4">
           <div className="font-medium">
             <div className="text-xs text-gray-500">You will receive</div>
-            <div className="text-sm">{0.9982} wXTM</div>
+            <div className="text-sm">
+              {0.9982} {toToken}
+            </div>
           </div>
 
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
 
           <div className="font-medium">
             <div className="text-xs text-gray-500">Destination address</div>
-            <div className="text-sm">{ethereumAddress || '-'}</div>
+            <div className="text-sm">{destAddress}</div>
           </div>
 
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
@@ -60,7 +72,7 @@ export const WrapModal: React.FC<WrapModalProps> = ({
               rel="noopener noreferrer"
               className="flex items-center text-sm underline"
             >
-              {`${address.slice(0, 6)}..${address.slice(-5)}`}
+              {`${txhash.slice(0, 6)}..${txhash.slice(-5)}`}
               <HiArrowRightOnRectangle className="text-xs stroke-[0.7] ml-1" />
             </a>
           </div>

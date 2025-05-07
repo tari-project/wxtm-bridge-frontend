@@ -6,10 +6,10 @@ import { useAccount } from 'wagmi'
 
 import { FaArrowRight } from 'react-icons/fa6'
 import { MainComponentProps } from './main.types'
-import { Network, NetworkBox } from '../network-box'
-import { networks } from '../../utils/networks'
-import { MainButton } from '../main-button/main-button'
-import { TariToEthInput } from '../tari-to-eth-input'
+import { Network, NetworkBox } from '@/components/network-box'
+import { networks } from '@/utils/networks'
+import { MainButton } from '@/components/main-button'
+import { BridgeInput } from '@/components/bridge-input'
 
 export const MainComponent: React.FC<MainComponentProps> = ({
   onConnectClick,
@@ -144,7 +144,11 @@ export const MainComponent: React.FC<MainComponentProps> = ({
                           <div className="font-medium text-xs text-gray-500">
                             Amount to Bridge
                           </div>
-                          <TariToEthInput control={control} errors={errors} />
+                          <BridgeInput
+                            fromNetwork={fromNetwork.name}
+                            control={control}
+                            errors={errors}
+                          />
                         </div>
                         <div className="flex flex-col">
                           <div className="w-fit flex py-2 px-3 bg-gray-200 items-center rounded-3xl justify-center self-end">
