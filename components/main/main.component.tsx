@@ -144,7 +144,11 @@ export const MainComponent: React.FC<MainComponentProps> = ({
                           <div className="font-medium text-xs text-gray-500">
                             Amount to Bridge
                           </div>
-                          <TariToEthInput control={control} errors={errors} />
+                          <TariToEthInput
+                            fromNetwork={fromNetwork.name}
+                            control={control}
+                            errors={errors}
+                          />
                         </div>
                         <div className="flex flex-col">
                           <div className="w-fit flex py-2 px-3 bg-gray-200 items-center rounded-3xl justify-center self-end">

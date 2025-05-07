@@ -5,6 +5,7 @@ export type TariToEthFormValues = {
 }
 
 export type TariToEthInputProps = {
+  fromNetwork: string
   control: Control<TariToEthFormValues>
   errors: FieldErrors<TariToEthFormValues>
 }
