@@ -79,6 +79,7 @@ export const MainModal: React.FC<MainModalProps> = ({
           tariWalletAddress={tariWalletAddress}
           ethereumAddress={ethereumAddress}
           fromNetwork={fromNetwork}
+          feesData={feesData}
         />
       )
     return null
