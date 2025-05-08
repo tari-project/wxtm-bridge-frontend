@@ -11,6 +11,7 @@ export const WrapModal: React.FC<WrapModalProps> = ({
   tariWalletAddress,
   ethereumAddress,
   fromNetwork,
+  feesData: { amountAfterFee },
 }) => {
   /** @dev Tmp hardcoded tx hash */
   const txhash =
@@ -40,9 +41,9 @@ export const WrapModal: React.FC<WrapModalProps> = ({
             We&apos;re wrapping your {amount.toLocaleString()} {fromToken}
           </div>
           <div className="font-normal text-xs mt-2 text-center px-5">
-            You&apos;ll receive {0.9982} {toToken} in no more than 12h. Funds
-            are automatically transferred from your linked Tari Universe wallet.
-            You don&apos;t need to do anything else.
+            You&apos;ll receive {amountAfterFee} {toToken} in no more than 12h.
+            Funds are automatically transferred from your linked Tari Universe
+            wallet. You don&apos;t need to do anything else.
           </div>
         </div>
 
@@ -51,7 +52,7 @@ export const WrapModal: React.FC<WrapModalProps> = ({
           <div className="font-medium">
             <div className="text-xs text-gray-500">You will receive</div>
             <div className="text-sm">
-              {0.9982} {toToken}
+              {amountAfterFee} {toToken}
             </div>
           </div>
 
