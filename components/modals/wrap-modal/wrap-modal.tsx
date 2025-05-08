@@ -38,7 +38,8 @@ export const WrapModal: React.FC<WrapModalProps> = ({
             />
           </div>
           <div className="font-semibold text-lg mt-2">
-            We&apos;re wrapping your {amount.toLocaleString()} {fromToken}
+            We&apos;re {fromToken === 'wXTM' ? 'unwrapping' : 'wrapping'} your{' '}
+            {amount.toLocaleString()} {fromToken}
           </div>
           <div className="font-normal text-xs mt-2 text-center px-5">
             You&apos;ll receive {amountAfterFee} {toToken} in no more than 12h.

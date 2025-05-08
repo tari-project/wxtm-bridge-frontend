@@ -38,7 +38,8 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
             />
           </div>
           <div className="font-semibold text-lg mt-2">
-            We&apos;ve wrapped your {amount.toLocaleString()} {fromToken}!
+            We&apos;ve {fromToken === 'wXTM' ? 'unwrapped' : 'wrapped'} your{' '}
+            {amount.toLocaleString()} {fromToken}!
           </div>
           <div className="font-normal text-xs mt-2 text-center px-3">
             Your {toToken} conversion has been complete and your funds have been
