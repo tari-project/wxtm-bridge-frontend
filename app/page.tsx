@@ -5,7 +5,7 @@ import { useAccount } from 'wagmi'
 import { useForm } from 'react-hook-form'
 
 import { MainModal } from '@/components/modals/main-modal'
-import Header from '@/components/header'
+import { Header } from '@/components/header'
 import { MainComponent } from '@/components/main'
 import { useBridgeToEthereum } from '@/hooks/use-bridge-to-ethereum'
 import { useTariWalletAddress } from '@/hooks/use-tari-wallet-address'

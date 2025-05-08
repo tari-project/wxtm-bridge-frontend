@@ -7,7 +7,7 @@ import { useAccount } from 'wagmi'
 import { FaArrowRight } from 'react-icons/fa6'
 import { MainComponentProps } from './main.types'
 import { Network, NetworkBox } from '@/components/network-box'
-import { networks } from '@/utils/networks'
+import { networks } from '@/utils/networksConfig'
 import { MainButton } from '@/components/main-button'
 import { BridgeInput } from '@/components/bridge-input'
 
