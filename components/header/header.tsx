@@ -5,63 +5,23 @@ import Image from 'next/image'
 import { useAccount, useChainId } from 'wagmi'
 import { truncateAddress } from '@/utils/truncate'
 import { NetworkSwitchModal } from '@/components/modals/network-switch-modal'
-import {
-  supportedChains,
-  chainsMap,
-  isChainSupported,
-} from '@/utils/networksConfig'
+import { supportedChains, chainsMap } from '@/utils/networksConfig'
 import { HeaderProps } from './header.types'
 
 export const Header: React.FC<HeaderProps> = ({ onConnectClick }) => {
   const chainId = useChainId()
-  const { address, isConnected } = useAccount()
-  const [currentChainId, setCurrentChainId] = useState<number | undefined>(
-    chainId,
-  )
+  const { address, isConnected, chain } = useAccount()
   const [showNetworkModal, setShowNetworkModal] = useState(false)
 
-  const isNetworkSupported = isChainSupported(currentChainId)
+  const isNetworkSupported = chain !== undefined
 
   useEffect(() => {
-    if (isConnected) {
-      setCurrentChainId(chainId)
-
-      // Show network switch modal if on unsupported network
-      if (!isChainSupported(chainId)) {
-        setShowNetworkModal(true)
-      }
+    if (isConnected && !isNetworkSupported) {
+      setShowNetworkModal(true)
+    } else {
+      setShowNetworkModal(false)
     }
-  }, [chainId, isConnected])
-
-  // Add direct ethereum provider listener as a fallback
-  useEffect(() => {
-    const handleChainChanged = (newChainId: string) => {
-      // Convert hex string to number
-      const parsedChainId = parseInt(newChainId, 16)
-      setCurrentChainId(parsedChainId)
-
-      // Show network switch modal if on unsupported network
-      if (!isChainSupported(parsedChainId)) {
-        setShowNetworkModal(true)
-      } else {
-        setShowNetworkModal(false)
-      }
-    }
-
-    if (window.ethereum) {
-      window.ethereum.on('chainChanged', handleChainChanged)
-    }
-
-    return () => {
-      if (window.ethereum) {
-        window.ethereum.removeListener('chainChanged', handleChainChanged)
-      }
-    }
-  }, [])
-
-  const networkName = currentChainId
-    ? chainsMap[currentChainId] ?? 'Unknown Network'
-    : 'Unknown Network'
+  }, [chain])
 
   return (
     <>
@@ -98,10 +58,12 @@ export const Header: React.FC<HeaderProps> = ({ onConnectClick }) => {
               </div>
               <div
                 className={`text-[10px] mt-[-5px] ${
-                  !isNetworkSupported ? 'text-red-600 font-medium' : ''
+                  !isNetworkSupported
+                    ? 'text-red-600 font-medium hover:cursor-pointer'
+                    : ''
                 }`}
               >
-                {networkName}
+                {chainsMap[chainId]}
                 {!isNetworkSupported && ' (Click to switch)'}
               </div>
             </div>
