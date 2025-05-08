@@ -16,6 +16,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
   ethereumAddress,
   fromNetwork,
   toNetwork,
+  feesData: { amountAfterFee, feeAmount, feePercentage },
 }) => {
   const { fromToken, toToken, destAddress, bridgeHandler } = useBridgeInfo(
     fromNetwork,
@@ -98,7 +99,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
             <div className="text-xs text-gray-500">You will receive</div>
 
             <div className="text-sm">
-              {0.9982} {toToken}
+              {amountAfterFee} {toToken}
             </div>
           </div>
 
@@ -109,12 +110,12 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
               <div className="text-xs text-gray-500">Network fee</div>
 
               <div className="text-sm">
-                {0.000024} {fromToken}
+                {feeAmount} {fromToken}
               </div>
             </div>
 
             <div className="text-gray-500 text-[10px] text-right self-end">
-              Fees 0.02%
+              Fees {feePercentage}%
             </div>
           </div>
 

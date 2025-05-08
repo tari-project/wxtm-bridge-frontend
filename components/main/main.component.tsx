@@ -7,7 +7,7 @@ import { useAccount } from 'wagmi'
 import { FaArrowRight } from 'react-icons/fa6'
 import { MainComponentProps } from './main.types'
 import { Network, NetworkBox } from '@/components/network-box'
-import { networks } from '@/utils/networks'
+import { networks } from '@/utils/networksConfig'
 import { MainButton } from '@/components/main-button'
 import { BridgeInput } from '@/components/bridge-input'
 
@@ -24,7 +24,9 @@ export const MainComponent: React.FC<MainComponentProps> = ({
 }) => {
   const [openDropdown, setOpenDropdown] = useState<'from' | 'to' | null>(null)
 
-  const { isConnected } = useAccount()
+  const { isConnected, chain } = useAccount()
+
+  const isDisabled = chain === undefined
 
   const fromNetworks = networks.filter(
     (n) => n.name === 'Ethereum' || n.name === 'Tari',
@@ -193,7 +195,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
                     <MainButton
                       endIcon={<FaArrowRight />}
                       onClick={onContinueClick}
-                      disabled={!isValid}
+                      disabled={!isValid || isDisabled}
                     >
                       Continue
                     </MainButton>

@@ -7,7 +7,7 @@ import { useAccount, useChainId } from 'wagmi'
 import { IoCloseOutline } from 'react-icons/io5'
 import { FaEthereum } from 'react-icons/fa'
 import { FaArrowRight } from 'react-icons/fa6'
-import { chainMap } from '@/utils/chainMap'
+import { chainsMap } from '@/utils/networksConfig'
 import { truncateAddress } from '@/utils/truncate'
 
 type BridgeModalProps = {
@@ -56,7 +56,7 @@ const BridgeModal: React.FC<BridgeModalProps> = ({ closeModal, nextStep }) => {
                 {truncateAddress(address ?? '0x', 15)}
               </div>
               <div className="text-[10px] mt-[-5px]">
-                {chainMap[chainId] ?? 'Unknown Network'}
+                {chainsMap[chainId] ?? 'Unknown Network'}
               </div>
             </div>
           </div>
