@@ -82,12 +82,12 @@ export const MainModal: React.FC<MainModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-[0px]"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
       onClick={handleOutsideClick}
     >
       <section
         ref={modalRef}
-        className="w-full max-w-md mx-4 bg-gray-200 backdrop-blur-3xl rounded-3xl overflow-hidden flex flex-col justify-center items-center"
+        className="w-full max-w-md mx-4 bg-white/80 shadow-[0px_4px_74px_0px_rgba(0,0,0,0.15)] backdrop-blur-[54px] rounded-3xl overflow-hidden flex flex-col justify-center items-center"
         onClick={(e) => e.stopPropagation()}
       >
         {renderModal()}

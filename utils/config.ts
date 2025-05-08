@@ -1,6 +1,6 @@
 import { http, createConfig, createStorage, cookieStorage } from 'wagmi'
 import { baseSepolia, sepolia } from 'wagmi/chains'
-import { metaMask, walletConnect, coinbaseWallet } from 'wagmi/connectors'
+import { metaMask, walletConnect } from 'wagmi/connectors'
 
 declare global {
   // Avoid TS error on `globalThis` and multiple WalletConnect reload
@@ -16,11 +16,10 @@ export function getConfig() {
         [sepolia.id]: http(),
       },
       connectors: [
-        metaMask(),
         walletConnect({
           projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID ?? '',
         }),
-        coinbaseWallet(),
+        metaMask(),
       ],
       storage: createStorage({
         storage: cookieStorage,
