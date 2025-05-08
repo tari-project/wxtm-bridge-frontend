@@ -11,6 +11,7 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
   tariWalletAddress,
   ethereumAddress,
   fromNetwork,
+  feesData: { amountAfterFee },
 }) => {
   /** @dev Tmp hardcoded tx hash */
   const txhash =
@@ -50,7 +51,7 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
           <div className="font-medium">
             <div className="text-xs text-gray-500">Amount to receive</div>
             <div className="text-sm">
-              {0.9982} {toToken}
+              {amountAfterFee} {toToken}
             </div>
           </div>
 
