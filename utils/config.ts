@@ -1,5 +1,5 @@
 import { http, createConfig, createStorage, cookieStorage } from 'wagmi'
-import { baseSepolia, sepolia } from 'wagmi/chains'
+import { mainnet, baseSepolia, sepolia } from 'wagmi/chains'
 import { metaMask, walletConnect } from 'wagmi/connectors'
 
 declare global {
@@ -10,10 +10,11 @@ declare global {
 export function getConfig() {
   if (!globalThis.wagmiConfig) {
     globalThis.wagmiConfig = createConfig({
-      chains: [baseSepolia, sepolia],
+      chains: [mainnet, baseSepolia, sepolia],
       transports: {
-        [baseSepolia.id]: http(),
+        [mainnet.id]: http(),
         [sepolia.id]: http(),
+        [baseSepolia.id]: http(),
       },
       connectors: [
         walletConnect({
