@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useConnect } from 'wagmi'
 import { IoCloseOutline } from 'react-icons/io5'
 import { ConnectionModalProps } from './connection-modal.types'
@@ -23,8 +24,9 @@ const ConnectionModal: React.FC<ConnectionModalProps> = ({ closeModal }) => {
         </h2>
       </div>
 
+      {/* Below to be changed to one connector only */}
       <div className="p-4">
-        <div className="rounded-3xl bg-white flex flex-col justify-center overflow-hidden px-6">
+        <div className="rounded-3xl bg-[#F8F8F9]/80 flex flex-col justify-center overflow-hidden">
           {connectors.map((connector, index) => (
             <div
               key={connector.uid}
@@ -34,8 +36,30 @@ const ConnectionModal: React.FC<ConnectionModalProps> = ({ closeModal }) => {
             >
               <button
                 onClick={() => connect({ connector })}
-                className="hover:bg-[#F8F8F9]/80 hover:cursor-pointer p-4 font-bold w-full text-left"
+                className="hover:bg-gray-200/80 hover:cursor-pointer p-4 font-bold w-full text-left flex gap-2 items-center px-6"
               >
+                {connector.name === 'WalletConnect' ? (
+                  <div className="w-[42px] h-[42px] rounded-xl overflow-hidden relative">
+                    <Image
+                      src="/icons/walletconnect.png"
+                      fill
+                      sizes="42px"
+                      alt={`Wallet`}
+                      className="object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-[30px] h-[30px] rounded-xl overflow-hidden relative ml-[6px]">
+                    <Image
+                      src="/icons/metamask.png"
+                      fill
+                      sizes="30px"
+                      alt={`Wallet`}
+                      className="object-contain"
+                    />
+                  </div>
+                )}
+
                 {connector.name}
               </button>
             </div>
