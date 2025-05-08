@@ -1,10 +1,10 @@
 {
   "name": "wxtm-bridge-frontend",
-  "version": "0.1.0",
+  "version": "0.1.5",
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --debug && next-sitemap && next export",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit"
