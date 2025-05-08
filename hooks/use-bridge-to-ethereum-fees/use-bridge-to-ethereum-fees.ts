@@ -21,6 +21,8 @@ export const useBridgeToEthereumFees = (
         feePercentage: config.FEE_PERCENTAGE_BPS / 100,
       }
     } catch (error) {
+      console.error('Could not estimate Eth fees: ', error)
+
       return {
         feeAmount: '0',
         amountAfterFee: '0',

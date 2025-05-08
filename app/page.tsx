@@ -8,9 +8,9 @@ import { MainModal } from '@/components/modals/main-modal'
 import { Header } from '@/components/header'
 import { MainComponent } from '@/components/main'
 import { useBridgeToEthereum } from '@/hooks/use-bridge-to-ethereum'
-import { useTariWalletAddress } from '@/hooks/use-tari-wallet-address'
 import { BridgeFormValues } from '@/components/bridge-input'
 import { Network } from '@/components/network-box'
+import useTariAccount from '@/store/account'
 
 export default function Home() {
   const { isConnected, address } = useAccount()
@@ -27,7 +27,7 @@ export default function Home() {
   })
 
   const { bridgeToEthereum, isBridging } = useBridgeToEthereum()
-  const { tariWalletAddress } = useTariWalletAddress()
+  const { tariAccount } = useTariAccount()
 
   const {
     watch,
@@ -65,7 +65,7 @@ export default function Home() {
       return
     }
 
-    bridgeToEthereum({ amount, address }).then(() => {
+    bridgeToEthereum({ amount, ethAddress: address }).then(() => {
       setModalStep(2)
     })
   }, [amount, address, bridgeToEthereum])
@@ -100,7 +100,7 @@ export default function Home() {
           isBridging={isBridging}
           amount={amount}
           ethereumAddress={address}
-          tariWalletAddress={tariWalletAddress}
+          tariWalletAddress={tariAccount?.address}
           fromNetwork={fromNetwork}
           toNetwork={toNetwork}
         />

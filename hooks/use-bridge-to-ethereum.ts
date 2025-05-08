@@ -7,9 +7,10 @@ import {
   OpenAPI,
 } from '@tari-project/wxtm-bridge-backend-api'
 
-import { useTariWalletAddress } from './use-tari-wallet-address'
-import { TariWalletClient } from '@/clients/tari-wallet-client'
+// import { useTariWalletAddress } from './use-tari-wallet-address'
 import { parseWxtmTokenAmount } from '@/utils/parse-wxtm-token-amount'
+import useTariSigner from '@/store/signer'
+import useTariAccount from '@/store/account'
 
 OpenAPI.BASE = config.BACKEND_API_URL
 
@@ -20,28 +21,36 @@ export const useBridgeToEthereum = () => {
   const confirmTokenSent = useMutation({
     mutationFn: WrapTokenService.updateToTokensSent,
   })
-  const { tariWalletAddress } = useTariWalletAddress()
+  // const { tariWalletAddress } = useTariWalletAddress()
+  const { signer } = useTariSigner()
+  const { tariAccount } = useTariAccount()
   const [isBridging, setIsBridging] = useState(false)
 
   const bridgeToEthereum = async ({
     amount,
-    address,
+    ethAddress,
   }: {
     amount: string
-    address: `0x${string}`
+    ethAddress: `0x${string}`
   }) => {
     setIsBridging(true)
+    if (!tariAccount) return
     const tokenAmount = parseWxtmTokenAmount(amount)
 
     const { paymentId } = await createTransaction.mutateAsync({
-      to: address,
-      from: tariWalletAddress,
+      to: ethAddress,
+      from: tariAccount.address,
       tokenAmount,
     })
 
-    await TariWalletClient.transferTokensToColdWallet({
+    // TODO how can we get tari address to send XTM?
+    const tariColdWalletAddress = 'placeholder'
+
+    //
+    await signer?.sendOneSided({
       amount,
-      paymentId,
+      address: tariColdWalletAddress,
+      message: paymentId,
     })
 
     await confirmTokenSent.mutateAsync(paymentId)

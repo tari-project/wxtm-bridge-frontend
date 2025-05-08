@@ -1,93 +1,35 @@
-import {
-  AccountData,
-  MinotariWalletSignerParameters,
-  SignerMethodNames,
-  SignerRequest,
-  SignerResponse,
-  SignerReturnType,
-} from './types'
+import { TariL1Signer } from '../../clients/tari-l1-signer'
 
-export type SendOneSidedRequest = {
-  amount: number
-  address?: string
-  message?: string
+export type TariL1SignerParameters = {
+  name?: string
+  onConnection?: () => void
 }
 
-export class MinotariWalletSigner {
-  public signerName = 'MinotariWalletSigner'
-  private __id = 0
-
-  public constructor(public params: MinotariWalletSignerParameters) {
-    const filterResizeEvent = function (event: MessageEvent) {
-      if (event.data && event.data.type === 'resize') {
-        const resizeEvent = new CustomEvent('resize', {
-          detail: { width: event.data.width, height: event.data.height },
-        })
-        window.dispatchEvent(resizeEvent)
-      }
-    }
-    window.addEventListener(
-      'message',
-      (event) => filterResizeEvent(event),
-      false,
-    )
-  }
-
-  private async sendRequest<MethodName extends SignerMethodNames>(
-    req: Omit<SignerRequest<MethodName>, 'id'>,
-  ): Promise<SignerReturnType<MethodName>> {
-    const id = ++this.__id
-    return sendSignerCall(req, id)
-  }
-
-  public isConnected(): boolean {
-    return true
-  }
-
-  // TODO what do we need?
-  public async getAccount(): Promise<AccountData> {
-    return {
-      account_id: 0,
-      address: 'placeholder',
-    }
-  }
-
-  public async sendOneSided({
-    amount,
-    address,
-    message,
-  }: SendOneSidedRequest): Promise<void> {
-    return this.sendRequest({
-      methodName: 'sendOneSided',
-      args: [{ amount, address, message }],
-    })
-  }
+export type WindowSize = {
+  width: number
+  height: number
 }
 
-function sendSignerCall<MethodName extends SignerMethodNames>(
-  req: Omit<SignerRequest<MethodName>, 'id'>,
-  id: number,
-): Promise<SignerReturnType<MethodName>> {
-  return new Promise<SignerReturnType<MethodName>>((resolve, reject) => {
-    const event_ref = (resp: MessageEvent<SignerResponse<MethodName>>) => {
-      if (resp.data.resultError) {
-        window.removeEventListener('message', event_ref)
-        reject(resp.data.resultError)
-      }
-      if (
-        resp &&
-        resp.data &&
-        resp.data.id &&
-        resp.data.id === id &&
-        resp.data.type === 'signer-call'
-      ) {
-        window.removeEventListener('message', event_ref)
-        resolve(resp.data.result)
-      }
-    }
+export type PickMatching<T, V> = {
+  [K in keyof T as T[K] extends V ? K : never]: T[K]
+}
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
+export type ExtractMethods<T> = PickMatching<T, Function>
+export type SignerMethods = ExtractMethods<TariL1Signer>
+export type SignerMethodNames = keyof SignerMethods
+export type SignerReturnType<T extends SignerMethodNames> = Awaited<
+  ReturnType<SignerMethods[T]>
+>
 
-    window.addEventListener('message', event_ref, false)
+export type SignerRequest<T extends SignerMethodNames> = {
+  id: number
+  methodName: T
+  args: Parameters<SignerMethods[T]>
+}
 
-    window.parent.postMessage({ ...req, id, type: 'signer-call' }, '*')
-  })
+export type SignerResponse<T extends SignerMethodNames> = {
+  id: number
+  type: 'signer-call'
+  result: SignerReturnType<T>
+  resultError?: string
 }

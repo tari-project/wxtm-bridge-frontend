@@ -19,5 +19,11 @@ export const useBridgeInfo = (
       : handleBridgeToTari
 
     return { fromToken, toToken, destAddress, bridgeHandler }
-  }, [fromNetwork.name, ethereumAddress, tariWalletAddress])
+  }, [
+    fromNetwork.name,
+    ethereumAddress,
+    tariWalletAddress,
+    handleBridgeToEthereum,
+    handleBridgeToTari,
+  ])
 }
