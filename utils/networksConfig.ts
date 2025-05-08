@@ -16,17 +16,10 @@ export const supportedChains = [
   },
 ]
 
-const supportedChainIds = new Set(supportedChains.map((chain) => chain.id))
-
 export const chainsMap: Record<number, string> = {
   1: 'ETH MAINNET',
   11155111: 'SEPOLIA',
   84532: 'BASE SEPOLIA',
-}
-
-export const isChainSupported = (chainId?: number): boolean => {
-  if (chainId === undefined) return false
-  return supportedChainIds.has(chainId)
 }
 
 export const networks = [
