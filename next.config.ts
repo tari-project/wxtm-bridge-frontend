@@ -6,7 +6,12 @@ const nextConfig: NextConfig = {
 
     return config
   },
-  output: 'export'
+  output: 'export',
+  images: {
+    loaderFile: './utils/imageLoader.ts',
+    path: process.env.NEXT_PUBLIC_PATH,
+  }
+
 }
 
 export default nextConfig
