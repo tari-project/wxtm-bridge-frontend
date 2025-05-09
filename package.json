@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build --debug && next-sitemap && next export",
+    "build": "next build --debug",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit"
