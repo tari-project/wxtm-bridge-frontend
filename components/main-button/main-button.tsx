@@ -33,6 +33,9 @@ export const MainButton: React.FC<MainButtonProps> = ({
           marginLeft: '0.5rem',
         },
         fontSize: '1.125rem',
+        '@media (max-width:1280px)': {
+          fontSize: '12px',
+        },
         ...props.sx,
       }}
       {...props}

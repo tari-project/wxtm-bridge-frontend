@@ -42,3 +42,9 @@ body {
     margin-top: 4rem;
   }
 }
+
+@media (max-width: 1150px) {
+  .mt-small {
+    display: none;
+  }
+}
