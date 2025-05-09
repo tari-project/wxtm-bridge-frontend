@@ -12,6 +12,9 @@ export const NetworkBox: React.FC<NetworkBoxProps> = ({
   onToggle,
   onSelect,
 }) => {
+  /** @dev Development */
+  const arrowsDisabled = true
+
   const getTokenSymbol = () => {
     if (type === 'from') {
       return selected.name === 'Tari' ? 'XTM' : 'wXTM'
@@ -55,17 +58,19 @@ export const NetworkBox: React.FC<NetworkBoxProps> = ({
           <div>{selected.name}</div>
         </div>
 
-        <div className="ml-auto cursor-pointer mr-2" onClick={onToggle}>
-          {isOpen ? (
-            <IoIosArrowUp className="text-xl" />
-          ) : (
-            <IoIosArrowDown className="text-xl" />
-          )}
-        </div>
+        {arrowsDisabled ? null : (
+          <div className="ml-auto cursor-pointer mr-2" onClick={onToggle}>
+            {isOpen ? (
+              <IoIosArrowUp className="text-xl" />
+            ) : (
+              <IoIosArrowDown className="text-xl" />
+            )}
+          </div>
+        )}
       </div>
 
       {isOpen && (
-        <div className="absolute bottom-full left-0 mt-2 w-full z-50 bg-white rounded-xl shadow-lg p-3 space-y-2">
+        <div className="absolute bottom-full left-0 mt-2 mb-1.5 w-full z-50 bg-white rounded-xl shadow-lg p-3 space-y-2">
           {filteredNetworks.map((network) => (
             <div
               key={network.name}

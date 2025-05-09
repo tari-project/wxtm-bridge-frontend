@@ -10,6 +10,7 @@ import { Network, NetworkBox } from '@/components/network-box'
 import { networks } from '@/utils/networksConfig'
 import { MainButton } from '@/components/main-button'
 import { BridgeInput } from '@/components/bridge-input'
+import { useBridgeInfo } from '@/hooks/use-bridge-info'
 
 export const MainComponent: React.FC<MainComponentProps> = ({
   onConnectClick,
@@ -25,6 +26,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
   const [openDropdown, setOpenDropdown] = useState<'from' | 'to' | null>(null)
 
   const { isConnected, chain } = useAccount()
+  const { fromToken } = useBridgeInfo(fromNetwork)
 
   const isDisabled = chain === undefined
 
@@ -62,14 +64,10 @@ export const MainComponent: React.FC<MainComponentProps> = ({
   }
 
   /** @dev TODO fetch balances dynamically */
-  const getAmount = () => {
+  const getBalance = () => {
     return fromNetwork.name === 'Tari'
       ? (1023451.931).toLocaleString()
       : (328.22).toLocaleString()
-  }
-
-  const getAmountTokenSymbol = () => {
-    return fromNetwork.name === 'Tari' ? 'XTM' : 'wXTM'
   }
 
   return (
@@ -141,19 +139,19 @@ export const MainComponent: React.FC<MainComponentProps> = ({
 
                     {/* Box 3 - Amount */}
                     <div className="flex-1">
-                      <div className="flex justify-between gap-2 items-center p-2 px-4 rounded-xl bg-white border border-gray-200">
-                        <div className="space-y-[-10px]">
+                      <div className="flex justify-between items-center p-2 px-2 xl:px-4 rounded-xl bg-white border border-gray-200 max-h-[80px] min-w-[232px]">
+                        <div className="space-y-[-8px] mr-[-10px]">
                           <div className="font-medium text-xs text-gray-500">
                             Amount to Bridge
                           </div>
                           <BridgeInput
-                            fromNetwork={fromNetwork.name}
+                            fromNetwork={fromNetwork}
                             control={control}
                             errors={errors}
                           />
                         </div>
                         <div className="flex flex-col">
-                          <div className="w-fit flex py-2 px-3 bg-gray-200 items-center rounded-3xl justify-center self-end">
+                          <div className="w-fit flex py-1 xl:py-2 px-3 bg-gray-200 items-center rounded-3xl justify-center self-end">
                             <div className="w-5 h-5 rounded-full overflow-hidden -ml-1 mr-2 relative">
                               <Image
                                 src={fromNetwork.icon}
@@ -164,12 +162,12 @@ export const MainComponent: React.FC<MainComponentProps> = ({
                               />
                             </div>
                             <div className="font-bold text-[12.85px]">
-                              {getAmountTokenSymbol()}
+                              {fromToken}
                             </div>
                           </div>
                           <div className="flex justify-end mt-2 gap-1 items-center">
-                            <div className="font-semibold text-xs text-gray-500">
-                              {getAmount()} {getAmountTokenSymbol()}
+                            <div className="font-semibold text-[9px] xl:text-xs text-gray-500">
+                              {getBalance()} {fromToken}
                             </div>
                             <div className="border border-gray-500/50 rounded-3xl text-xs font-medium px-1.5">
                               MAX
