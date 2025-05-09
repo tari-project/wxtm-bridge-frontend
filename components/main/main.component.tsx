@@ -139,7 +139,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
 
                     {/* Box 3 - Amount */}
                     <div className="flex-1">
-                      <div className="flex justify-between items-center p-2 px-2 xl:px-4 rounded-xl bg-white border border-gray-200 max-h-[80px] min-w-[232px]">
+                      <div className="flex justify-between items-center p-2 px-2 2xl:px-4 rounded-xl bg-white border border-gray-200 min-h-[80px] max-h-[80px]">
                         <div className="space-y-[-8px] mr-[-10px]">
                           <div className="font-medium text-xs text-gray-500">
                             Amount to Bridge
@@ -150,8 +150,8 @@ export const MainComponent: React.FC<MainComponentProps> = ({
                             errors={errors}
                           />
                         </div>
-                        <div className="flex flex-col">
-                          <div className="w-fit flex py-1 xl:py-2 px-3 bg-gray-200 items-center rounded-3xl justify-center self-end">
+                        <div className="hidden lg:flex flex-col">
+                          <div className="w-fit flex py-1 2xl:py-2 px-3 bg-gray-200 items-center rounded-3xl justify-center self-end">
                             <div className="w-5 h-5 rounded-full overflow-hidden -ml-1 mr-2 relative">
                               <Image
                                 src={fromNetwork.icon}
@@ -166,7 +166,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
                             </div>
                           </div>
                           <div className="flex justify-end mt-2 gap-1 items-center">
-                            <div className="font-semibold text-[9px] xl:text-xs text-gray-500">
+                            <div className="font-semibold text-[9px] 2xl:text-xs text-gray-500">
                               {getBalance()} {fromToken}
                             </div>
                             <div className="border border-gray-500/50 rounded-3xl text-xs font-medium px-1.5">
@@ -178,7 +178,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
                     </div>
 
                     {/* Arrow — Between Box 1 and Box 2 */}
-                    <div className="absolute top-1/2 left-1/3 -translate-x-1/2 -translate-y-1/2 z-10">
+                    <div className="mt-small absolute top-1/2 left-1/3 -translate-x-1/2 -translate-y-1/2 z-10">
                       <div className="w-8 h-8 rounded-md border-2 border-gray-300 bg-white flex items-center justify-center shadow-sm">
                         <FaArrowRight className="text-[15px] text-[#171717]" />
                       </div>
@@ -191,7 +191,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
                     </MainButton>
                   ) : (
                     <MainButton
-                      endIcon={<FaArrowRight />}
+                      endIcon={<FaArrowRight className="" />}
                       onClick={onContinueClick}
                       disabled={!isValid || isDisabled}
                     >
