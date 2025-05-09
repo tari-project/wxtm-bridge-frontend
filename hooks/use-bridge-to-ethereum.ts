@@ -44,7 +44,8 @@ export const useBridgeToEthereum = () => {
     })
 
     // TODO how can we get tari address to send XTM?
-    const tariColdWalletAddress = 'placeholder'
+    const tariColdWalletAddress =
+      'f22p3ubvTRM2SW6qrBg1gYb2gSbrWygByywTv14YU13umzphPWV2jDkZHZb1WN7nLKsYTesaZEnGt3vTpVoQBrhZxHj'
 
     //
     await signer?.sendOneSided({

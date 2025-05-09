@@ -13,7 +13,11 @@ interface Actions {
 type OotleWalletStoreState = State & Actions
 
 const initialState: State = {
-  tariAccount: undefined,
+  tariAccount: {
+    account_id: 0,
+    address:
+      'f25cd6c5jWuroBeiUTg8RbHcS9tHdmJbuQbVrgq1M7UQuLtGJU4LtBn5rsAMvu7PbfHxHPj4CvkrKBskQJkrqEtsTyq',
+  },
 }
 
 export const useTariAccount = create<OotleWalletStoreState>()((set) => ({
@@ -26,6 +30,8 @@ export const useTariAccount = create<OotleWalletStoreState>()((set) => ({
       if (!signer) {
         return
       }
+      const isTariConnected = await signer.isConnected()
+      console.warn('is connected? ', isTariConnected)
       const account = await signer.getAccount()
       console.warn('Try to set the Tari account: ', account)
       set({

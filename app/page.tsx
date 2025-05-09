@@ -11,6 +11,9 @@ import { useBridgeToEthereum } from '@/hooks/use-bridge-to-ethereum'
 import { BridgeFormValues } from '@/components/bridge-input'
 import { Network } from '@/components/network-box'
 import useTariAccount from '@/store/account'
+import useTariSigner from '@/store/signer'
+import TariL1Signer from '@/clients/tari-l1-signer'
+import { TariL1SignerParameters } from '@/types/tapplet'
 
 export default function Home() {
   const { isConnected, address } = useAccount()
@@ -28,6 +31,10 @@ export default function Home() {
 
   const { bridgeToEthereum, isBridging } = useBridgeToEthereum()
   const { tariAccount } = useTariAccount()
+  const { signer, setSigner } = useTariSigner()
+  const { setTariAccount } = useTariAccount()
+  console.log('SIGNER', signer)
+  console.log('account', tariAccount)
 
   const {
     watch,
@@ -39,6 +46,28 @@ export default function Home() {
   })
 
   const amount = watch('amount')
+
+  // Auto-close modal when connected and on connect step
+  useEffect(() => {
+    const setAccount = async () => {
+      try {
+        console.info('🛜 setting account')
+        await setTariAccount()
+      } catch (error) {
+        console.error('Failed to set Tari Account:', error)
+      }
+    }
+    if (!signer) {
+      console.info('🛜 signer not found set signer')
+      const signerParams: TariL1SignerParameters = {
+        name: 'TariL1Signer',
+        onConnection: setTariAccount,
+      }
+      const signer = new TariL1Signer(signerParams)
+      setSigner(signer)
+    }
+    setAccount()
+  }, [setSigner, setTariAccount, signer])
 
   // Auto-close modal when connected and on connect step
   useEffect(() => {

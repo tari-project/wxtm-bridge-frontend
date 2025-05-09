@@ -40,21 +40,24 @@ export class TariL1Signer {
     return sendSignerCall(req, id)
   }
 
-  public isConnected(): boolean {
-    return true
+  public async isConnected(): Promise<boolean> {
+    return this.sendRequest({
+      methodName: 'isConnected',
+      args: [],
+    })
   }
 
   // TODO what do we need as response?
   public async getAccount(): Promise<AccountData> {
     // TODO implement in TU
-    // const resp = await this.sendRequest({
-    //   methodName: 'getAccount',
-    //   args: [],
-    // })
+    const resp = await this.sendRequest({
+      methodName: 'getAccount',
+      args: [],
+    })
 
     return {
-      account_id: 0,
-      address: 'placeholder',
+      account_id: resp.account_id,
+      address: resp.address,
     }
   }
 
