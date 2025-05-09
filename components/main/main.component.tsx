@@ -82,17 +82,17 @@ export const MainComponent: React.FC<MainComponentProps> = ({
             className="object-cover"
           />
         </div>
-        <div className="font-light text-[67.64px] leading-[71.5px] tracking-[-3.98px] max-w-[40rem]">
+        <div className="font-light text-4xl lg:text-[67.64px] leading-[40px] lg:leading-[71.5px] tracking-[0px] lg:tracking-[-3.98px] max-w-[30rem] lg:max-w-[40rem]">
           Move your XTM with <span className="font-semibold">infinite</span>{' '}
           possibilities
         </div>
-        <div className="font-normal text-[27px] leading-[30px] tracking-[-1px] max-w-[35rem]">
+        <div className="font-normal text-lg lg:text-[27px] leading-[30px] tracking-[0px] lg:tracking-[-1px] max-w-[25rem] lg:max-w-[35rem]">
           We&apos;ll wrap your XTM allowing you to exchange across any network.
           Powered by <span className="font-semibold">LayerZero</span>
         </div>
       </div>
 
-      <div className="mt-[8rem] mt-shrink">
+      <div className="mt-[4rem] mt-shrink">
         <div className="mb-4 font-medium text-xl leading-[30px] tracking-[-1px]">
           Start Bridging
         </div>
