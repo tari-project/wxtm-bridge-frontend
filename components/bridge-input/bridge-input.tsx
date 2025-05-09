@@ -1,8 +1,9 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import { Controller } from 'react-hook-form'
 import { TextField } from '@mui/material'
 
 import { BridgeInputProps } from './bridge-input.types'
+import { useBridgeInfo } from '@/hooks/use-bridge-info'
 import { config } from '@/config'
 
 export const BridgeInput: React.FC<BridgeInputProps> = ({
@@ -10,12 +11,7 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
   control,
   errors,
 }) => {
-  const { tokenSymbol } = useMemo(() => {
-    const isFromTari = fromNetwork === 'Tari'
-    const tokenSymbol = isFromTari ? 'XTM' : 'wXTM'
-
-    return { isFromTari, tokenSymbol }
-  }, [fromNetwork])
+  const { fromToken } = useBridgeInfo(fromNetwork)
 
   return (
     <Controller
@@ -25,11 +21,11 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
         required: 'Amount is required',
         min: {
           value: config.MIN_BRIDGE_AMOUNT,
-          message: `Amount must be at least ${config.MIN_BRIDGE_AMOUNT} ${tokenSymbol}`,
+          message: `Min amount is ${config.MIN_BRIDGE_AMOUNT} ${fromToken}`,
         },
         max: {
           value: config.MAX_BRIDGE_AMOUNT,
-          message: `Maximum amount is ${config.MAX_BRIDGE_AMOUNT} ${tokenSymbol}`,
+          message: `Maximum amount is ${config.MAX_BRIDGE_AMOUNT} ${fromToken}`,
         },
         pattern: {
           value: /^\d+(\.\d{0,6})?$/,
@@ -48,12 +44,18 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
               disableUnderline: true,
               inputProps: {
                 style: {
-                  fontSize: '32px',
+                  fontSize: '30px',
                   fontWeight: 500,
                   width: '130px',
                   padding: 0,
                   appearance: 'textfield',
                 },
+              },
+              style: {
+                display: 'flex',
+                alignItems: 'center',
+                height: '35px',
+                paddingTop: '10px',
               },
             },
           }}
@@ -66,7 +68,11 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
               },
             },
             '& .Mui-error': {
-              fontSize: '12px',
+              fontSize: '11px',
+              marginTop: '2px',
+              '@media (max-width:1280px)': {
+                fontSize: '9px',
+              },
             },
           }}
         />

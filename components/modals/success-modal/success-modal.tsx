@@ -39,7 +39,7 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
           </div>
           <div className="font-semibold text-lg mt-2">
             We&apos;ve {fromToken === 'wXTM' ? 'unwrapped' : 'wrapped'} your{' '}
-            {amount.toLocaleString()} {fromToken}!
+            {amount} {fromToken}!
           </div>
           <div className="font-normal text-xs mt-2 text-center px-3">
             Your {toToken} conversion has been complete and your funds have been
@@ -80,12 +80,12 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
 
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
 
-          <div className="font-medium">
+          {/* <div className="font-medium">
             <div className="text-xs text-gray-500">Transaction ID</div>
             <div className="text-sm">GH7SLK9087</div>
           </div>
 
-          <div className="py-[0.5px] w-full bg-gray-300 mt-2 mb-4"></div>
+          <div className="py-[0.5px] w-full bg-gray-300 mt-2 mb-4"></div> */}
 
           {/* Section 1 */}
           <ModalButton label="Close" onClick={closeModal} disabled={false} />
