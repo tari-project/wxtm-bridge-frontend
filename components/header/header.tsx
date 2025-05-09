@@ -21,7 +21,7 @@ export const Header: React.FC<HeaderProps> = ({ onConnectClick }) => {
     } else {
       setShowNetworkModal(false)
     }
-  }, [chain])
+  }, [isConnected, isNetworkSupported])
 
   return (
     <>

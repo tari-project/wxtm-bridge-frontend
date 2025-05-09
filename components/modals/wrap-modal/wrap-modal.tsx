@@ -1,6 +1,6 @@
 import React from 'react'
 import Image from 'next/image'
-import { HiArrowRightOnRectangle } from 'react-icons/hi2'
+// import { HiArrowRightOnRectangle } from 'react-icons/hi2'
 import { WrapModalProps } from './wrap-modal.types'
 import { ModalButton } from '@/components/modals/modal-button'
 import { useBridgeInfo } from '@/hooks/use-bridge-info'
@@ -14,8 +14,7 @@ export const WrapModal: React.FC<WrapModalProps> = ({
   feesData: { amountAfterFee },
 }) => {
   /** @dev Tmp hardcoded tx hash */
-  const txhash =
-    '0x0bec7941a37c07ec7cd408b3478c66ac7a26c4e48c2fd22577bb2c9c44cb4ae8'
+  //const txhash = '0x0bec7941a37c07ec7cd408b3478c66ac7a26c4e48c2fd22577bb2c9c44cb4ae8'
 
   const { fromToken, toToken, destAddress } = useBridgeInfo(
     fromNetwork,
