@@ -3,6 +3,7 @@ import { Controller } from 'react-hook-form'
 import { TextField } from '@mui/material'
 
 import { BridgeInputProps } from './bridge-input.types'
+import { config } from '@/config'
 
 export const BridgeInput: React.FC<BridgeInputProps> = ({
   fromNetwork,
@@ -23,12 +24,12 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
       rules={{
         required: 'Amount is required',
         min: {
-          value: 1,
-          message: `Amount must be at least 1 ${tokenSymbol}`,
+          value: config.MIN_BRIDGE_AMOUNT,
+          message: `Amount must be at least ${config.MIN_BRIDGE_AMOUNT} ${tokenSymbol}`,
         },
         max: {
-          value: 1000,
-          message: `Maximum amount is 1000 ${tokenSymbol}`,
+          value: config.MAX_BRIDGE_AMOUNT,
+          message: `Maximum amount is ${config.MAX_BRIDGE_AMOUNT} ${tokenSymbol}`,
         },
         pattern: {
           value: /^\d+(\.\d{0,6})?$/,
