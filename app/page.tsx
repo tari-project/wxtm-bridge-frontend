@@ -41,7 +41,7 @@ export default function Home() {
     control,
     formState: { errors, isValid },
   } = useForm<BridgeFormValues>({
-    defaultValues: { amount: '1' },
+    defaultValues: { amount: '1000' },
     mode: 'onChange',
   })
 

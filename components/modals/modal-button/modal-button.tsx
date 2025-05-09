@@ -15,9 +15,7 @@ export const ModalButton: React.FC<ModalButtonProps> = ({
       {disabled ? (
         <div className="h-5 w-5 animate-spin rounded-full border-b-[3px] border-white"></div>
       ) : (
-        <div className="text-[13px] font-semibold text-white group-hover:font-bold">
-          {label}
-        </div>
+        <div className="text-[13px] font-semibold text-white">{label}</div>
       )}
     </button>
   )

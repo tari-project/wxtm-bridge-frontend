@@ -126,12 +126,12 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
             <div className="text-sm">24h</div>
           </div>
 
-          <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
+          {/* <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
 
           <div className="font-medium">
             <div className="text-xs text-gray-500">Transaction ID</div>
             <div className="text-sm">GH7SLK9087</div>
-          </div>
+          </div> */}
         </div>
 
         <ModalButton

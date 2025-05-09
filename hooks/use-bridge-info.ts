@@ -3,8 +3,8 @@ import { Network } from '@/components/network-box'
 
 export const useBridgeInfo = (
   fromNetwork: Network,
-  ethereumAddress: string,
-  tariWalletAddress: string,
+  ethereumAddress?: string,
+  tariWalletAddress?: string,
   handleBridgeToEthereum?: () => void,
   handleBridgeToTari?: () => void,
 ) => {
