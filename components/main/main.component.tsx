@@ -23,6 +23,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
   setFromNetwork,
   toNetwork,
   setToNetwork,
+  isProcessingTransaction,
 }) => {
   const [openDropdown, setOpenDropdown] = useState<'from' | 'to' | null>(null)
 
@@ -30,7 +31,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
   const { fromToken } = useBridgeInfo(fromNetwork)
   const { available_balance } = useTariAccount()
 
-  const isDisabled = chain === undefined
+  const isDisabled = chain === undefined || isProcessingTransaction
 
   const fromNetworks = networks.filter(
     (n) => n.name === 'Ethereum' || n.name === 'Tari',

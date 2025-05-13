@@ -30,7 +30,12 @@ export default function Home() {
   })
 
   const { bridgeToEthereum, isBridging } = useBridgeToEthereum()
-  const { tariAccount } = useTariAccount()
+  const {
+    tariAccount,
+    isProcessingTransaction,
+    addPendingTransaction,
+    removePendingTransaction,
+  } = useTariAccount()
   const { signer, setSigner } = useTariSigner()
   const { setTariAccount } = useTariAccount()
   console.log('SIGNER', signer)
@@ -94,9 +99,19 @@ export default function Home() {
       return
     }
 
-    bridgeToEthereum({ amount, ethAddress: address }).then(() => {
-      setModalStep(2)
-    })
+    const txId = `bridge-${Date.now()}`
+
+    addPendingTransaction(txId)
+
+    bridgeToEthereum({ amount, ethAddress: address })
+      .then(() => {
+        setModalStep(2)
+      })
+      .catch((error) => {
+        console.error('Bridge operation failed:', error)
+
+        removePendingTransaction(txId)
+      })
   }, [amount, address, bridgeToEthereum])
 
   const handleBridgeToTari = () => {
@@ -117,6 +132,7 @@ export default function Home() {
         setFromNetwork={setFromNetwork}
         toNetwork={toNetwork}
         setToNetwork={setToNetwork}
+        isProcessingTransaction={isProcessingTransaction || isBridging}
       />
       {modalOpen && (
         <MainModal

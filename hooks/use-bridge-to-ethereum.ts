@@ -22,7 +22,7 @@ export const useBridgeToEthereum = () => {
     mutationFn: WrapTokenService.updateToTokensSent,
   })
   const { signer } = useTariSigner()
-  const { tariAccount, addPendingBridgeTx } = useTariAccount()
+  const { tariAccount } = useTariAccount()
   const [isBridging, setIsBridging] = useState(false)
 
   const bridgeToEthereum = async ({
@@ -57,11 +57,6 @@ export const useBridgeToEthereum = () => {
     console.log('[TAPPLET] send one sided done? ', isSend)
     const { success } = await confirmTokenSent.mutateAsync(paymentId)
     console.log('[TAPPLET] confirm token sent success: ', success)
-
-    // TODO tmp solution - fetch tx from tari wallet
-    addPendingBridgeTx({
-      paymentId,
-    })
 
     setIsBridging(false)
   }
