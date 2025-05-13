@@ -1,4 +1,4 @@
-import { config } from '@/config'
+// import { config } from '@/config'
 import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
 
@@ -11,7 +11,8 @@ import { parseWxtmTokenAmount } from '@/utils/parse-wxtm-token-amount'
 import useTariSigner from '@/store/signer'
 import useTariAccount from '@/store/account'
 
-OpenAPI.BASE = config.BACKEND_API_URL
+// OpenAPI.BASE = config.BACKEND_API_URL
+OpenAPI.BASE = 'https://api.staging-bridge.tari.com'
 
 export const useBridgeToEthereum = () => {
   const createTransaction = useMutation({
@@ -21,7 +22,7 @@ export const useBridgeToEthereum = () => {
     mutationFn: WrapTokenService.updateToTokensSent,
   })
   const { signer } = useTariSigner()
-  const { tariAccount } = useTariAccount()
+  const { tariAccount, addPendingBridgeTx } = useTariAccount()
   const [isBridging, setIsBridging] = useState(false)
 
   const bridgeToEthereum = async ({
@@ -56,6 +57,11 @@ export const useBridgeToEthereum = () => {
     console.log('[TAPPLET] send one sided done? ', isSend)
     const { success } = await confirmTokenSent.mutateAsync(paymentId)
     console.log('[TAPPLET] confirm token sent success: ', success)
+
+    // TODO tmp solution - fetch tx from tari wallet
+    addPendingBridgeTx({
+      paymentId,
+    })
 
     setIsBridging(false)
   }

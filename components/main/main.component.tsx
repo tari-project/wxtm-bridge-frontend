@@ -11,6 +11,7 @@ import { networks } from '@/utils/networksConfig'
 import { MainButton } from '@/components/main-button'
 import { BridgeInput } from '@/components/bridge-input'
 import { useBridgeInfo } from '@/hooks/use-bridge-info'
+import useTariAccount from '@/store/account'
 
 export const MainComponent: React.FC<MainComponentProps> = ({
   onConnectClick,
@@ -27,6 +28,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
 
   const { isConnected, chain } = useAccount()
   const { fromToken } = useBridgeInfo(fromNetwork)
+  const { available_balance } = useTariAccount()
 
   const isDisabled = chain === undefined
 
@@ -66,7 +68,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
   /** @dev TODO fetch balances dynamically */
   const getBalance = () => {
     return fromNetwork.name === 'Tari'
-      ? (1023451.931).toLocaleString()
+      ? available_balance.toString()
       : (328.22).toLocaleString()
   }
 

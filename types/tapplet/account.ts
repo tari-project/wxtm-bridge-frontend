@@ -2,3 +2,14 @@ export interface AccountData {
   account_id: number
   address: string
 }
+
+export interface WalletBalance {
+  available_balance: number
+  timelocked_balance: number
+  pending_incoming_balance: number
+  pending_outgoing_balance: number
+}
+
+export interface PendingBridgeTx {
+  paymentId: string
+}
