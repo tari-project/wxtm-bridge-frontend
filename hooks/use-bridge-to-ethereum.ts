@@ -1,4 +1,4 @@
-import { config } from '@/config'
+// import { config } from '@/config'
 import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
 
@@ -11,7 +11,8 @@ import { parseWxtmTokenAmount } from '@/utils/parse-wxtm-token-amount'
 import useTariSigner from '@/store/signer'
 import useTariAccount from '@/store/account'
 
-OpenAPI.BASE = config.BACKEND_API_URL
+// OpenAPI.BASE = config.BACKEND_API_URL
+OpenAPI.BASE = 'https://api.staging-bridge.tari.com'
 
 export const useBridgeToEthereum = () => {
   const createTransaction = useMutation({

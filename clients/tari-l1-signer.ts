@@ -5,6 +5,7 @@ import {
   SignerResponse,
   SignerReturnType,
   AccountData,
+  WalletBalance,
 } from '../types/tapplet'
 
 export type SendOneSidedRequest = {
@@ -90,7 +91,7 @@ export class TariL1Signer {
    * @description get Tari Account balance
    * @returns XTM amount
    */
-  public async getTariBalance(): Promise<string> {
+  public async getTariBalance(): Promise<WalletBalance> {
     //TODO implement on TU side
     return this.sendRequest({
       methodName: 'getTariBalance',

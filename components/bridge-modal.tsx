@@ -9,6 +9,7 @@ import { FaEthereum } from 'react-icons/fa'
 import { FaArrowRight } from 'react-icons/fa6'
 import { chainsMap } from '@/utils/networksConfig'
 import { truncateAddress } from '@/utils/truncate'
+import useTariAccount from '@/store/account'
 
 type BridgeModalProps = {
   closeModal: () => void
@@ -18,6 +19,7 @@ type BridgeModalProps = {
 const BridgeModal: React.FC<BridgeModalProps> = ({ closeModal, nextStep }) => {
   const chainId = useChainId()
   const { address } = useAccount()
+  const { available_balance } = useTariAccount()
 
   return (
     <div className="w-full flex flex-col p-5">
@@ -119,7 +121,7 @@ const BridgeModal: React.FC<BridgeModalProps> = ({ closeModal, nextStep }) => {
               {(1000).toLocaleString()}
             </div>
             <div className="font-semibold text-[10px] text-gray-500">
-              {(1023451.931).toLocaleString()} XTM
+              {available_balance.toLocaleString()} XTM
             </div>
           </div>
 
