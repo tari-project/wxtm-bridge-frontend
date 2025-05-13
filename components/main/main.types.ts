@@ -9,4 +9,5 @@ export type MainComponentProps = {
   setFromNetwork: React.Dispatch<React.SetStateAction<Network>>
   toNetwork: Network
   setToNetwork: React.Dispatch<React.SetStateAction<Network>>
+  isProcessingTransaction: boolean
 } & Pick<BridgeInputProps, 'control' | 'errors'>
