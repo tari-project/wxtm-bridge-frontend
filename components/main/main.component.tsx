@@ -69,7 +69,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
   /** @dev TODO fetch balances dynamically */
   const getBalance = () => {
     return fromNetwork.name === 'Tari'
-      ? available_balance.toString()
+      ? available_balance
       : (328.22).toLocaleString()
   }
 
