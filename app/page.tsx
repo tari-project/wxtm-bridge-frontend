@@ -8,9 +8,12 @@ import { MainModal } from '@/components/modals/main-modal'
 import { Header } from '@/components/header'
 import { MainComponent } from '@/components/main'
 import { useBridgeToEthereum } from '@/hooks/use-bridge-to-ethereum'
-import { useTariWalletAddress } from '@/hooks/use-tari-wallet-address'
 import { BridgeFormValues } from '@/components/bridge-input'
 import { Network } from '@/components/network-box'
+import useTariAccount from '@/store/account'
+import useTariSigner from '@/store/signer'
+import TariL1Signer from '@/clients/tari-l1-signer'
+import { TariL1SignerParameters } from '@/types/tapplet'
 
 export default function Home() {
   const { isConnected, address } = useAccount()
@@ -27,7 +30,11 @@ export default function Home() {
   })
 
   const { bridgeToEthereum, isBridging } = useBridgeToEthereum()
-  const { tariWalletAddress } = useTariWalletAddress()
+  const { tariAccount } = useTariAccount()
+  const { signer, setSigner } = useTariSigner()
+  const { setTariAccount } = useTariAccount()
+  console.log('SIGNER', signer)
+  console.log('account', tariAccount)
 
   const {
     watch,
@@ -39,6 +46,28 @@ export default function Home() {
   })
 
   const amount = watch('amount')
+
+  // Auto-close modal when connected and on connect step
+  useEffect(() => {
+    const setAccount = async () => {
+      try {
+        console.info('🛜 setting account')
+        await setTariAccount()
+      } catch (error) {
+        console.error('Failed to set Tari Account:', error)
+      }
+    }
+    if (!signer) {
+      console.info('🛜 signer not found set signer')
+      const signerParams: TariL1SignerParameters = {
+        name: 'TariL1Signer',
+        onConnection: setTariAccount,
+      }
+      const signer = new TariL1Signer(signerParams)
+      setSigner(signer)
+    }
+    setAccount()
+  }, [setSigner, setTariAccount, signer])
 
   // Auto-close modal when connected and on connect step
   useEffect(() => {
@@ -65,7 +94,7 @@ export default function Home() {
       return
     }
 
-    bridgeToEthereum({ amount, address }).then(() => {
+    bridgeToEthereum({ amount, ethAddress: address }).then(() => {
       setModalStep(2)
     })
   }, [amount, address, bridgeToEthereum])
@@ -100,7 +129,7 @@ export default function Home() {
           isBridging={isBridging}
           amount={amount}
           ethereumAddress={address}
-          tariWalletAddress={tariWalletAddress}
+          tariWalletAddress={tariAccount?.address}
           fromNetwork={fromNetwork}
           toNetwork={toNetwork}
         />

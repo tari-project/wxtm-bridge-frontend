@@ -7,9 +7,9 @@ import {
   OpenAPI,
 } from '@tari-project/wxtm-bridge-backend-api'
 
-import { useTariWalletAddress } from './use-tari-wallet-address'
-import { TariWalletClient } from '@/clients/tari-wallet-client'
 import { parseWxtmTokenAmount } from '@/utils/parse-wxtm-token-amount'
+import useTariSigner from '@/store/signer'
+import useTariAccount from '@/store/account'
 
 OpenAPI.BASE = config.BACKEND_API_URL
 
@@ -20,31 +20,42 @@ export const useBridgeToEthereum = () => {
   const confirmTokenSent = useMutation({
     mutationFn: WrapTokenService.updateToTokensSent,
   })
-  const { tariWalletAddress } = useTariWalletAddress()
+  const { signer } = useTariSigner()
+  const { tariAccount } = useTariAccount()
   const [isBridging, setIsBridging] = useState(false)
 
   const bridgeToEthereum = async ({
     amount,
-    address,
+    ethAddress,
   }: {
     amount: string
-    address: `0x${string}`
+    ethAddress: `0x${string}`
   }) => {
     setIsBridging(true)
+    if (!tariAccount) return
     const tokenAmount = parseWxtmTokenAmount(amount)
 
+    console.log('[TAPPLET] start bridging to eth')
     const { paymentId } = await createTransaction.mutateAsync({
-      to: address,
-      from: tariWalletAddress,
+      to: ethAddress,
+      from: tariAccount.address,
       tokenAmount,
     })
+    console.log('[TAPPLET] response from mutate paymentid:', paymentId)
 
-    await TariWalletClient.transferTokensToColdWallet({
+    // TODO how can we get tari address to send XTM?
+    const tariColdWalletAddress =
+      'f2Kjz1SH4vRSXpNSb15SUNoECBNkxE57USorF7PpXT7hT4pJ1QViLMzinU5WiEoPn7m6hZ1BmS7AGPXAr4WpdNAU65m'
+
+    const isSend = await signer?.sendOneSided({
       amount,
-      paymentId,
+      address: tariColdWalletAddress,
+      message: paymentId,
     })
 
-    await confirmTokenSent.mutateAsync(paymentId)
+    console.log('[TAPPLET] send one sided done? ', isSend)
+    const { success } = await confirmTokenSent.mutateAsync(paymentId)
+    console.log('[TAPPLET] confirm token sent success: ', success)
 
     setIsBridging(false)
   }
