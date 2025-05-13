@@ -3,7 +3,7 @@ export const truncateAddress = (fullStr: `0x${string}`, strLen: number) => {
 
   const separator = '...'
 
-  var sepLen = separator.length,
+  const sepLen = separator.length,
     charsToShow = strLen - sepLen,
     frontChars = Math.ceil(charsToShow / 2),
     backChars = Math.floor(charsToShow / 2)

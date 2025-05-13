@@ -4,6 +4,7 @@ import useTariSigner from './signer'
 
 interface State {
   tariAccount?: AccountData
+  pendingBridgeTx: [] //TODO fetch with tari signer
 }
 
 interface Actions {
@@ -16,8 +17,9 @@ const initialState: State = {
   tariAccount: {
     account_id: 0,
     address:
-      'f25cd6c5jWuroBeiUTg8RbHcS9tHdmJbuQbVrgq1M7UQuLtGJU4LtBn5rsAMvu7PbfHxHPj4CvkrKBskQJkrqEtsTyq',
+      'f25V4MStkUBE8UaD1Ar84KropPKLNSJLN5XUZFzSkMEv6u2AQYAsGTkwx5Lj5WcjWnTxGyDPfwPgh6hnw5BQX1G7T8C',
   },
+  pendingBridgeTx: [],
 }
 
 export const useTariAccount = create<OotleWalletStoreState>()((set) => ({
@@ -30,10 +32,11 @@ export const useTariAccount = create<OotleWalletStoreState>()((set) => ({
       if (!signer) {
         return
       }
-      const isTariConnected = await signer.isConnected()
-      console.warn('is connected? ', isTariConnected)
+      console.warn('[TAPPLET-BRIDGE ]Try to set the Tari account: ')
       const account = await signer.getAccount()
-      console.warn('Try to set the Tari account: ', account)
+      console.warn('[TAPPLET-BRIDGE ]Tari account: ', account.address)
+      const isTariConnected = await signer.isConnected()
+      console.warn('[TAPPLET-BRIDGE ]is connected? ', isTariConnected)
       set({
         tariAccount: {
           account_id: account.account_id,

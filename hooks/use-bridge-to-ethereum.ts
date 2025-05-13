@@ -7,7 +7,6 @@ import {
   OpenAPI,
 } from '@tari-project/wxtm-bridge-backend-api'
 
-// import { useTariWalletAddress } from './use-tari-wallet-address'
 import { parseWxtmTokenAmount } from '@/utils/parse-wxtm-token-amount'
 import useTariSigner from '@/store/signer'
 import useTariAccount from '@/store/account'
@@ -21,7 +20,6 @@ export const useBridgeToEthereum = () => {
   const confirmTokenSent = useMutation({
     mutationFn: WrapTokenService.updateToTokensSent,
   })
-  // const { tariWalletAddress } = useTariWalletAddress()
   const { signer } = useTariSigner()
   const { tariAccount } = useTariAccount()
   const [isBridging, setIsBridging] = useState(false)
@@ -37,24 +35,27 @@ export const useBridgeToEthereum = () => {
     if (!tariAccount) return
     const tokenAmount = parseWxtmTokenAmount(amount)
 
+    console.log('[TAPPLET] start bridging to eth')
     const { paymentId } = await createTransaction.mutateAsync({
       to: ethAddress,
       from: tariAccount.address,
       tokenAmount,
     })
+    console.log('[TAPPLET] response from mutate paymentid:', paymentId)
 
     // TODO how can we get tari address to send XTM?
     const tariColdWalletAddress =
-      'f22p3ubvTRM2SW6qrBg1gYb2gSbrWygByywTv14YU13umzphPWV2jDkZHZb1WN7nLKsYTesaZEnGt3vTpVoQBrhZxHj'
+      'f2Kjz1SH4vRSXpNSb15SUNoECBNkxE57USorF7PpXT7hT4pJ1QViLMzinU5WiEoPn7m6hZ1BmS7AGPXAr4WpdNAU65m'
 
-    //
-    await signer?.sendOneSided({
+    const isSend = await signer?.sendOneSided({
       amount,
       address: tariColdWalletAddress,
       message: paymentId,
     })
 
-    await confirmTokenSent.mutateAsync(paymentId)
+    console.log('[TAPPLET] send one sided done? ', isSend)
+    const { success } = await confirmTokenSent.mutateAsync(paymentId)
+    console.log('[TAPPLET] confirm token sent success: ', success)
 
     setIsBridging(false)
   }

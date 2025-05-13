@@ -40,6 +40,10 @@ export class TariL1Signer {
     return sendSignerCall(req, id)
   }
 
+  /**
+   * @description check if Tari Signer is connected with the Tari Universe
+   * @returns true or false
+   */
   public async isConnected(): Promise<boolean> {
     return this.sendRequest({
       methodName: 'isConnected',
@@ -47,9 +51,12 @@ export class TariL1Signer {
     })
   }
 
-  // TODO what do we need as response?
+  /**
+   * @description get Tari Account details
+   * @returns account data
+   */
   public async getAccount(): Promise<AccountData> {
-    // TODO implement in TU
+    // TODO what do we need as response?
     const resp = await this.sendRequest({
       methodName: 'getAccount',
       args: [],
@@ -62,21 +69,32 @@ export class TariL1Signer {
   }
 
   /**
-   *
    * @description send XTM via one-sided transaction
    * @param amount XTM amount (uT or T)
    * @param address Tari Address one-sided
    * @param message (optional) payment-id
-   * @returns
+   * @returns true if tx success; otherwise false
    */
   public async sendOneSided({
     amount,
     address,
     message,
-  }: SendOneSidedRequest): Promise<void> {
+  }: SendOneSidedRequest): Promise<boolean> {
     return this.sendRequest({
       methodName: 'sendOneSided',
       args: [{ amount, address, message }],
+    })
+  }
+
+  /**
+   * @description get Tari Account balance
+   * @returns XTM amount
+   */
+  public async getTariBalance(): Promise<string> {
+    //TODO implement on TU side
+    return this.sendRequest({
+      methodName: 'getTariBalance',
+      args: [],
     })
   }
 }
