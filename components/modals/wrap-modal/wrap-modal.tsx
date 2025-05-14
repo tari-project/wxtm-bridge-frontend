@@ -88,7 +88,7 @@ export const WrapModal: React.FC<WrapModalProps> = ({
           <div className="py-[0.5px] w-full bg-gray-300 mt-2 mb-4"></div> */}
 
           {/* Section 1 */}
-          <ModalButton label="Done" onClick={closeModal} disabled={false} />
+          {/* <ModalButton label="Done" onClick={closeModal} disabled={false} /> */}
         </div>
       </div>
     </div>
