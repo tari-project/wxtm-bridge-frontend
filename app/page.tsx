@@ -83,7 +83,7 @@ export default function Home() {
       setModalStep(2)
       setModalOpen(true)
     }
-  }, [isConnected, modalOpen, modalStep])
+  }, [isConnected, modalOpen, modalStep, isProcessingTransaction])
 
   const handleConnectClick = () => {
     if (!isConnected) {
@@ -115,7 +115,13 @@ export default function Home() {
 
         removePendingTransaction(txId)
       })
-  }, [amount, address, bridgeToEthereum])
+  }, [
+    amount,
+    address,
+    bridgeToEthereum,
+    addPendingTransaction,
+    removePendingTransaction,
+  ])
 
   const handleBridgeToTari = () => {
     console.log('Bridging to Tari...')
