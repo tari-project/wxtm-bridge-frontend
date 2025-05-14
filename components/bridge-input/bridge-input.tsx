@@ -37,6 +37,7 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
           {...field}
           type="number"
           variant="standard"
+          placeholder="0"
           error={Boolean(errors.amount)}
           helperText={errors.amount?.message}
           slotProps={{

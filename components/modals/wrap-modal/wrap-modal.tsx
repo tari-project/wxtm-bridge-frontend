@@ -2,11 +2,11 @@ import React from 'react'
 import Image from 'next/image'
 // import { HiArrowRightOnRectangle } from 'react-icons/hi2'
 import { WrapModalProps } from './wrap-modal.types'
-import { ModalButton } from '@/components/modals/modal-button'
+// import { ModalButton } from '@/components/modals/modal-button'
 import { useBridgeInfo } from '@/hooks/use-bridge-info'
 
 export const WrapModal: React.FC<WrapModalProps> = ({
-  closeModal,
+  // closeModal,
   amount,
   tariWalletAddress,
   ethereumAddress,
@@ -88,7 +88,7 @@ export const WrapModal: React.FC<WrapModalProps> = ({
           <div className="py-[0.5px] w-full bg-gray-300 mt-2 mb-4"></div> */}
 
           {/* Section 1 */}
-          <ModalButton label="Done" onClick={closeModal} disabled={false} />
+          {/* <ModalButton label="Done" onClick={closeModal} disabled={false} /> */}
         </div>
       </div>
     </div>

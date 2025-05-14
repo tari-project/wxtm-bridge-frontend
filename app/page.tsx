@@ -46,7 +46,7 @@ export default function Home() {
     control,
     formState: { errors, isValid },
   } = useForm<BridgeFormValues>({
-    defaultValues: { amount: '1000' },
+    defaultValues: { amount: '' },
     mode: 'onChange',
   })
 
@@ -79,8 +79,11 @@ export default function Home() {
     if (modalOpen && modalStep === 0 && isConnected) {
       setModalOpen(false)
       setModalStep(1)
+    } else if (isProcessingTransaction) {
+      setModalStep(2)
+      setModalOpen(true)
     }
-  }, [isConnected, modalOpen, modalStep])
+  }, [isConnected, modalOpen, modalStep, isProcessingTransaction])
 
   const handleConnectClick = () => {
     if (!isConnected) {
@@ -112,7 +115,13 @@ export default function Home() {
 
         removePendingTransaction(txId)
       })
-  }, [amount, address, bridgeToEthereum])
+  }, [
+    amount,
+    address,
+    bridgeToEthereum,
+    addPendingTransaction,
+    removePendingTransaction,
+  ])
 
   const handleBridgeToTari = () => {
     console.log('Bridging to Tari...')

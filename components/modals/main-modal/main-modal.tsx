@@ -33,11 +33,11 @@ export const MainModal: React.FC<MainModalProps> = ({
     setStep(1)
   }
 
-  const handleOutsideClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
-      closeModal()
-    }
-  }
+  // const handleOutsideClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  //   if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
+  //     closeModal()
+  //   }
+  // }
 
   if (step === 0 && isConnected) return null
 
@@ -88,7 +88,7 @@ export const MainModal: React.FC<MainModalProps> = ({
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-      onClick={handleOutsideClick}
+      // onClick={handleOutsideClick}
     >
       <section
         ref={modalRef}
