@@ -1,12 +1,14 @@
 import { AccountData } from '@/types/tapplet'
 import { create } from 'zustand'
 import useTariSigner from './signer'
+import { SendOneSidedRequest } from '@/clients/tari-l1-signer'
 
 interface State {
   tariAccount?: AccountData
   available_balance: number
   pendingBridgeTx: string[]
   isProcessingTransaction: boolean
+  pendingBridgeTxFromTU?: SendOneSidedRequest
 }
 
 interface Actions {
@@ -26,6 +28,7 @@ const initialState: State = {
   available_balance: 0,
   pendingBridgeTx: [],
   isProcessingTransaction: false,
+  pendingBridgeTxFromTU: undefined,
 }
 
 export const useTariAccount = create<OotleWalletStoreState>()((set) => ({
@@ -40,12 +43,16 @@ export const useTariAccount = create<OotleWalletStoreState>()((set) => ({
       }
       const account = await signer.getAccount()
       const balance = await signer.getTariBalance()
+      const pendingTx = await signer.isPendingTappletTx()
+      console.info('[ TAPPLET-BRIDGE ] call TU pending tx', pendingTx)
       set({
         tariAccount: {
           account_id: account.account_id,
           address: account.address,
         },
         available_balance: balance?.available_balance ?? 0,
+        pendingBridgeTxFromTU: pendingTx,
+        isProcessingTransaction: !!pendingTx,
       })
     } catch (error) {
       console.error('Could not set the Tari account: ', error)

@@ -23,10 +23,15 @@ export const MainModal: React.FC<MainModalProps> = ({
   ethereumAddress,
   fromNetwork,
   toNetwork,
+  pendingBridgeTxFromTU,
 }) => {
   const { isConnected } = useAccount()
   const modalRef = useRef<HTMLDivElement>(null)
-  const feesData = useBridgeToEthereumFees(amount)
+  const feesData = useBridgeToEthereumFees(
+    !isBridging && pendingBridgeTxFromTU
+      ? pendingBridgeTxFromTU?.amount
+      : amount,
+  )
 
   const closeModal = () => {
     setModalOpen(false)
@@ -75,7 +80,11 @@ export const MainModal: React.FC<MainModalProps> = ({
       return (
         <WrapModal
           closeModal={closeModal}
-          amount={amount}
+          amount={
+            !isBridging && pendingBridgeTxFromTU
+              ? pendingBridgeTxFromTU?.amount
+              : amount
+          }
           tariWalletAddress={tariWalletAddress}
           ethereumAddress={ethereumAddress}
           fromNetwork={fromNetwork}
@@ -86,9 +95,7 @@ export const MainModal: React.FC<MainModalProps> = ({
   }
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-    >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <section
         ref={modalRef}
         className="w-full max-w-md mx-4 bg-white/80 shadow-[0px_4px_74px_0px_rgba(0,0,0,0.15)] backdrop-blur-[54px] rounded-3xl overflow-hidden flex flex-col justify-center items-center"

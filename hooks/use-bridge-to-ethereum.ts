@@ -44,9 +44,9 @@ export const useBridgeToEthereum = () => {
     console.debug('[ TAPPLET-BRIDGE ] created tx with id: ', paymentId)
 
     const isSend = await signer?.sendOneSided({
-      amount,
+      amount: tokenAmount,
       address: config.TARI_BRIDGE_COLDWALLET_ADDRESS,
-      message: paymentId,
+      paymentId: paymentId,
     })
 
     if (!isSend) {

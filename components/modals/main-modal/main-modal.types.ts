@@ -1,3 +1,4 @@
+import { SendOneSidedRequest } from '@/clients/tari-l1-signer'
 import { Network } from '@/components/network-box'
 
 export type MainModalProps = {
@@ -13,4 +14,5 @@ export type MainModalProps = {
   tariWalletAddress?: string
   fromNetwork: Network
   toNetwork: Network
+  pendingBridgeTxFromTU?: SendOneSidedRequest
 }

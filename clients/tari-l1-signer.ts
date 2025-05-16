@@ -8,10 +8,10 @@ import {
   WalletBalance,
 } from '../types/tapplet'
 
-export type SendOneSidedRequest = {
+export interface SendOneSidedRequest {
   amount: string
   address: string
-  message?: string
+  paymentId: string
 }
 
 export class TariL1Signer {
@@ -72,17 +72,17 @@ export class TariL1Signer {
    * @description send XTM via one-sided transaction
    * @param amount XTM amount (uT or T)
    * @param address Tari Address one-sided
-   * @param message (optional) payment-id
+   * @param paymentId (optional) payment-id
    * @returns true if tx success; otherwise false
    */
   public async sendOneSided({
     amount,
     address,
-    message,
+    paymentId,
   }: SendOneSidedRequest): Promise<boolean> {
     return this.sendRequest({
       methodName: 'sendOneSided',
-      args: [{ amount, address, message }],
+      args: [{ amount, address, paymentId }],
     })
   }
 
@@ -94,6 +94,28 @@ export class TariL1Signer {
     return this.sendRequest({
       methodName: 'getTariBalance',
       args: [],
+    })
+  }
+
+  /**
+   * @description check if there is any processing transaction
+   * @returns true or false
+   */
+  public async isPendingTappletTx(): Promise<SendOneSidedRequest | undefined> {
+    return this.sendRequest({
+      methodName: 'isPendingTappletTx',
+      args: [],
+    })
+  }
+
+  /**
+   * @description check if there is any processing transaction
+   * @returns true or false
+   */
+  public async removePendingTappletTx(paymentId: string): Promise<boolean> {
+    return this.sendRequest({
+      methodName: 'removePendingTappletTx',
+      args: [paymentId],
     })
   }
 }

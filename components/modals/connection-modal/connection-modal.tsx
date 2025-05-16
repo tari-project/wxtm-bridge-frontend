@@ -9,10 +9,9 @@ const ConnectionModal: React.FC<ConnectionModalProps> = ({ closeModal }) => {
   const { connectors, connect } = useConnect()
 
   return (
-    <div className="w-full flex flex-col mt-9">
+    <div className="w-full flex flex-col mt-9 relative">
       <button
-        className="text-black font-bold hover:cursor-pointer
-        absolute top-4 right-4 cursor-pointer flex text-xl rounded-full p-1 bg-black/10 hover:bg-black/20"
+        className="text-black font-bold hover:cursor-pointer absolute top-4 right-4 cursor-pointer flex text-xl rounded-full p-1 bg-black/10 hover:bg-black/20"
         onClick={closeModal}
       >
         <IoCloseOutline />

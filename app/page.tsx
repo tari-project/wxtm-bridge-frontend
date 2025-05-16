@@ -35,6 +35,7 @@ export default function Home() {
     isProcessingTransaction,
     addPendingTransaction,
     removePendingTransaction,
+    pendingBridgeTxFromTU,
   } = useTariAccount()
   const { signer, setSigner } = useTariSigner()
   const { setTariAccount } = useTariAccount()
@@ -54,14 +55,12 @@ export default function Home() {
   useEffect(() => {
     const setAccount = async () => {
       try {
-        console.info('🛜 setting account')
         await setTariAccount()
       } catch (error) {
         console.error('Failed to set Tari Account:', error)
       }
     }
     if (!signer) {
-      console.info('🛜 signer not found set signer')
       const signerParams: TariL1SignerParameters = {
         name: 'TariL1Signer',
         onConnection: setTariAccount,
@@ -155,6 +154,7 @@ export default function Home() {
           tariWalletAddress={tariAccount?.address}
           fromNetwork={fromNetwork}
           toNetwork={toNetwork}
+          pendingBridgeTxFromTU={pendingBridgeTxFromTU}
         />
       )}
     </main>
