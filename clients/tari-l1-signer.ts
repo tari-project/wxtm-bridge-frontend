@@ -57,15 +57,14 @@ export class TariL1Signer {
    * @returns account data
    */
   public async getAccount(): Promise<AccountData> {
-    // TODO what do we need as response?
     const resp = await this.sendRequest({
       methodName: 'getAccount',
       args: [],
     })
 
     return {
-      account_id: resp.account_id,
-      address: resp.address,
+      account_id: resp?.account_id ?? 0,
+      address: resp?.address ?? '',
     }
   }
 
@@ -92,7 +91,6 @@ export class TariL1Signer {
    * @returns XTM amount
    */
   public async getTariBalance(): Promise<WalletBalance> {
-    //TODO implement on TU side
     return this.sendRequest({
       methodName: 'getTariBalance',
       args: [],

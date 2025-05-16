@@ -38,8 +38,6 @@ export default function Home() {
   } = useTariAccount()
   const { signer, setSigner } = useTariSigner()
   const { setTariAccount } = useTariAccount()
-  console.log('SIGNER', signer)
-  console.log('account', tariAccount)
 
   const {
     watch,
@@ -124,7 +122,7 @@ export default function Home() {
   ])
 
   const handleBridgeToTari = () => {
-    console.log('Bridging to Tari...')
+    console.log('[ TAPPLET-BRIDGE ] Bridging to Tari...')
     setModalStep(2)
   }
 

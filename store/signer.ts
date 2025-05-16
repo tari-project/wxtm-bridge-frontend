@@ -10,7 +10,10 @@ export interface SignerStore<TSigner extends TariL1Signer> {
 const useTariSigner = create<SignerStore<TariL1Signer>>()((set) => ({
   signer: null,
   setSigner(signer) {
-    console.warn('🛜🛜 set signer ', signer)
+    console.info(
+      '[ TAPPLET-BRIDGE ] set tari signer with name:',
+      signer.signerName,
+    )
 
     set({ signer })
   },

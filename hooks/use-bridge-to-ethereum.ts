@@ -1,4 +1,4 @@
-// import { config } from '@/config'
+import { config } from '@/config'
 import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
 
@@ -11,8 +11,7 @@ import { parseWxtmTokenAmount } from '@/utils/parse-wxtm-token-amount'
 import useTariSigner from '@/store/signer'
 import useTariAccount from '@/store/account'
 
-// OpenAPI.BASE = config.BACKEND_API_URL
-OpenAPI.BASE = 'https://api.staging-bridge.tari.com'
+OpenAPI.BASE = config.BACKEND_API_URL
 
 export const useBridgeToEthereum = () => {
   const createTransaction = useMutation({
@@ -36,27 +35,28 @@ export const useBridgeToEthereum = () => {
     if (!tariAccount) return
     const tokenAmount = parseWxtmTokenAmount(amount)
 
-    console.log('[TAPPLET] start bridging to eth')
+    console.debug('[ TAPPLET-BRIDGE ] start bridging to eth')
     const { paymentId } = await createTransaction.mutateAsync({
       to: ethAddress,
       from: tariAccount.address,
       tokenAmount,
     })
-    console.log('[TAPPLET] response from mutate paymentid:', paymentId)
-
-    // TODO how can we get tari address to send XTM?
-    const tariColdWalletAddress =
-      'f2Kjz1SH4vRSXpNSb15SUNoECBNkxE57USorF7PpXT7hT4pJ1QViLMzinU5WiEoPn7m6hZ1BmS7AGPXAr4WpdNAU65m'
+    console.debug('[ TAPPLET-BRIDGE ] created tx with id: ', paymentId)
 
     const isSend = await signer?.sendOneSided({
       amount,
-      address: tariColdWalletAddress,
+      address: config.TARI_BRIDGE_COLDWALLET_ADDRESS,
       message: paymentId,
     })
 
-    console.log('[TAPPLET] send one sided done? ', isSend)
+    if (!isSend) {
+      console.error('[ TAPPLET-BRIDGE ] send one sided failed')
+    }
+
     const { success } = await confirmTokenSent.mutateAsync(paymentId)
-    console.log('[TAPPLET] confirm token sent success: ', success)
+    if (!success) {
+      console.error('[ TAPPLET-BRIDGE ] confirm token sent failed')
+    }
 
     setIsBridging(false)
   }
