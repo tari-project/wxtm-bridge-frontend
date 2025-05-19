@@ -26,9 +26,11 @@ export const useBridgeToEthereum = () => {
 
   const bridgeToEthereum = async ({
     amount,
+    amountAfterFee,
     ethAddress,
   }: {
     amount: string
+    amountAfterFee: string
     ethAddress: `0x${string}`
   }) => {
     setIsBridging(true)
@@ -46,6 +48,12 @@ export const useBridgeToEthereum = () => {
     const isSend = await signer?.sendOneSided({
       amount: tokenAmount,
       address: config.TARI_BRIDGE_COLDWALLET_ADDRESS,
+      paymentId: paymentId,
+    })
+    await signer?.addPendingTappletTx({
+      amount: tokenAmount,
+      amountToReceive: amountAfterFee,
+      destinationAddress: ethAddress,
       paymentId: paymentId,
     })
 

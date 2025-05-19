@@ -14,6 +14,13 @@ export interface SendOneSidedRequest {
   paymentId: string
 }
 
+export interface BridgeTxDetails {
+  amount: string
+  amountToReceive: string
+  destinationAddress: string
+  paymentId: string
+}
+
 export class TariL1Signer {
   public signerName = 'TariL1Signer'
   private __id = 0
@@ -98,18 +105,29 @@ export class TariL1Signer {
   }
 
   /**
-   * @description check if there is any processing transaction
+   * @description add to TU store pending transaction
    * @returns true or false
    */
-  public async isPendingTappletTx(): Promise<SendOneSidedRequest | undefined> {
+  public async addPendingTappletTx(tx: BridgeTxDetails): Promise<boolean> {
     return this.sendRequest({
-      methodName: 'isPendingTappletTx',
+      methodName: 'addPendingTappletTx',
+      args: [tx],
+    })
+  }
+
+  /**
+   * @description check if there is any pending transaction
+   * @returns true or false
+   */
+  public async getPendingTappletTx(): Promise<BridgeTxDetails | undefined> {
+    return this.sendRequest({
+      methodName: 'getPendingTappletTx',
       args: [],
     })
   }
 
   /**
-   * @description check if there is any processing transaction
+   * @description check if there is any pending transaction
    * @returns true or false
    */
   public async removePendingTappletTx(paymentId: string): Promise<boolean> {

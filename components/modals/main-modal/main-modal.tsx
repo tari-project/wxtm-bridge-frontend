@@ -8,7 +8,6 @@ import { ReviewModal } from '@/components/modals/review-modal'
 import { SuccessModal } from '@/components/modals/success-modal'
 import { WrapModal } from '@/components/modals/wrap-modal'
 import { MainModalProps } from './main-modal.types'
-import { useBridgeToEthereumFees } from '@/hooks/use-bridge-to-ethereum-fees'
 
 export const MainModal: React.FC<MainModalProps> = ({
   setModalOpen,
@@ -23,15 +22,12 @@ export const MainModal: React.FC<MainModalProps> = ({
   ethereumAddress,
   fromNetwork,
   toNetwork,
+  feesData,
   pendingBridgeTxFromTU,
 }) => {
   const { isConnected } = useAccount()
   const modalRef = useRef<HTMLDivElement>(null)
-  const feesData = useBridgeToEthereumFees(
-    !isBridging && pendingBridgeTxFromTU
-      ? pendingBridgeTxFromTU?.amount
-      : amount,
-  )
+  // const feesData = useBridgeToEthereumFees(amount)
 
   const closeModal = () => {
     setModalOpen(false)
@@ -80,15 +76,12 @@ export const MainModal: React.FC<MainModalProps> = ({
       return (
         <WrapModal
           closeModal={closeModal}
-          amount={
-            !isBridging && pendingBridgeTxFromTU
-              ? pendingBridgeTxFromTU?.amount
-              : amount
-          }
+          amount={amount}
           tariWalletAddress={tariWalletAddress}
           ethereumAddress={ethereumAddress}
           fromNetwork={fromNetwork}
           feesData={feesData}
+          pendingBridgeTxFromTU={pendingBridgeTxFromTU}
         />
       )
     return null

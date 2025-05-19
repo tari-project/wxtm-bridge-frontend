@@ -14,9 +14,10 @@ import useTariAccount from '@/store/account'
 import useTariSigner from '@/store/signer'
 import TariL1Signer from '@/clients/tari-l1-signer'
 import { TariL1SignerParameters } from '@/types/tapplet'
+import { useBridgeToEthereumFees } from '@/hooks/use-bridge-to-ethereum-fees'
 
 export default function Home() {
-  const { isConnected, address } = useAccount()
+  const { isConnected, address: ethAddress } = useAccount()
   const [modalOpen, setModalOpen] = useState(false)
   const [modalStep, setModalStep] = useState<number>(1)
   const [success] = useState(false)
@@ -50,6 +51,7 @@ export default function Home() {
   })
 
   const amount = watch('amount')
+  const feesData = useBridgeToEthereumFees(amount)
 
   // Auto-close modal when connected and on connect step
   useEffect(() => {
@@ -95,7 +97,7 @@ export default function Home() {
   }
 
   const handleBridgeToEthereum = useCallback(() => {
-    if (!amount || !address) {
+    if (!amount || !ethAddress) {
       return
     }
 
@@ -103,7 +105,11 @@ export default function Home() {
 
     addPendingTransaction(txId)
 
-    bridgeToEthereum({ amount, ethAddress: address })
+    bridgeToEthereum({
+      amount,
+      amountAfterFee: feesData.amountAfterFee,
+      ethAddress: ethAddress,
+    })
       .then(() => {
         setModalStep(2)
       })
@@ -114,9 +120,10 @@ export default function Home() {
       })
   }, [
     amount,
-    address,
-    bridgeToEthereum,
+    ethAddress,
     addPendingTransaction,
+    bridgeToEthereum,
+    feesData,
     removePendingTransaction,
   ])
 
@@ -150,10 +157,11 @@ export default function Home() {
           handleBridgeToTari={handleBridgeToTari}
           isBridging={isBridging}
           amount={amount}
-          ethereumAddress={address}
+          ethereumAddress={ethAddress}
           tariWalletAddress={tariAccount?.address}
           fromNetwork={fromNetwork}
           toNetwork={toNetwork}
+          feesData={feesData}
           pendingBridgeTxFromTU={pendingBridgeTxFromTU}
         />
       )}

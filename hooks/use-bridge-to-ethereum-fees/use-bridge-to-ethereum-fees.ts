@@ -9,6 +9,13 @@ export const useBridgeToEthereumFees = (
 ): BridgeToEthereumFees => {
   return useMemo(() => {
     try {
+      if (!tokenAmount || tokenAmount.trim() === '') {
+        return {
+          feeAmount: '0',
+          amountAfterFee: '0',
+          feePercentage: 0,
+        }
+      }
       const amount = parseUnits(tokenAmount, 6)
 
       const feeAmountBN =
