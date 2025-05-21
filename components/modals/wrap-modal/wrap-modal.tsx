@@ -24,6 +24,7 @@ export const WrapModal: React.FC<WrapModalProps> = ({
     tariWalletAddress!,
   )
 
+  // TODO temp solution if backend is not ready to be fetched
   // in case tx is still pending
   const amountPending = pendingBridgeTxFromTU?.amount ?? amount
   const amountAfterFeePending =

@@ -59,7 +59,7 @@ export default function Home() {
       try {
         await setTariAccount()
       } catch (error) {
-        console.error('Failed to set Tari Account:', error)
+        console.error('[ TAPPLET-BRIDGE ] Failed to set Tari Account:', error)
       }
     }
     if (!signer) {
@@ -114,7 +114,7 @@ export default function Home() {
         setModalStep(2)
       })
       .catch((error) => {
-        console.error('Bridge operation failed:', error)
+        console.error('[ TAPPLET-BRIDGE ] Bridge operation failed:', error)
 
         removePendingTransaction(txId)
       })
@@ -128,7 +128,6 @@ export default function Home() {
   ])
 
   const handleBridgeToTari = () => {
-    console.log('[ TAPPLET-BRIDGE ] Bridging to Tari...')
     setModalStep(2)
   }
 

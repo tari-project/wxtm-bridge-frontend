@@ -35,23 +35,28 @@ export const useBridgeToEthereum = () => {
   }) => {
     setIsBridging(true)
     if (!tariAccount) return
-    const tokenAmount = parseWxtmTokenAmount(amount)
+    const parsedAmount = parseWxtmTokenAmount(amount)
 
-    console.debug('[ TAPPLET-BRIDGE ] start bridging to eth')
+    console.debug(
+      '[ TAPPLET-BRIDGE ] start bridging to eth with amount:',
+      parsedAmount,
+    )
     const { paymentId } = await createTransaction.mutateAsync({
       to: ethAddress,
       from: tariAccount.address,
-      tokenAmount,
+      tokenAmount: parsedAmount,
     })
     console.debug('[ TAPPLET-BRIDGE ] created tx with id: ', paymentId)
 
+    // the amount is parsed in TU in the `send_one_sided_to_stealth_address` function
+    // so here it is necessary to pass the value entered by the user as is
     const isSend = await signer?.sendOneSided({
-      amount: tokenAmount,
+      amount: amount,
       address: config.TARI_BRIDGE_COLDWALLET_ADDRESS,
       paymentId: paymentId,
     })
     await signer?.addPendingTappletTx({
-      amount: tokenAmount,
+      amount: parsedAmount,
       amountToReceive: amountAfterFee,
       destinationAddress: ethAddress,
       paymentId: paymentId,

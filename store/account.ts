@@ -34,7 +34,6 @@ const initialState: State = {
 export const useTariAccount = create<OotleWalletStoreState>()((set) => ({
   ...initialState,
   setTariAccount: async () => {
-    console.info('[ TAPPLET-BRIDGE ] set tari account')
     const signer = useTariSigner.getState().signer
     try {
       if (!signer) {
@@ -43,8 +42,8 @@ export const useTariAccount = create<OotleWalletStoreState>()((set) => ({
       }
       const account = await signer.getAccount()
       const balance = await signer.getTariBalance()
+      // TODO temp solution if backend is not ready to be fetched
       const pendingTx = await signer.getPendingTappletTx()
-      console.info('[ TAPPLET-BRIDGE ] call TU pending tx', pendingTx)
       set({
         tariAccount: {
           account_id: account.account_id,
@@ -55,7 +54,10 @@ export const useTariAccount = create<OotleWalletStoreState>()((set) => ({
         isProcessingTransaction: !!pendingTx,
       })
     } catch (error) {
-      console.error('Could not set the Tari account: ', error)
+      console.error(
+        '[ TAPPLET-BRIDGE ] error setting the Tari account: ',
+        error,
+      )
     }
   },
 
