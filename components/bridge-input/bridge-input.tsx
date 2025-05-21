@@ -5,6 +5,7 @@ import { TextField } from '@mui/material'
 import { BridgeInputProps } from './bridge-input.types'
 import { useBridgeInfo } from '@/hooks/use-bridge-info'
 import { config } from '@/config'
+import useTariAccount from '@/store/account'
 
 export const BridgeInput: React.FC<BridgeInputProps> = ({
   fromNetwork,
@@ -12,6 +13,7 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
   errors,
 }) => {
   const { fromToken } = useBridgeInfo(fromNetwork)
+  const { available_balance } = useTariAccount()
 
   return (
     <Controller
@@ -30,6 +32,19 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
         pattern: {
           value: /^\d+(\.\d{0,6})?$/,
           message: 'Maximum 6 decimal places allowed',
+        },
+        validate: (value) => {
+          const amount = parseFloat(value)
+          if (isNaN(amount)) {
+            return 'Amount must be a valid number'
+          }
+          if (amount > config.MAX_BRIDGE_AMOUNT) {
+            return `Maximum amount is ${config.MAX_BRIDGE_AMOUNT} ${fromToken}`
+          }
+          if (amount > available_balance) {
+            return `Amount exceeds your wallet balance`
+          }
+          return true
         },
       }}
       render={({ field }) => (
