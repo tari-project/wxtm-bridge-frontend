@@ -56,7 +56,7 @@ export const useBridgeToEthereum = () => {
       paymentId: paymentId,
     })
     await signer?.addPendingTappletTx({
-      amount: parsedAmount,
+      amount: amount,
       amountToReceive: amountAfterFee,
       destinationAddress: ethAddress,
       paymentId: paymentId,
