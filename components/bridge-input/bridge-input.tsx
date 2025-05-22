@@ -23,7 +23,7 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
         required: 'Amount is required',
         min: {
           value: config.MIN_BRIDGE_AMOUNT,
-          message: `Min amount is ${config.MIN_BRIDGE_AMOUNT} ${fromToken}`,
+          message: `You must bridge at least ${config.MIN_BRIDGE_AMOUNT.toLocaleString()} ${fromToken}`,
         },
         max: {
           value: config.MAX_BRIDGE_AMOUNT,
