@@ -1,12 +1,14 @@
 import { AccountData } from '@/types/tapplet'
 import { create } from 'zustand'
 import useTariSigner from './signer'
+import { BridgeTxDetails } from '@/clients/tari-l1-signer'
 
 interface State {
   tariAccount?: AccountData
   available_balance: number
   pendingBridgeTx: string[]
   isProcessingTransaction: boolean
+  pendingBridgeTxFromTU?: BridgeTxDetails
 }
 
 interface Actions {
@@ -21,40 +23,41 @@ type OotleWalletStoreState = State & Actions
 const initialState: State = {
   tariAccount: {
     account_id: 0,
-    address:
-      'f25V4MStkUBE8UaD1Ar84KropPKLNSJLN5XUZFzSkMEv6u2AQYAsGTkwx5Lj5WcjWnTxGyDPfwPgh6hnw5BQX1G7T8C',
+    address: '',
   },
   available_balance: 0,
   pendingBridgeTx: [],
   isProcessingTransaction: false,
+  pendingBridgeTxFromTU: undefined,
 }
 
 export const useTariAccount = create<OotleWalletStoreState>()((set) => ({
   ...initialState,
   setTariAccount: async () => {
-    console.warn('Try to set the Tari acc')
     const signer = useTariSigner.getState().signer
-    console.warn('Try to set the Tari signer', signer)
     try {
       if (!signer) {
+        console.error('[ TAPPLET-BRIDGE ] signer undefined')
         return
       }
-      console.warn('[TAPPLET-BRIDGE ]Try to set the Tari account: ')
       const account = await signer.getAccount()
-      console.warn('[TAPPLET-BRIDGE ]Tari account: ', account.address)
-      const isTariConnected = await signer.isConnected()
-      console.warn('[TAPPLET-BRIDGE ]is connected? ', isTariConnected)
       const balance = await signer.getTariBalance()
-      console.warn('[TAPPLET-BRIDGE ]balance ', { balance })
+      // TODO temp solution if backend is not ready to be fetched
+      const pendingTx = await signer.getPendingTappletTx()
       set({
         tariAccount: {
           account_id: account.account_id,
           address: account.address,
         },
-        available_balance: balance.available_balance,
+        available_balance: balance?.available_balance ?? 0,
+        pendingBridgeTxFromTU: pendingTx,
+        isProcessingTransaction: !!pendingTx,
       })
     } catch (error) {
-      console.error('Could not set the Tari account: ', error)
+      console.error(
+        '[ TAPPLET-BRIDGE ] error setting the Tari account: ',
+        error,
+      )
     }
   },
 

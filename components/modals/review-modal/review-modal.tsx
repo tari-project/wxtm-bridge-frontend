@@ -5,6 +5,7 @@ import { IoCloseOutline } from 'react-icons/io5'
 import { ReviewModalProps } from './review-modal.types'
 import { ModalButton } from '@/components/modals/modal-button'
 import { useBridgeInfo } from '@/hooks/use-bridge-info'
+import { config } from '@/config'
 
 export const ReviewModal: React.FC<ReviewModalProps> = ({
   closeModal,
@@ -16,7 +17,12 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
   ethereumAddress,
   fromNetwork,
   toNetwork,
-  feesData: { amountAfterFee, feeAmount, feePercentage },
+  feesData: {
+    amountAfterFee,
+    feeAmount,
+    feePercentage,
+    isOverHighBridgeThreshold,
+  },
 }) => {
   const { fromToken, toToken, destAddress, bridgeHandler } = useBridgeInfo(
     fromNetwork,
@@ -43,7 +49,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
         </div>
 
         {/* Section 1 */}
-        <div className="flex justify-between gap-2 mt-4 items-center p-4 rounded-lg bg-white border-[1px] border-gray-200 max-w-[421px]">
+        <div className="flex justify-between gap-2 mt-4 items-center p-4 rounded-2xl bg-white border-[1px] border-gray-200 max-w-[421px]">
           <div className="space-y-[-10px]">
             <div className="font-medium text-sm">Amount to bridge</div>
           </div>
@@ -68,6 +74,27 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
             </div>
           </div>
         </div>
+
+        {/* Optional modal if amount > 100,000 XTM */}
+        {isOverHighBridgeThreshold && (
+          <div
+            className="flex justify-between gap-2 mt-4 items-center p-4 rounded-2xl bg-white border-[1px] border-gray-200 max-w-[421px]"
+            style={{
+              backgroundColor: '#FF770033',
+              border: '1px solid #0000001A',
+            }}
+          >
+            <div className="space-y-[-10px]">
+              <div className="font-medium text-sm" style={{ color: '#B35400' }}>
+                Bridging over{' '}
+                <span className="font-bold">
+                  {config.HIGH_BRIDGE_THRESHOLD.toLocaleString()} XTM
+                </span>{' '}
+                may take up to 24-48h to complete due to extra verification.
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Section 2 */}
         <div className="flex flex-col my-4">

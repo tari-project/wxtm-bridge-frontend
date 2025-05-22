@@ -4,6 +4,7 @@ import { metaMask, walletConnect } from 'wagmi/connectors'
 
 declare global {
   // Avoid TS error on `globalThis` and multiple WalletConnect reload
+  // eslint-disable-next-line no-var
   var wagmiConfig: ReturnType<typeof createConfig> | undefined
 }
 

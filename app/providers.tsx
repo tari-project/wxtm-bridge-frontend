@@ -18,7 +18,7 @@ export const Providers = ({ children }: { children: ReactNode }) => {
   }, [config])
 
   if (!initialState)
-    console.error('[ Bridge ] provider initial state undefined')
+    console.debug('[ TAPPLET-BRIDGE ] provider initial state undefined')
 
   return (
     <WagmiProvider config={config} initialState={initialState}>

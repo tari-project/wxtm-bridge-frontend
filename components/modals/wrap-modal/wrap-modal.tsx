@@ -12,15 +12,25 @@ export const WrapModal: React.FC<WrapModalProps> = ({
   ethereumAddress,
   fromNetwork,
   feesData: { amountAfterFee },
+  pendingBridgeTxFromTU,
 }) => {
   /** @dev Tmp hardcoded tx hash */
   //const txhash = '0x0bec7941a37c07ec7cd408b3478c66ac7a26c4e48c2fd22577bb2c9c44cb4ae8'
 
+  console.debug('[WRAP MODAL] pending tx from TU:', { pendingBridgeTxFromTU })
   const { fromToken, toToken, destAddress } = useBridgeInfo(
     fromNetwork,
     ethereumAddress!,
     tariWalletAddress!,
   )
+
+  // TODO temp solution if backend is not ready to be fetched
+  // in case tx is still pending
+  const amountPending = pendingBridgeTxFromTU?.amount ?? amount
+  const amountAfterFeePending =
+    pendingBridgeTxFromTU?.amountToReceive ?? amountAfterFee
+  const destAddressPending =
+    pendingBridgeTxFromTU?.destinationAddress ?? destAddress
 
   return (
     <div className="w-full flex flex-col p-6">
@@ -38,12 +48,12 @@ export const WrapModal: React.FC<WrapModalProps> = ({
           </div>
           <div className="font-semibold text-lg mt-2">
             We&apos;re {fromToken === 'wXTM' ? 'unwrapping' : 'wrapping'} your{' '}
-            {amount.toLocaleString()} {fromToken}
+            {amountPending.toLocaleString()} {fromToken}
           </div>
           <div className="font-normal text-xs mt-2 text-center px-5">
-            You&apos;ll receive {amountAfterFee} {toToken} in no more than 12h.
-            Funds are automatically transferred from your linked Tari Universe
-            wallet. You don&apos;t need to do anything else.
+            You&apos;ll receive {amountAfterFeePending} {toToken} in no more
+            than 12h. Funds are automatically transferred from your linked Tari
+            Universe wallet. You don&apos;t need to do anything else.
           </div>
         </div>
 
@@ -52,7 +62,7 @@ export const WrapModal: React.FC<WrapModalProps> = ({
           <div className="font-medium">
             <div className="text-xs text-gray-500">You will receive</div>
             <div className="text-sm">
-              {amountAfterFee} {toToken}
+              {amountAfterFeePending} {toToken}
             </div>
           </div>
 
@@ -60,7 +70,7 @@ export const WrapModal: React.FC<WrapModalProps> = ({
 
           <div className="font-medium">
             <div className="text-xs text-gray-500">Destination address</div>
-            <div className="text-sm">{destAddress}</div>
+            <div className="text-sm">{destAddressPending}</div>
           </div>
 
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>

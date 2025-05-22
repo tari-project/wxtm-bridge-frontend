@@ -1,4 +1,4 @@
-// import { config } from '@/config'
+import { config } from '@/config'
 import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
 
@@ -11,8 +11,7 @@ import { parseWxtmTokenAmount } from '@/utils/parse-wxtm-token-amount'
 import useTariSigner from '@/store/signer'
 import useTariAccount from '@/store/account'
 
-// OpenAPI.BASE = config.BACKEND_API_URL
-OpenAPI.BASE = 'https://api.staging-bridge.tari.com'
+OpenAPI.BASE = config.BACKEND_API_URL
 
 export const useBridgeToEthereum = () => {
   const createTransaction = useMutation({
@@ -27,36 +26,50 @@ export const useBridgeToEthereum = () => {
 
   const bridgeToEthereum = async ({
     amount,
+    amountAfterFee,
     ethAddress,
   }: {
     amount: string
+    amountAfterFee: string
     ethAddress: `0x${string}`
   }) => {
     setIsBridging(true)
     if (!tariAccount) return
-    const tokenAmount = parseWxtmTokenAmount(amount)
+    const parsedAmount = parseWxtmTokenAmount(amount)
 
-    console.log('[TAPPLET] start bridging to eth')
+    console.debug(
+      '[ TAPPLET-BRIDGE ] start bridging to eth with amount:',
+      parsedAmount,
+    )
     const { paymentId } = await createTransaction.mutateAsync({
       to: ethAddress,
       from: tariAccount.address,
-      tokenAmount,
+      tokenAmount: parsedAmount,
     })
-    console.log('[TAPPLET] response from mutate paymentid:', paymentId)
+    console.debug('[ TAPPLET-BRIDGE ] created tx with id: ', paymentId)
 
-    // TODO how can we get tari address to send XTM?
-    const tariColdWalletAddress =
-      'f2Kjz1SH4vRSXpNSb15SUNoECBNkxE57USorF7PpXT7hT4pJ1QViLMzinU5WiEoPn7m6hZ1BmS7AGPXAr4WpdNAU65m'
-
+    // the amount is parsed in TU in the `send_one_sided_to_stealth_address` function
+    // so here it is necessary to pass the value entered by the user as is
     const isSend = await signer?.sendOneSided({
-      amount,
-      address: tariColdWalletAddress,
-      message: paymentId,
+      amount: amount,
+      address: config.TARI_BRIDGE_COLDWALLET_ADDRESS,
+      paymentId: paymentId,
+    })
+    await signer?.addPendingTappletTx({
+      amount: amount,
+      amountToReceive: amountAfterFee,
+      destinationAddress: ethAddress,
+      paymentId: paymentId,
     })
 
-    console.log('[TAPPLET] send one sided done? ', isSend)
+    if (!isSend) {
+      console.error('[ TAPPLET-BRIDGE ] send one sided failed')
+    }
+
     const { success } = await confirmTokenSent.mutateAsync(paymentId)
-    console.log('[TAPPLET] confirm token sent success: ', success)
+    if (!success) {
+      console.error('[ TAPPLET-BRIDGE ] confirm token sent failed')
+    }
 
     setIsBridging(false)
   }

@@ -8,7 +8,6 @@ import { ReviewModal } from '@/components/modals/review-modal'
 import { SuccessModal } from '@/components/modals/success-modal'
 import { WrapModal } from '@/components/modals/wrap-modal'
 import { MainModalProps } from './main-modal.types'
-import { useBridgeToEthereumFees } from '@/hooks/use-bridge-to-ethereum-fees'
 
 export const MainModal: React.FC<MainModalProps> = ({
   setModalOpen,
@@ -23,10 +22,12 @@ export const MainModal: React.FC<MainModalProps> = ({
   ethereumAddress,
   fromNetwork,
   toNetwork,
+  feesData,
+  pendingBridgeTxFromTU,
 }) => {
   const { isConnected } = useAccount()
   const modalRef = useRef<HTMLDivElement>(null)
-  const feesData = useBridgeToEthereumFees(amount)
+  // const feesData = useBridgeToEthereumFees(amount)
 
   const closeModal = () => {
     setModalOpen(false)
@@ -80,16 +81,14 @@ export const MainModal: React.FC<MainModalProps> = ({
           ethereumAddress={ethereumAddress}
           fromNetwork={fromNetwork}
           feesData={feesData}
+          pendingBridgeTxFromTU={pendingBridgeTxFromTU}
         />
       )
     return null
   }
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-      // onClick={handleOutsideClick}
-    >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <section
         ref={modalRef}
         className="w-full max-w-md mx-4 bg-white/80 shadow-[0px_4px_74px_0px_rgba(0,0,0,0.15)] backdrop-blur-[54px] rounded-3xl overflow-hidden flex flex-col justify-center items-center"
