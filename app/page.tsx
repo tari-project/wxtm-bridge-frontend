@@ -14,9 +14,10 @@ import useTariAccount from '@/store/account'
 import useTariSigner from '@/store/signer'
 import TariL1Signer from '@/clients/tari-l1-signer'
 import { TariL1SignerParameters } from '@/types/tapplet'
+import { useBridgeToEthereumFees } from '@/hooks/use-bridge-to-ethereum-fees'
 
 export default function Home() {
-  const { isConnected, address } = useAccount()
+  const { isConnected, address: ethAddress } = useAccount()
   const [modalOpen, setModalOpen] = useState(false)
   const [modalStep, setModalStep] = useState<number>(1)
   const [success] = useState(false)
@@ -35,11 +36,10 @@ export default function Home() {
     isProcessingTransaction,
     addPendingTransaction,
     removePendingTransaction,
+    pendingBridgeTxFromTU,
   } = useTariAccount()
   const { signer, setSigner } = useTariSigner()
   const { setTariAccount } = useTariAccount()
-  console.log('SIGNER', signer)
-  console.log('account', tariAccount)
 
   const {
     watch,
@@ -51,19 +51,18 @@ export default function Home() {
   })
 
   const amount = watch('amount')
+  const feesData = useBridgeToEthereumFees(amount)
 
   // Auto-close modal when connected and on connect step
   useEffect(() => {
     const setAccount = async () => {
       try {
-        console.info('🛜 setting account')
         await setTariAccount()
       } catch (error) {
-        console.error('Failed to set Tari Account:', error)
+        console.error('[ TAPPLET-BRIDGE ] Failed to set Tari Account:', error)
       }
     }
     if (!signer) {
-      console.info('🛜 signer not found set signer')
       const signerParams: TariL1SignerParameters = {
         name: 'TariL1Signer',
         onConnection: setTariAccount,
@@ -98,7 +97,7 @@ export default function Home() {
   }
 
   const handleBridgeToEthereum = useCallback(() => {
-    if (!amount || !address) {
+    if (!amount || !ethAddress) {
       return
     }
 
@@ -106,25 +105,29 @@ export default function Home() {
 
     addPendingTransaction(txId)
 
-    bridgeToEthereum({ amount, ethAddress: address })
+    bridgeToEthereum({
+      amount,
+      amountAfterFee: feesData.amountAfterFee,
+      ethAddress: ethAddress,
+    })
       .then(() => {
         setModalStep(2)
       })
       .catch((error) => {
-        console.error('Bridge operation failed:', error)
+        console.error('[ TAPPLET-BRIDGE ] Bridge operation failed:', error)
 
         removePendingTransaction(txId)
       })
   }, [
     amount,
-    address,
-    bridgeToEthereum,
+    ethAddress,
     addPendingTransaction,
+    bridgeToEthereum,
+    feesData,
     removePendingTransaction,
   ])
 
   const handleBridgeToTari = () => {
-    console.log('Bridging to Tari...')
     setModalStep(2)
   }
 
@@ -153,10 +156,12 @@ export default function Home() {
           handleBridgeToTari={handleBridgeToTari}
           isBridging={isBridging}
           amount={amount}
-          ethereumAddress={address}
+          ethereumAddress={ethAddress}
           tariWalletAddress={tariAccount?.address}
           fromNetwork={fromNetwork}
           toNetwork={toNetwork}
+          feesData={feesData}
+          pendingBridgeTxFromTU={pendingBridgeTxFromTU}
         />
       )}
     </main>
