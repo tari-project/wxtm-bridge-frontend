@@ -55,6 +55,7 @@ jobs:
           yarn config set //npm.pkg.github.com/download/:_authToken ${{ env.NODE_AUTH_TOKEN }}
           yarn config set @tari-project:registry https://npm.pkg.github.com
           yarn --frozen-lockfile
+          # npm install
 
       - name: Build
         run: |
