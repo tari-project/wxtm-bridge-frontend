@@ -1,9 +1,10 @@
 import { http, createConfig, createStorage, cookieStorage } from 'wagmi'
 import { mainnet, baseSepolia, sepolia } from 'wagmi/chains'
-import { metaMask, walletConnect } from 'wagmi/connectors'
+import { walletConnect } from 'wagmi/connectors'
 
 declare global {
   // Avoid TS error on `globalThis` and multiple WalletConnect reload
+  // eslint-disable-next-line no-var
   var wagmiConfig: ReturnType<typeof createConfig> | undefined
 }
 
@@ -20,7 +21,6 @@ export function getConfig() {
         walletConnect({
           projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID ?? '',
         }),
-        metaMask(),
       ],
       storage: createStorage({
         storage: cookieStorage,
