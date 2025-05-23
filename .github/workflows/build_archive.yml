@@ -18,7 +18,9 @@ concurrency:
   group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
   cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/v') || github.ref != 'refs/heads/development' }}
 
-permissions: {}
+permissions:
+  contents: read
+  packages: read
 
 env:
   NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -26,7 +28,7 @@ env:
   TS_FILENAME: "bridge"
 
 jobs:
-  tests:
+  build:
     runs-on: ubuntu-22.04
 
     steps:
