@@ -86,12 +86,17 @@ export const MainComponent: React.FC<MainComponentProps> = ({
           />
         </div>
         <div className="font-light text-4xl lg:text-[67.64px] leading-[40px] lg:leading-[71.5px] tracking-[0px] lg:tracking-[-3.98px] max-w-[30rem] lg:max-w-[40rem]">
-          Move your XTM with <span className="font-semibold">infinite</span>{' '}
-          possibilities
+          Bridge your <span className="font-semibold">XTM</span> to <br /> any
+          chain
         </div>
-        <div className="font-normal text-lg lg:text-[27px] leading-[30px] tracking-[0px] lg:tracking-[-1px] max-w-[25rem] lg:max-w-[35rem]">
-          We&apos;ll wrap your XTM allowing you to exchange across any network.
-          Powered by <span className="font-semibold">LayerZero</span>
+        <div className="font-normal text-lg lg:text-[24px] leading-[30px] tracking-[0px] lg:tracking-[-1px] max-w-[25rem] lg:max-w-[35rem] whitespace-pre">
+          Wrap XTM to create wXTM on Ethereum. wXTM isn&apos;t your <br />
+          everyday Ethereum token anon. It&apos;s a powerful{' '}
+          <span className="font-semibold">
+            LayerZero <br />
+            OFT
+          </span>{' '}
+          that can exist on nearly any chain you desire.
         </div>
       </div>
 
