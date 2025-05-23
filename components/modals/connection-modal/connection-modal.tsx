@@ -19,9 +19,7 @@ const ConnectionModal: React.FC<ConnectionModalProps> = ({ closeModal }) => {
       </button>
 
       <div className="flex justify-between items-center p-4">
-        <h2 className="text-lg font-bold mt-2 mb-[-1rem] ml-1">
-          Connect a Wallet
-        </h2>
+        <h2 className="text-lg font-bold mb-[-1rem] ml-1">Connect a Wallet</h2>
       </div>
 
       {/* Below to be changed to one connector only */}
@@ -38,7 +36,7 @@ const ConnectionModal: React.FC<ConnectionModalProps> = ({ closeModal }) => {
                 onClick={() => connect({ connector })}
                 className="hover:bg-gray-200/80 hover:cursor-pointer p-4 font-bold w-full text-left flex gap-2 items-center px-6"
               >
-                {connector.name === 'WalletConnect' ? (
+                {connector.name === 'WalletConnect' && (
                   <div className="w-[42px] h-[42px] rounded-xl overflow-hidden relative">
                     <Image
                       src="/icons/walletconnect.png"
@@ -46,16 +44,6 @@ const ConnectionModal: React.FC<ConnectionModalProps> = ({ closeModal }) => {
                       sizes="42px"
                       alt={`Wallet`}
                       className="object-cover"
-                    />
-                  </div>
-                ) : (
-                  <div className="w-[30px] h-[30px] rounded-xl overflow-hidden relative ml-[6px]">
-                    <Image
-                      src="/icons/metamask.png"
-                      fill
-                      sizes="30px"
-                      alt={`Wallet`}
-                      className="object-contain"
                     />
                   </div>
                 )}
