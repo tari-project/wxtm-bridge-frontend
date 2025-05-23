@@ -89,7 +89,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
           Bridge your <span className="font-semibold">XTM</span> to <br /> any
           chain
         </div>
-        <div className="font-normal text-lg lg:text-[27px] leading-[30px] tracking-[0px] lg:tracking-[-1px]max-w-none whitespace-pre">
+        <div className="font-normal text-lg lg:text-[24px] leading-[30px] tracking-[0px] lg:tracking-[-1px] max-w-[25rem] lg:max-w-[35rem] whitespace-pre">
           Wrap XTM to create wXTM on Ethereum. wXTM isn&apos;t your <br />
           everyday Ethereum token anon. It&apos;s a powerful{' '}
           <span className="font-semibold">
