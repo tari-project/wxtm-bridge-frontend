@@ -23,7 +23,6 @@ export const MainModal: React.FC<MainModalProps> = ({
   fromNetwork,
   toNetwork,
   feesData,
-  pendingBridgeTxFromTU,
 }) => {
   const { isConnected } = useAccount()
   const modalRef = useRef<HTMLDivElement>(null)
@@ -81,7 +80,6 @@ export const MainModal: React.FC<MainModalProps> = ({
           ethereumAddress={ethereumAddress}
           fromNetwork={fromNetwork}
           feesData={feesData}
-          pendingBridgeTxFromTU={pendingBridgeTxFromTU}
         />
       )
     return null

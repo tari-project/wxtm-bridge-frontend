@@ -1,3 +1,5 @@
+import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
+
 export interface AccountData {
   account_id: number
   address: string
@@ -12,4 +14,8 @@ export interface WalletBalance {
 
 export interface PendingBridgeTx {
   paymentId: string
+}
+
+export type PendingUserTransaction = Omit<UserTransactionDTO, 'feeAmount'> & {
+  destinationAddress: string
 }
