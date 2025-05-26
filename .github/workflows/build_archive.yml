@@ -1,0 +1,129 @@
+---
+name: Release archive
+
+'on':
+  push:
+    paths-ignore:
+      - '**/*.md'
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]*"
+    branches:
+      - 'build-*'
+  schedule:
+    - cron: '05 00 01 * *'
+  workflow_dispatch:
+
+concurrency:
+  # https://docs.github.com/en/actions/examples/using-concurrency-expressions-and-a-test-matrix
+  group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/v') || github.ref != 'refs/heads/development' }}
+
+permissions:
+  contents: read
+  packages: read
+
+env:
+  NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  NODE_VERSION: 18.19.0
+  TS_FILENAME: "bridge"
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          registry-url: 'https://npm.pkg.github.com'
+
+      - name: Install dependencies
+        run: |
+          yarn config set //npm.pkg.github.com/download/:_authToken ${{ env.NODE_AUTH_TOKEN }}
+          yarn config set @tari-project:registry https://npm.pkg.github.com
+          yarn --frozen-lockfile
+
+      - name: Build
+        run: |
+          npm run build
+
+      - name: Artifact upload for Archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.TS_FILENAME }}_archive_unreleased
+          path: "out"
+
+  create-release:
+    if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+
+    runs-on: ubuntu-latest
+    needs: build
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download binaries
+        uses: actions/download-artifact@v4
+        with:
+          path: ${{ env.TS_FILENAME }}
+          pattern: "${{ env.TS_FILENAME }}*"
+          merge-multiple: true
+
+      - name: Archive and Checksum Binaries
+        shell: bash
+        working-directory: ${{ env.TS_FILENAME }}
+        run: |
+          # set -xo pipefail
+          TS_VERSION=${GITHUB_REF#refs/tags/v}
+          echo "TS_VERSION=${TS_VERSION}" >> "$GITHUB_ENV"
+          ls -alhtR
+          echo "Archive ${{ env.TS_FILENAME }} too ${{ env.TS_FILENAME }}-v${TS_VERSION}.zip"
+          7z a "${{ env.TS_FILENAME }}-v${TS_VERSION}.zip" *
+          echo "Compute archive shasum"
+          ${SHARUN} "${{ env.TS_FILENAME }}-v${TS_VERSION}.zip" >> "${{ env.TS_FILENAME }}-v${TS_VERSION}.zip.sha256"
+          echo "Show the shasum"
+          cat "${{ env.TS_FILENAME }}-v${TS_VERSION}.zip.sha256"
+          echo "Checksum verification archive is "
+          ${SHARUN} --check "${{ env.TS_FILENAME }}-v${TS_VERSION}.zip.sha256"
+
+      - name: Create release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "${{ env.TS_FILENAME }}/${{ env.TS_FILENAME }}-v${TS_VERSION}.zip*"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          prerelease: true
+          draft: true
+          allowUpdates: true
+          updateOnlyUnreleased: true
+          replacesArtifacts: true
+
+      - name: Sync assets to S3
+        continue-on-error: true
+        if: ${{ env.AWS_SECRET_ACCESS_KEY != '' && !contains(runner.labels, 'self-hosted') }}
+        env:
+          BASE_URL: ${{ secrets.BASE_URL }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_ENDPOINT_URL: ${{ secrets.AWS_ENDPOINT_URL }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+          S3CMD: "cp"
+          # S3OPTIONS: '--recursive --exclude "*" --include "*.sha256*" --include "*.zip*" --content-type "application/octet-stream" --checksum-algorithm CRC32'
+          S3OPTIONS: '--exclude "*" --include "*.sha256*" --include "*.zip*" --content-type "application/octet-stream" --checksum-algorithm CRC32'
+        shell: bash
+        working-directory: ${{ env.TS_FILENAME }}
+        run: |
+          echo "Upload processing ..."
+          ls -alhtR
+          aws --version
+          echo "Upload current"
+          aws s3 ${{ env.S3CMD }} \
+            ${{ env.TS_FILENAME }}-v${{ env.TS_VERSION }}.zip* \
+            s3://${{ env.BASE_URL }}/${{ github.repository }}/releases/download/v${{ env.TS_VERSION }}/ \
+            ${{ env.S3OPTIONS }}
