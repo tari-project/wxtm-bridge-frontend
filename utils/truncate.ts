@@ -1,4 +1,4 @@
-export const truncateAddress = (fullStr: `0x${string}`, strLen: number) => {
+export const truncateAddress = (fullStr: string, strLen: number) => {
   if (fullStr.length <= strLen) return fullStr
 
   const separator = '...'
