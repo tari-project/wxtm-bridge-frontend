@@ -16,6 +16,4 @@ export interface PendingBridgeTx {
   paymentId: string
 }
 
-export type PendingUserTransaction = Omit<UserTransactionDTO, 'feeAmount'> & {
-  destinationAddress: string
-}
+export type PendingUserTransaction = Omit<UserTransactionDTO, 'feeAmount'>

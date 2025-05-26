@@ -23,12 +23,7 @@ export const useBridgeTransaction = () => {
     walletAddress: string,
     pendingBridgeTx?: PendingUserTransaction,
   ) => {
-    // const walletAddress = tariAccount.address
-    console.log('[ TAPPLET BACKEND GET USER TXS ] address', walletAddress)
     const { transactions } = await getUserTxs.mutateAsync(walletAddress)
-
-    console.log('[ TAPPLET BACKEND GET USER TXS ]', transactions.length)
-    console.log('[ TAPPLET BACKEND GET USER TXS ]', transactions)
 
     if (Array.isArray(transactions) && transactions.length > 0) {
       // check if new tx has status PENDING and if so, add to store
@@ -36,16 +31,11 @@ export const useBridgeTransaction = () => {
         (tx) => tx.status === UserTransactionDTO.status.PENDING,
       )
       if (pending) {
-        // the backend data has no destinationAddress so don't override it
-        const updatedPending: PendingUserTransaction = {
-          ...pending,
-          destinationAddress: pendingBridgeTx?.destinationAddress ?? '',
-        }
-        setPendingTransaction(updatedPending)
+        setPendingTransaction(pending)
         return
       }
 
-      // check if tx changed status to SUCCESS and if so, remove pending
+      // double check to remove pending tx which is already success
       const success = transactions.find(
         (tx) => tx.status === UserTransactionDTO.status.SUCCESS,
       )
