@@ -6,6 +6,7 @@ import { ReviewModalProps } from './review-modal.types'
 import { ModalButton } from '@/components/modals/modal-button'
 import { useBridgeInfo } from '@/hooks/use-bridge-info'
 import { config } from '@/config'
+import { truncateAddress } from '@/utils/truncate'
 
 export const ReviewModal: React.FC<ReviewModalProps> = ({
   closeModal,
@@ -105,7 +106,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
 
             <div className="text-sm">
               {destAddress === ethereumAddress
-                ? tariWalletAddress
+                ? truncateAddress(tariWalletAddress!, 50)
                 : ethereumAddress}
             </div>
           </div>
