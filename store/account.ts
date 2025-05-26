@@ -1,21 +1,21 @@
-import { AccountData } from '@/types/tapplet'
+import { AccountData, PendingUserTransaction } from '@/types/tapplet'
 import { create } from 'zustand'
 import useTariSigner from './signer'
 import { BridgeTxDetails } from '@/clients/tari-l1-signer'
+import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
 
 interface State {
   tariAccount?: AccountData
   available_balance: number
-  pendingBridgeTx: string[]
   isProcessingTransaction: boolean
+  pendingBridgeTx?: PendingUserTransaction
   pendingBridgeTxFromTU?: BridgeTxDetails
 }
 
 interface Actions {
   setTariAccount: () => Promise<void>
-  addPendingTransaction: (txId: string) => void
-  removePendingTransaction: (txId: string) => void
-  setProcessingTransaction: (isProcessing: boolean) => void
+  setPendingTransaction: (tx: PendingUserTransaction) => void
+  removePendingTransaction: () => void
 }
 
 type OotleWalletStoreState = State & Actions
@@ -26,7 +26,7 @@ const initialState: State = {
     address: '',
   },
   available_balance: 0,
-  pendingBridgeTx: [],
+  pendingBridgeTx: undefined,
   isProcessingTransaction: false,
   pendingBridgeTxFromTU: undefined,
 }
@@ -35,6 +35,7 @@ export const useTariAccount = create<OotleWalletStoreState>()((set) => ({
   ...initialState,
   setTariAccount: async () => {
     const signer = useTariSigner.getState().signer
+
     try {
       if (!signer) {
         console.error('[ TAPPLET-BRIDGE ] signer undefined')
@@ -44,6 +45,7 @@ export const useTariAccount = create<OotleWalletStoreState>()((set) => ({
       const balance = await signer.getTariBalance()
       // TODO temp solution if backend is not ready to be fetched
       const pendingTx = await signer.getPendingTappletTx()
+      console.log('[ TAPPLET-BRIDGE ] setAccount signer ', { account })
       set({
         tariAccount: {
           account_id: account.account_id,
@@ -51,7 +53,13 @@ export const useTariAccount = create<OotleWalletStoreState>()((set) => ({
         },
         available_balance: balance?.available_balance ?? 0,
         pendingBridgeTxFromTU: pendingTx,
-        isProcessingTransaction: !!pendingTx,
+        pendingBridgeTx: {
+          tokenAmount: pendingTx?.amount ?? '',
+          amountAfterFee: pendingTx?.amountToReceive ?? '',
+          createdAt: '',
+          destinationAddress: pendingTx?.destinationAddress ?? '',
+          status: UserTransactionDTO.status.PENDING,
+        },
       })
     } catch (error) {
       console.error(
@@ -61,23 +69,17 @@ export const useTariAccount = create<OotleWalletStoreState>()((set) => ({
     }
   },
 
-  addPendingTransaction: (txId: string) => {
-    set((state) => ({
-      pendingBridgeTx: [...state.pendingBridgeTx, txId],
+  setPendingTransaction: (tx: PendingUserTransaction) => {
+    set({
+      pendingBridgeTx: tx,
       isProcessingTransaction: true,
-    }))
-  },
-  removePendingTransaction: (txId: string) => {
-    set((state) => {
-      const updatedTxs = state.pendingBridgeTx.filter((id) => id !== txId)
-      return {
-        pendingBridgeTx: updatedTxs,
-        isProcessingTransaction: updatedTxs.length > 0,
-      }
     })
   },
-  setProcessingTransaction: (isProcessing: boolean) => {
-    set({ isProcessingTransaction: isProcessing })
+  removePendingTransaction: () => {
+    set({
+      pendingBridgeTx: undefined,
+      isProcessingTransaction: false,
+    })
   },
 }))
 
