@@ -5,7 +5,6 @@ import { useState } from 'react'
 import {
   WrapTokenService,
   OpenAPI,
-  UserTransactionDTO,
 } from '@tari-project/wxtm-bridge-backend-api'
 
 import { parseWxtmTokenAmount } from '@/utils/parse-wxtm-token-amount'
@@ -22,7 +21,7 @@ export const useBridgeToEthereum = () => {
     mutationFn: WrapTokenService.updateToTokensSent,
   })
   const { signer } = useTariSigner()
-  const { tariAccount, setPendingTransaction } = useTariAccount()
+  const { tariAccount } = useTariAccount()
   const [isBridging, setIsBridging] = useState(false)
 
   const bridgeToEthereum = async ({
@@ -50,14 +49,14 @@ export const useBridgeToEthereum = () => {
     console.debug('[ TAPPLET-BRIDGE ] created tx with id: ', paymentId)
 
     // ADD THIS DO STORE DO KEEP MODAL OPENED
-    const createdAtPlaceholder = `${Date.now()}`
-    setPendingTransaction({
-      tokenAmount: amount,
-      amountAfterFee: amountAfterFee,
-      createdAt: createdAtPlaceholder,
-      destinationAddress: ethAddress,
-      status: UserTransactionDTO.status.PENDING,
-    })
+    // const createdAtPlaceholder = `${Date.now()}`
+    // setPendingTransaction({
+    //   tokenAmount: amount,
+    //   amountAfterFee: amountAfterFee,
+    //   createdAt: createdAtPlaceholder,
+    //   destinationAddress: ethAddress,
+    //   status: UserTransactionDTO.status.PENDING,
+    // })
 
     // the amount is parsed in TU in the `send_one_sided_to_stealth_address` function
     // so here it is necessary to pass the value entered by the user as is
