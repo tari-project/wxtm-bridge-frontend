@@ -6,7 +6,7 @@ name: Release archive
     paths-ignore:
       - '**/*.md'
     tags:
-      - "v[0-9]+.[0-9]+.[0-9]*"
+      - 'v[0-9]+.[0-9]+.[0-9]*'
     branches:
       - 'build-*'
   schedule:
@@ -87,11 +87,11 @@ jobs:
           echo "Archive ${{ env.TS_FILENAME }} too ${{ env.TS_FILENAME }}-v${TS_VERSION}.zip"
           7z a "${{ env.TS_FILENAME }}-v${TS_VERSION}.zip" *
           echo "Compute archive shasum"
-          ${SHARUN} "${{ env.TS_FILENAME }}-v${TS_VERSION}.zip" >> "${{ env.TS_FILENAME }}-v${TS_VERSION}.zip.sha256"
+          shasum "${{ env.TS_FILENAME }}-v${TS_VERSION}.zip" >> "${{ env.TS_FILENAME }}-v${TS_VERSION}.zip.sha256"
           echo "Show the shasum"
           cat "${{ env.TS_FILENAME }}-v${TS_VERSION}.zip.sha256"
           echo "Checksum verification archive is "
-          ${SHARUN} --check "${{ env.TS_FILENAME }}-v${TS_VERSION}.zip.sha256"
+          shasum --check "${{ env.TS_FILENAME }}-v${TS_VERSION}.zip.sha256"
 
       - name: Create release
         uses: ncipollo/release-action@v1
