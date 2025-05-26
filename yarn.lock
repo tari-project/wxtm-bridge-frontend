@@ -1018,10 +1018,10 @@
   resolved "https://npm.pkg.github.com/download/@tari-project/wxtm-bridge-backend-api/0.1.18/e01da526d65bb3be3f31cb01f401ee0df159670b"
   integrity sha512-s0kXxc0fNjTaHz6EO4KBmsx6qISfG/EtBmkCjY6M0pYa/JUmDwnRj0uaFPpeTocLXbe7Sdd234f7y+G+UXKx/g==
 
-"@tari-project/wxtm-bridge-contracts@0.1.6":
-  version "0.1.6"
-  resolved "https://npm.pkg.github.com/download/@tari-project/wxtm-bridge-contracts/0.1.6/026baee44e67f53710eb24f47e8f990d4ea4d80b"
-  integrity sha512-l4UymmWZTNqOzM12C/j4Uni24ZSEUa/K7KlbThMz/cDr6ktew25/QHrvWAFYHHSPnORLMOOZWQM9Xsk3+9y0+w==
+"@tari-project/wxtm-bridge-contracts@0.1.8":
+  version "0.1.8"
+  resolved "https://npm.pkg.github.com/download/@tari-project/wxtm-bridge-contracts/0.1.8/cdbe66acb31e483cec29678c3f23d10068ab1bb6"
+  integrity sha512-ipNXVOHmYo7r8CgddDBixdZvWjXfucosF6tRdBYmdTpNicEGRlivurgEUnIDL1cQZHZ024McuyAc2+JwOGrw/w==
 
 "@types/debug@^4.1.7":
   version "4.1.12"
