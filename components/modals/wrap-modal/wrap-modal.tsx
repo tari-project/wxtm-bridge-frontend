@@ -1,36 +1,35 @@
 import React from 'react'
 import Image from 'next/image'
-// import { HiArrowRightOnRectangle } from 'react-icons/hi2'
 import { WrapModalProps } from './wrap-modal.types'
-// import { ModalButton } from '@/components/modals/modal-button'
 import { useBridgeInfo } from '@/hooks/use-bridge-info'
+import useTariAccount from '@/store/account'
+import { formatUnits } from 'ethers'
 
 export const WrapModal: React.FC<WrapModalProps> = ({
-  // closeModal,
   amount,
   tariWalletAddress,
   ethereumAddress,
   fromNetwork,
   feesData: { amountAfterFee },
-  pendingBridgeTxFromTU,
 }) => {
-  /** @dev Tmp hardcoded tx hash */
-  //const txhash = '0x0bec7941a37c07ec7cd408b3478c66ac7a26c4e48c2fd22577bb2c9c44cb4ae8'
-
-  console.debug('[WRAP MODAL] pending tx from TU:', { pendingBridgeTxFromTU })
+  const { pendingBridgeTx } = useTariAccount()
+  console.debug('[WRAP MODAL] pending tx backend:', { pendingBridgeTx })
   const { fromToken, toToken, destAddress } = useBridgeInfo(
     fromNetwork,
     ethereumAddress!,
     tariWalletAddress!,
   )
 
-  // TODO temp solution if backend is not ready to be fetched
-  // in case tx is still pending
-  const amountPending = pendingBridgeTxFromTU?.amount ?? amount
-  const amountAfterFeePending =
-    pendingBridgeTxFromTU?.amountToReceive ?? amountAfterFee
-  const destAddressPending =
-    pendingBridgeTxFromTU?.destinationAddress ?? destAddress
+  // if pending tx exists use its amounts
+  const amountPending = pendingBridgeTx?.tokenAmount
+    ? formatUnits(pendingBridgeTx.tokenAmount, 6)
+    : amount
+
+  const amountAfterFeePending = pendingBridgeTx?.amountAfterFee
+    ? formatUnits(pendingBridgeTx.amountAfterFee, 6)
+    : amountAfterFee
+
+  const destAddressPending = pendingBridgeTx?.destinationAddress ?? destAddress
 
   return (
     <div className="w-full flex flex-col p-6">
