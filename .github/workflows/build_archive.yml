@@ -83,7 +83,6 @@ jobs:
           # set -xo pipefail
           TS_VERSION=${GITHUB_REF#refs/tags/v}
           echo "TS_VERSION=${TS_VERSION}" >> "$GITHUB_ENV"
-          ls -alhtR
           echo "Archive ${{ env.TS_FILENAME }} too ${{ env.TS_FILENAME }}-v${TS_VERSION}.zip"
           7z a "${{ env.TS_FILENAME }}-v${TS_VERSION}.zip" *
           echo "Compute archive shasum"
@@ -96,7 +95,7 @@ jobs:
       - name: Create release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "${{ env.TS_FILENAME }}/${{ env.TS_FILENAME }}-v${TS_VERSION}.zip*"
+          artifacts: "${{ env.TS_FILENAME }}/${{ env.TS_FILENAME }}-v${{ env.TS_VERSION }}.zip*"
           token: ${{ secrets.GITHUB_TOKEN }}
           prerelease: true
           draft: true
@@ -115,15 +114,19 @@ jobs:
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
           S3CMD: "cp"
           # S3OPTIONS: '--recursive --exclude "*" --include "*.sha256*" --include "*.zip*" --content-type "application/octet-stream" --checksum-algorithm CRC32'
-          S3OPTIONS: '--exclude "*" --include "*.sha256*" --include "*.zip*" --content-type "application/octet-stream" --checksum-algorithm CRC32'
+          S3OPTIONS: '--checksum-algorithm CRC32'
         shell: bash
         working-directory: ${{ env.TS_FILENAME }}
         run: |
           echo "Upload processing ..."
-          ls -alhtR
           aws --version
-          echo "Upload current"
+          echo "Upload zip"
           aws s3 ${{ env.S3CMD }} \
-            ${{ env.TS_FILENAME }}-v${{ env.TS_VERSION }}.zip* \
+            ${{ env.TS_FILENAME }}-v${{ env.TS_VERSION }}.zip \
+            s3://${{ env.BASE_URL }}/${{ github.repository }}/releases/download/v${{ env.TS_VERSION }}/ \
+            ${{ env.S3OPTIONS }}
+          echo "Upload sha256"
+          aws s3 ${{ env.S3CMD }} \
+            ${{ env.TS_FILENAME }}-v${{ env.TS_VERSION }}.zip.sha256 \
             s3://${{ env.BASE_URL }}/${{ github.repository }}/releases/download/v${{ env.TS_VERSION }}/ \
             ${{ env.S3OPTIONS }}
