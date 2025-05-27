@@ -18,7 +18,12 @@ export const useBridgeToEthereum = () => {
     mutationFn: WrapTokenService.getWrapTokenParams,
   })
   const { signer } = useTariSigner()
-  const { tariAccount } = useTariAccount()
+  const {
+    tariAccount,
+    tariColdWalletAddress,
+    setWrapTokenFeePercentageBps,
+    setTariColdWalletAddress,
+  } = useTariAccount()
   const [isBridging, setIsBridging] = useState(false)
 
   const bridgeToEthereum = async ({
@@ -39,7 +44,6 @@ export const useBridgeToEthereum = () => {
       '[ TAPPLET-BRIDGE ] start bridging to eth with amount:',
       parsedAmount,
     )
-    const { coldWalletAddress } = await getWrapTokenParams.mutateAsync()
 
     const { paymentId } = await createTransaction.mutateAsync({
       to: ethAddress,
@@ -52,7 +56,7 @@ export const useBridgeToEthereum = () => {
     // so here it is necessary to pass the value entered by the user as is
     const isSend = await signer?.sendOneSided({
       amount: amount,
-      address: coldWalletAddress,
+      address: tariColdWalletAddress,
       paymentId: paymentId,
     })
 
@@ -75,8 +79,21 @@ export const useBridgeToEthereum = () => {
     setIsBridging(false)
   }
 
+  const getBridgeTxParams = async () => {
+    try {
+      const { coldWalletAddress, wrapTokenFeePercentageBps } =
+        await getWrapTokenParams.mutateAsync()
+
+      setTariColdWalletAddress(coldWalletAddress)
+      setWrapTokenFeePercentageBps(wrapTokenFeePercentageBps)
+    } catch (error) {
+      console.error('[ TAPPLET-BRIDGE ] Failed to fetch token params:', error)
+    }
+  }
+
   return {
     bridgeToEthereum,
     isBridging,
+    getBridgeTxParams,
   }
 }

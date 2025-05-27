@@ -3,10 +3,12 @@ import { parseUnits, formatUnits } from 'ethers'
 
 import { config } from '@/config'
 import { BridgeToEthereumFees } from './use-bridge-to-ethereum-fees.types'
+import useTariAccount from '@/store/account'
 
 export const useBridgeToEthereumFees = (
   tokenAmount: string,
 ): BridgeToEthereumFees => {
+  const { wrapTokenFeePercentageBps } = useTariAccount()
   return useMemo(() => {
     try {
       if (!tokenAmount || tokenAmount.trim() === '') {
@@ -25,13 +27,13 @@ export const useBridgeToEthereumFees = (
       const isOverHighBridgeThreshold = amount > parsedThreshold
 
       const feeAmountBN =
-        (amount * BigInt(config.FEE_PERCENTAGE_BPS)) / BigInt(10000)
+        (amount * BigInt(wrapTokenFeePercentageBps)) / BigInt(10000)
       const amountAfterFeeBN = amount - feeAmountBN
 
       return {
         feeAmount: formatUnits(feeAmountBN, 6).toString(),
         amountAfterFee: formatUnits(amountAfterFeeBN, 6).toString(),
-        feePercentage: config.FEE_PERCENTAGE_BPS / 100,
+        feePercentage: wrapTokenFeePercentageBps / 100,
         isOverHighBridgeThreshold,
       }
     } catch (error) {
@@ -44,5 +46,5 @@ export const useBridgeToEthereumFees = (
         isOverHighBridgeThreshold: false,
       }
     }
-  }, [tokenAmount])
+  }, [tokenAmount, wrapTokenFeePercentageBps])
 }

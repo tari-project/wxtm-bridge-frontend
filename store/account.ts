@@ -13,12 +13,16 @@ interface State {
   language: string
   walletconnect_id: string
   bridge_api: string
+  wrapTokenFeePercentageBps: number
+  tariColdWalletAddress: string
 }
 
 interface Actions {
   setTariAccount: () => Promise<string | undefined>
   setPendingTransaction: (tx: PendingUserTransaction) => void
   removePendingTransaction: () => void
+  setWrapTokenFeePercentageBps: (fee: number) => void
+  setTariColdWalletAddress: (address: string) => void
 }
 
 type OotleWalletStoreState = State & Actions
@@ -35,6 +39,8 @@ const initialState: State = {
   language: '',
   walletconnect_id: '',
   bridge_api: '',
+  wrapTokenFeePercentageBps: 50, // 0.5% fee
+  tariColdWalletAddress: '',
 }
 
 export const useTariAccount = create<OotleWalletStoreState>()((set) => ({
@@ -82,6 +88,16 @@ export const useTariAccount = create<OotleWalletStoreState>()((set) => ({
     set({
       pendingBridgeTx: undefined,
       isProcessingTransaction: false,
+    })
+  },
+  setWrapTokenFeePercentageBps: (fee: number) => {
+    set({
+      wrapTokenFeePercentageBps: fee,
+    })
+  },
+  setTariColdWalletAddress: (address: string) => {
+    set({
+      tariColdWalletAddress: address,
     })
   },
 }))

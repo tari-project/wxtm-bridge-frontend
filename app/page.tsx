@@ -28,7 +28,8 @@ export default function Home() {
     icon: '/icons/eth.png',
   })
 
-  const { bridgeToEthereum, isBridging } = useBridgeToEthereum()
+  const { bridgeToEthereum, isBridging, getBridgeTxParams } =
+    useBridgeToEthereum()
   const { tariAccount, isProcessingTransaction, pendingBridgeTx } =
     useTariAccount()
   const { getUserTransactions } = useBridgeTransaction()
@@ -51,6 +52,7 @@ export default function Home() {
       const fetchUserTransactions = async () => {
         try {
           await getUserTransactions(tariAccount.address, pendingBridgeTx)
+          await getBridgeTxParams()
         } catch (error) {
           console.error(
             '[ TAPPLET-BRIDGE ] Failed to get user transactions:',
