@@ -1,16 +1,12 @@
-import { config } from '@/config'
 import { useMutation } from '@tanstack/react-query'
 
 import {
   WrapTokenService,
-  OpenAPI,
   UserTransactionDTO,
 } from '@tari-project/wxtm-bridge-backend-api'
 
 import useTariAccount from '@/store/account'
 import { PendingUserTransaction } from '@/types/tapplet'
-
-OpenAPI.BASE = config.BACKEND_API_URL
 
 export const useBridgeTransaction = () => {
   const getUserTxs = useMutation({

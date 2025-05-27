@@ -11,9 +11,6 @@ import { useBridgeToEthereum } from '@/hooks/use-bridge-to-ethereum'
 import { BridgeFormValues } from '@/components/bridge-input'
 import { Network } from '@/components/network-box'
 import useTariAccount from '@/store/account'
-import useTariSigner from '@/store/signer'
-import TariL1Signer from '@/clients/tari-l1-signer'
-import { TariL1SignerParameters } from '@/types/tapplet'
 import { useBridgeToEthereumFees } from '@/hooks/use-bridge-to-ethereum-fees'
 import { useBridgeTransaction } from '@/hooks/use-bridge-transaction'
 
@@ -32,13 +29,8 @@ export default function Home() {
   })
 
   const { bridgeToEthereum, isBridging } = useBridgeToEthereum()
-  const {
-    tariAccount,
-    isProcessingTransaction,
-    pendingBridgeTx,
-    setTariAccount,
-  } = useTariAccount()
-  const { signer, setSigner } = useTariSigner()
+  const { tariAccount, isProcessingTransaction, pendingBridgeTx } =
+    useTariAccount()
   const { getUserTransactions } = useBridgeTransaction()
 
   const {
@@ -53,27 +45,6 @@ export default function Home() {
 
   const amount = watch('amount')
   const feesData = useBridgeToEthereumFees(amount)
-
-  useEffect(() => {
-    const initializeSignerAndAccount = async () => {
-      try {
-        if (!signer) {
-          const signerParams: TariL1SignerParameters = {
-            name: 'TariL1Signer',
-            onConnection: setTariAccount,
-          }
-          const newSigner = new TariL1Signer(signerParams)
-          setSigner(newSigner)
-        }
-
-        await setTariAccount()
-      } catch (error) {
-        console.error('[ TAPPLET-BRIDGE ] Failed to set Tari Account:', error)
-      }
-    }
-
-    initializeSignerAndAccount()
-  }, [setSigner, setTariAccount, signer])
 
   useEffect(() => {
     if (tariAccount) {
