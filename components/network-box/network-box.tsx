@@ -41,7 +41,7 @@ export const NetworkBox: React.FC<NetworkBoxProps> = ({
   return (
     <div className="relative">
       <div className="flex items-center gap-3 p-2 px-4 bg-white rounded-xl border border-gray-200 h-20">
-        <div className="w-[38px] h-[38px] relative rounded-full overflow-hidden">
+        <div className="w-[38px] h-[38px] relative rounded-full overflow-hidden ml-3">
           <Image
             src={selected.icon}
             fill

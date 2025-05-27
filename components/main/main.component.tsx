@@ -138,39 +138,49 @@ export const MainComponent: React.FC<MainComponentProps> = ({
               <div className="relative">
                 <div className="flex items-center">
                   <div className="relative flex gap-[2px] w-full items-stretch">
-                    {/* Box 1 - From */}
-                    <div className="flex-1">
-                      <NetworkBox
-                        type="from"
-                        selected={fromNetwork}
-                        isOpen={openDropdown === 'from'}
-                        networks={fromNetworks}
-                        onToggle={() =>
-                          setOpenDropdown(
-                            openDropdown === 'from' ? null : 'from',
-                          )
-                        }
-                        onSelect={(network) =>
-                          handleNetworkSelect(network, 'from')
-                        }
-                      />
-                    </div>
+                    {/* Wrap Box 1 and Box 2 in a relative container for precise arrow positioning */}
+                    <div className="relative flex flex-[2] gap-[2px]">
+                      {/* Box 1 - From */}
+                      <div className="flex-1">
+                        <NetworkBox
+                          type="from"
+                          selected={fromNetwork}
+                          isOpen={openDropdown === 'from'}
+                          networks={fromNetworks}
+                          onToggle={() =>
+                            setOpenDropdown(
+                              openDropdown === 'from' ? null : 'from',
+                            )
+                          }
+                          onSelect={(network) =>
+                            handleNetworkSelect(network, 'from')
+                          }
+                        />
+                      </div>
 
-                    {/* Box 2 - To */}
-                    <div className="flex-1">
-                      <NetworkBox
-                        type="to"
-                        selected={toNetwork}
-                        isOpen={openDropdown === 'to'}
-                        networks={networks}
-                        onToggle={() =>
-                          setOpenDropdown(openDropdown === 'to' ? null : 'to')
-                        }
-                        onSelect={(network) =>
-                          handleNetworkSelect(network, 'to')
-                        }
-                        fromNetwork={fromNetwork}
-                      />
+                      {/* Box 2 - To */}
+                      <div className="flex-1">
+                        <NetworkBox
+                          type="to"
+                          selected={toNetwork}
+                          isOpen={openDropdown === 'to'}
+                          networks={networks}
+                          onToggle={() =>
+                            setOpenDropdown(openDropdown === 'to' ? null : 'to')
+                          }
+                          onSelect={(network) =>
+                            handleNetworkSelect(network, 'to')
+                          }
+                          fromNetwork={fromNetwork}
+                        />
+                      </div>
+
+                      {/* Arrow — Between Box 1 and Box 2 */}
+                      <div className="mt-small absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+                        <div className="w-8 h-8 rounded-md border-2 border-gray-300 bg-white flex items-center justify-center shadow-sm">
+                          <FaArrowRight className="text-[15px] text-[#171717]" />
+                        </div>
+                      </div>
                     </div>
 
                     {/* Box 3 - Amount */}
@@ -213,13 +223,6 @@ export const MainComponent: React.FC<MainComponentProps> = ({
                             </button>
                           </div>
                         </div>
-                      </div>
-                    </div>
-
-                    {/* Arrow — Between Box 1 and Box 2 */}
-                    <div className="mt-small absolute top-1/2 left-1/3 -translate-x-1/2 -translate-y-1/2 z-10">
-                      <div className="w-8 h-8 rounded-md border-2 border-gray-300 bg-white flex items-center justify-center shadow-sm">
-                        <FaArrowRight className="text-[15px] text-[#171717]" />
                       </div>
                     </div>
                   </div>
