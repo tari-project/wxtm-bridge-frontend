@@ -2,8 +2,10 @@
 
 import React, { useState } from 'react'
 import Image from 'next/image'
-import { useAccount } from 'wagmi'
+import useTariAccount from '@/store/account'
 
+import { ethers } from 'ethers'
+import { useAccount, useBalance } from 'wagmi'
 import { FaArrowRight } from 'react-icons/fa6'
 import { MainComponentProps } from './main.types'
 import { Network, NetworkBox } from '@/components/network-box'
@@ -11,13 +13,17 @@ import { networks } from '@/utils/networksConfig'
 import { MainButton } from '@/components/main-button'
 import { BridgeInput } from '@/components/bridge-input'
 import { useBridgeInfo } from '@/hooks/use-bridge-info'
-import useTariAccount from '@/store/account'
+import {
+  DeployedChains,
+  getDeployments,
+} from '@tari-project/wxtm-bridge-contracts/deployments'
 
 export const MainComponent: React.FC<MainComponentProps> = ({
   onConnectClick,
   onContinueClick,
   control,
   errors,
+  setValue,
   isValid,
   fromNetwork,
   setFromNetwork,
@@ -27,10 +33,21 @@ export const MainComponent: React.FC<MainComponentProps> = ({
 }) => {
   const [openDropdown, setOpenDropdown] = useState<'from' | 'to' | null>(null)
 
-  const { isConnected, chain } = useAccount()
+  const { isConnected, chain, address } = useAccount()
   const { fromToken } = useBridgeInfo(fromNetwork)
   const { available_balance } = useTariAccount()
 
+  const chainId = (chain?.id ?? 1) as DeployedChains
+  const deployments = getDeployments(chainId)
+  const wXTM = deployments.wXTM
+  const { data } = useBalance({
+    address: address,
+    token: wXTM,
+  })
+
+  const evm_balance = data?.value
+    ? parseFloat(ethers.formatEther(data?.value)).toPrecision(4)
+    : 0
   const isDisabled = chain === undefined || isProcessingTransaction
 
   const fromNetworks = networks.filter(
@@ -66,11 +83,22 @@ export const MainComponent: React.FC<MainComponentProps> = ({
     setOpenDropdown(null)
   }
 
-  /** @dev TODO fetch balances dynamically */
+  const handleMaxAmount = () => {
+    const balance = getBalance()
+
+    if (balance && Number(balance) > 0) {
+      setValue('amount', balance.toString(), {
+        shouldValidate: true,
+        shouldDirty: true,
+        shouldTouch: true,
+      })
+    }
+  }
+
   const getBalance = () => {
     return fromNetwork.name === 'Tari'
       ? available_balance.toLocaleString()
-      : (0).toLocaleString() // TODO getBalance() wagmi
+      : evm_balance
   }
 
   return (
@@ -177,9 +205,12 @@ export const MainComponent: React.FC<MainComponentProps> = ({
                             <div className="font-semibold text-[9px] 2xl:text-xs text-gray-500">
                               {getBalance()} {fromToken}
                             </div>
-                            <div className="border border-gray-500/50 rounded-3xl text-xs font-medium px-1.5">
+                            <button
+                              className="border border-gray-500/50 rounded-3xl text-xs font-medium px-1.5 hover:cursor-pointer"
+                              onClick={handleMaxAmount}
+                            >
                               MAX
-                            </div>
+                            </button>
                           </div>
                         </div>
                       </div>

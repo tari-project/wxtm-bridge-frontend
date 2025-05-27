@@ -1,9 +1,11 @@
 import { Network } from '@/components/network-box'
-import { BridgeInputProps } from '@/components/bridge-input'
+import { BridgeFormValues, BridgeInputProps } from '@/components/bridge-input'
+import { UseFormSetValue } from 'react-hook-form'
 
 export type MainComponentProps = {
   onConnectClick: () => void
   onContinueClick: () => void
+  setValue: UseFormSetValue<BridgeFormValues>
   isValid: boolean
   fromNetwork: Network
   setFromNetwork: React.Dispatch<React.SetStateAction<Network>>
