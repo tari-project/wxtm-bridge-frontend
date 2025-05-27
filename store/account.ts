@@ -2,7 +2,6 @@ import { AccountData, PendingUserTransaction } from '@/types/tapplet'
 import { create } from 'zustand'
 import useTariSigner from './signer'
 import { BridgeTxDetails } from '@/clients/tari-l1-signer'
-import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
 
 interface State {
   tariAccount?: AccountData
@@ -43,23 +42,12 @@ export const useTariAccount = create<OotleWalletStoreState>()((set) => ({
       }
       const account = await signer.getAccount()
       const balance = await signer.getTariBalance()
-      // TODO temp solution if backend is not ready to be fetched
-      const pendingTx = await signer.getPendingTappletTx()
-      console.log('[ TAPPLET-BRIDGE ] setAccount signer ', { account })
       set({
         tariAccount: {
           account_id: account.account_id,
           address: account.address,
         },
         available_balance: balance?.available_balance ?? 0,
-        pendingBridgeTxFromTU: pendingTx,
-        pendingBridgeTx: {
-          tokenAmount: pendingTx?.amount ?? '',
-          amountAfterFee: pendingTx?.amountToReceive ?? '',
-          createdAt: '',
-          destinationAddress: pendingTx?.destinationAddress ?? '',
-          status: UserTransactionDTO.status.PENDING,
-        },
       })
     } catch (error) {
       console.error(

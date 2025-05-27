@@ -20,6 +20,9 @@ export const useBridgeToEthereum = () => {
   const confirmTokenSent = useMutation({
     mutationFn: WrapTokenService.updateToTokensSent,
   })
+  const getColdWalletAddress = useMutation({
+    mutationFn: WrapTokenService.getColdWalletAddress,
+  })
   const { signer } = useTariSigner()
   const { tariAccount } = useTariAccount()
   const [isBridging, setIsBridging] = useState(false)
@@ -41,6 +44,7 @@ export const useBridgeToEthereum = () => {
       '[ TAPPLET-BRIDGE ] start bridging to eth with amount:',
       parsedAmount,
     )
+    const { coldWalletAddress } = await getColdWalletAddress.mutateAsync()
     const { paymentId } = await createTransaction.mutateAsync({
       to: ethAddress,
       from: tariAccount.address,
@@ -48,21 +52,11 @@ export const useBridgeToEthereum = () => {
     })
     console.debug('[ TAPPLET-BRIDGE ] created tx with id: ', paymentId)
 
-    // ADD THIS DO STORE DO KEEP MODAL OPENED
-    // const createdAtPlaceholder = `${Date.now()}`
-    // setPendingTransaction({
-    //   tokenAmount: amount,
-    //   amountAfterFee: amountAfterFee,
-    //   createdAt: createdAtPlaceholder,
-    //   destinationAddress: ethAddress,
-    //   status: UserTransactionDTO.status.PENDING,
-    // })
-
     // the amount is parsed in TU in the `send_one_sided_to_stealth_address` function
     // so here it is necessary to pass the value entered by the user as is
     const isSend = await signer?.sendOneSided({
       amount: amount,
-      address: config.TARI_BRIDGE_COLDWALLET_ADDRESS,
+      address: coldWalletAddress,
       paymentId: paymentId,
     })
 
