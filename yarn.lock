@@ -1013,10 +1013,10 @@
   dependencies:
     "@tanstack/query-core" "5.72.2"
 
-"@tari-project/wxtm-bridge-backend-api@0.1.18":
-  version "0.1.18"
-  resolved "https://npm.pkg.github.com/download/@tari-project/wxtm-bridge-backend-api/0.1.18/e01da526d65bb3be3f31cb01f401ee0df159670b"
-  integrity sha512-s0kXxc0fNjTaHz6EO4KBmsx6qISfG/EtBmkCjY6M0pYa/JUmDwnRj0uaFPpeTocLXbe7Sdd234f7y+G+UXKx/g==
+"@tari-project/wxtm-bridge-backend-api@0.1.19":
+  version "0.1.19"
+  resolved "https://npm.pkg.github.com/download/@tari-project/wxtm-bridge-backend-api/0.1.19/13e4f953a306b2a0da7c96df1f659a3bde961d0f"
+  integrity sha512-zqIGI5C5dlAZyQjfl6klPIty0oo48D9/r94K4BvDw3kzaa55FdlQkP3fKUzRMb8irmd1aaFhEEe5thRHOW39Ew==
 
 "@tari-project/wxtm-bridge-contracts@0.1.8":
   version "0.1.8"
