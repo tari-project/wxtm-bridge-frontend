@@ -20,7 +20,6 @@ export const Providers = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (projectId) {
-      console.log('pvociders get config', getConfig())
       setConfig(getConfig())
     }
   }, [projectId])
@@ -36,7 +35,6 @@ export const Providers = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const initializeSignerAndAccount = async () => {
       try {
-        console.log('HOME USEEFFECT')
         if (!signer) {
           const signerParams: TariL1SignerParameters = {
             name: 'TariL1Signer',
@@ -68,7 +66,7 @@ export const Providers = ({ children }: { children: ReactNode }) => {
           </QueryClientProvider>
         </WagmiProvider>
       ) : (
-        <h1>loading</h1>
+        <h1>Bridge initialization in progress</h1>
       )}
     </>
   )

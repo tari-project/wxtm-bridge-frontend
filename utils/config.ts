@@ -11,7 +11,6 @@ declare global {
 
 export function getConfig(id?: string) {
   const project_id = id || useTariAccount.getState().walletconnect_id
-  console.log('getconfig projecid', project_id)
   if (!globalThis.wagmiConfig) {
     globalThis.wagmiConfig = createConfig({
       chains: [mainnet, baseSepolia, sepolia],

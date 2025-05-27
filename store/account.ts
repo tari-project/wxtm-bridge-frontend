@@ -47,13 +47,10 @@ export const useTariAccount = create<OotleWalletStoreState>()((set) => ({
         console.error('[ TAPPLET-BRIDGE ] signer undefined')
         return
       }
-      console.warn('[ TAPPLET-BRIDGE ] GET SIGNER')
       const account = await signer.getAccount()
       const balance = await signer.getTariBalance()
       const language = await signer.getAppLanguage()
-      console.warn('[ TAPPLET-BRIDGE ] GET LANGUAGE', language)
       const envs = await signer.getBridgeEnvs()
-      console.warn('[ TAPPLET-BRIDGE ] AND ENVS', { envs })
       const id = envs?.[0] ?? ''
       set({
         tariAccount: {

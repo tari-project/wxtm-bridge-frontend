@@ -1,17 +1,11 @@
-// import { config } from '@/config'
 import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
 
-import {
-  WrapTokenService,
-  // OpenAPI,
-} from '@tari-project/wxtm-bridge-backend-api'
+import { WrapTokenService } from '@tari-project/wxtm-bridge-backend-api'
 
 import { parseWxtmTokenAmount } from '@/utils/parse-wxtm-token-amount'
 import useTariSigner from '@/store/signer'
 import useTariAccount from '@/store/account'
-
-// OpenAPI.BASE = config.BACKEND_API_URL
 
 export const useBridgeToEthereum = () => {
   const createTransaction = useMutation({
@@ -46,6 +40,7 @@ export const useBridgeToEthereum = () => {
       parsedAmount,
     )
     const { coldWalletAddress } = await getWrapTokenParams.mutateAsync()
+
     const { paymentId } = await createTransaction.mutateAsync({
       to: ethAddress,
       from: tariAccount.address,

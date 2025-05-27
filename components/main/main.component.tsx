@@ -96,7 +96,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
             LayerZero <br />
             OFT
           </span>{' '}
-          that can exist on nearly any chain you desire.
+          that in future can exist on nearly any chain you desire.
         </div>
       </div>
 
