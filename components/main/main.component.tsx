@@ -228,7 +228,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
                   </div>
 
                   {!isConnected ? (
-                    <MainButton onClick={onConnectClick}>
+                    <MainButton onClick={onConnectClick} subText="ETH MAINNET">
                       Connect Wallet
                     </MainButton>
                   ) : (
