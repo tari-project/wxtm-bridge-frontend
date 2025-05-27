@@ -50,8 +50,7 @@ export const useBridgeToEthereum = () => {
       from: tariAccount.address,
       tokenAmount: parsedAmount,
     })
-    console.info('[ TAPPLET-BRIDGE ] created tx with id: ', paymentId)
-    console.info('[ TAPPLET-BRIDGE ] coldwallet: ', coldWalletAddress)
+    console.debug('[ TAPPLET-BRIDGE ] created tx with id: ', paymentId)
 
     // the amount is parsed in TU in the `send_one_sided_to_stealth_address` function
     // so here it is necessary to pass the value entered by the user as is
