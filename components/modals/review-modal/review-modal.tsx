@@ -106,7 +106,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
 
             <div className="text-sm">
               {destAddress === ethereumAddress
-                ? truncateAddress(tariWalletAddress!, 50)
+                ? truncateAddress(tariWalletAddress!, 15)
                 : ethereumAddress}
             </div>
           </div>
