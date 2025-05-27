@@ -1,3 +1,4 @@
+import useTariAccount from '@/store/account'
 import { http, createConfig, createStorage, cookieStorage } from 'wagmi'
 import { mainnet, baseSepolia, sepolia } from 'wagmi/chains'
 import { walletConnect } from 'wagmi/connectors'
@@ -8,7 +9,9 @@ declare global {
   var wagmiConfig: ReturnType<typeof createConfig> | undefined
 }
 
-export function getConfig() {
+export function getConfig(id?: string) {
+  const project_id = id || useTariAccount.getState().walletconnect_id
+  console.log('getconfig projecid', project_id)
   if (!globalThis.wagmiConfig) {
     globalThis.wagmiConfig = createConfig({
       chains: [mainnet, baseSepolia, sepolia],
@@ -19,7 +22,7 @@ export function getConfig() {
       },
       connectors: [
         walletConnect({
-          projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID ?? '',
+          projectId: project_id ?? '',
         }),
       ],
       storage: createStorage({

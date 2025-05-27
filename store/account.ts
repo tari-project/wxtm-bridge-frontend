@@ -2,6 +2,7 @@ import { AccountData, PendingUserTransaction } from '@/types/tapplet'
 import { create } from 'zustand'
 import useTariSigner from './signer'
 import { BridgeTxDetails } from '@/clients/tari-l1-signer'
+import { OpenAPI } from '@tari-project/wxtm-bridge-backend-api'
 
 interface State {
   tariAccount?: AccountData
@@ -9,10 +10,13 @@ interface State {
   isProcessingTransaction: boolean
   pendingBridgeTx?: PendingUserTransaction
   pendingBridgeTxFromTU?: BridgeTxDetails
+  language: string
+  walletconnect_id: string
+  bridge_api: string
 }
 
 interface Actions {
-  setTariAccount: () => Promise<void>
+  setTariAccount: () => Promise<string | undefined>
   setPendingTransaction: (tx: PendingUserTransaction) => void
   removePendingTransaction: () => void
 }
@@ -28,6 +32,9 @@ const initialState: State = {
   pendingBridgeTx: undefined,
   isProcessingTransaction: false,
   pendingBridgeTxFromTU: undefined,
+  language: '',
+  walletconnect_id: '',
+  bridge_api: '',
 }
 
 export const useTariAccount = create<OotleWalletStoreState>()((set) => ({
@@ -40,15 +47,26 @@ export const useTariAccount = create<OotleWalletStoreState>()((set) => ({
         console.error('[ TAPPLET-BRIDGE ] signer undefined')
         return
       }
+      console.warn('[ TAPPLET-BRIDGE ] GET SIGNER')
       const account = await signer.getAccount()
       const balance = await signer.getTariBalance()
+      const language = await signer.getAppLanguage()
+      console.warn('[ TAPPLET-BRIDGE ] GET LANGUAGE', language)
+      const envs = await signer.getBridgeEnvs()
+      console.warn('[ TAPPLET-BRIDGE ] AND ENVS', { envs })
+      const id = envs?.[0] ?? ''
       set({
         tariAccount: {
           account_id: account.account_id,
           address: account.address,
         },
         available_balance: balance?.available_balance ?? 0,
+        language: language,
+        walletconnect_id: envs?.[0] ?? '',
+        bridge_api: envs?.[1] ?? '',
       })
+      OpenAPI.BASE = envs?.[1] ?? ''
+      return id ?? ''
     } catch (error) {
       console.error(
         '[ TAPPLET-BRIDGE ] error setting the Tari account: ',

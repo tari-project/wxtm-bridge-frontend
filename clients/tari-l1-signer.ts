@@ -21,6 +21,11 @@ export interface BridgeTxDetails {
   paymentId: string
 }
 
+export interface BridgeEnvs {
+  walletconnect_id: string
+  backend_api: string
+}
+
 export class TariL1Signer {
   public signerName = 'TariL1Signer'
   private __id = 0
@@ -134,6 +139,28 @@ export class TariL1Signer {
     return this.sendRequest({
       methodName: 'removePendingTappletTx',
       args: [paymentId],
+    })
+  }
+
+  /**
+   * @description get Tari Universe language
+   * @returns app language
+   */
+  public async getAppLanguage(): Promise<string | undefined> {
+    return this.sendRequest({
+      methodName: 'getAppLanguage',
+      args: [],
+    })
+  }
+
+  /**
+   * @description get bridge envs for different environments
+   * @returns bridge envs
+   */
+  public async getBridgeEnvs(): Promise<[string, string] | undefined> {
+    return this.sendRequest({
+      methodName: 'getBridgeEnvs',
+      args: [],
     })
   }
 }

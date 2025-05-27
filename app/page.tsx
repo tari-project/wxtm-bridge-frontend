@@ -56,6 +56,7 @@ export default function Home() {
   useEffect(() => {
     const initializeSignerAndAccount = async () => {
       try {
+        console.log('HOME USEEFFECT')
         if (!signer) {
           const signerParams: TariL1SignerParameters = {
             name: 'TariL1Signer',
