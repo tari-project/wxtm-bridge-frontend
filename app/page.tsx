@@ -44,6 +44,7 @@ export default function Home() {
   const {
     watch,
     control,
+    setValue,
     formState: { errors, isValid },
   } = useForm<BridgeFormValues>({
     defaultValues: { amount: '' },
@@ -145,6 +146,7 @@ export default function Home() {
         onContinueClick={handleContinueClick}
         control={control}
         errors={errors}
+        setValue={setValue}
         isValid={isValid}
         fromNetwork={fromNetwork}
         setFromNetwork={setFromNetwork}
