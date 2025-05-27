@@ -17,6 +17,7 @@ import {
   DeployedChains,
   getDeployments,
 } from '@tari-project/wxtm-bridge-contracts/deployments'
+import { useTranslations } from 'next-intl'
 
 export const MainComponent: React.FC<MainComponentProps> = ({
   onConnectClick,
@@ -44,6 +45,8 @@ export const MainComponent: React.FC<MainComponentProps> = ({
     address: address,
     token: wXTM,
   })
+
+  const t = useTranslations('Home')
 
   const evm_balance = data?.value
     ? parseFloat(ethers.formatEther(data?.value)).toPrecision(4)
@@ -119,6 +122,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
         </div>
         <div className="font-normal text-lg lg:text-[24px] leading-[30px] tracking-[0px] lg:tracking-[-1px] max-w-[25rem] lg:max-w-[35rem] whitespace-pre">
           Wrap XTM to create wXTM on Ethereum. wXTM isn&apos;t your <br />
+          <h1>{t('title')}</h1>
           everyday Ethereum token anon. It&apos;s a powerful{' '}
           <span className="font-semibold">
             LayerZero <br />
