@@ -17,8 +17,11 @@ const ConnectionModal: React.FC<ConnectionModalProps> = ({ closeModal }) => {
         <IoCloseOutline />
       </button>
       <div className="mt-10 px-4">
-        <div className="flex justify-between items-center p-4">
-          <h2 className="text-lg font-bold  ml-1">Connect a Wallet</h2>
+        <div className="ml-1 flex flex-col">
+          <h2 className="text-lg font-bold">Connect a Wallet</h2>
+          <span className="text-sm font-bold text-gray-500 mt-1">
+            This will be the destination for your wXTM
+          </span>
         </div>
 
         {/* Below to be changed to one connector only */}
