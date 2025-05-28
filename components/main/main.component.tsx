@@ -101,7 +101,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
     return fromNetwork.name === 'Tari'
       ? formatted
         ? formatNumber(available_balance || 0, FormatPreset.XTM_COMPACT)
-        : available_balance.toLocaleString()
+        : (available_balance / 1_000_000).toString()
       : evm_balance
   }
 
