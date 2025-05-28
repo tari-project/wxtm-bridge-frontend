@@ -39,7 +39,7 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
           </div>
           <div className="font-semibold text-lg mt-2">
             We&apos;ve {fromToken === 'wXTM' ? 'unwrapped' : 'wrapped'} your{' '}
-            {amount} {fromToken}!
+            {parseFloat(amount).toPrecision()} {fromToken}!
           </div>
           <div className="font-normal text-xs mt-2 text-center px-3">
             Your {toToken} conversion has been complete and your funds have been
@@ -52,7 +52,7 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
           <div className="font-medium">
             <div className="text-xs text-gray-500">Amount to receive</div>
             <div className="text-sm">
-              {amountAfterFee} {toToken}
+              {parseFloat(amountAfterFee).toPrecision()} {toToken}
             </div>
           </div>
 

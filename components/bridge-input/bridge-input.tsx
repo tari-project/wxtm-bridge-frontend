@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Controller } from 'react-hook-form'
 import { TextField } from '@mui/material'
 
@@ -12,6 +12,7 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
   control,
   errors,
 }) => {
+  const [valueLength, setValueLength] = useState(5)
   const { fromToken } = useBridgeInfo(fromNetwork)
   const { available_balance } = useTariAccount()
 
@@ -60,8 +61,16 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
         value = limitedInteger
       }
 
+      setValueLength(value.length)
       onChange(value)
     }
+
+  const getFontSize = (length: number) => {
+    if (length < 10) return '22px'
+    if (length < 14) return '18px'
+    if (length < 18) return '14px'
+    return '10px'
+  }
 
   return (
     <Controller
@@ -71,7 +80,7 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
         required: 'Amount is required',
         min: {
           value: config.MIN_BRIDGE_AMOUNT,
-          message: `You must bridge at least ${config.MIN_BRIDGE_AMOUNT.toLocaleString()} ${fromToken}`,
+          message: `Min amount is ${config.MIN_BRIDGE_AMOUNT.toLocaleString()} ${fromToken}`,
         },
         max: {
           value: config.MAX_BRIDGE_AMOUNT,
@@ -79,7 +88,7 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
         },
         pattern: {
           value: /^\d+(\.\d{0,6})?$/,
-          message: 'Maximum 6 decimal places allowed',
+          message: 'Max 6 decimal places allowed',
         },
         validate: (value) => {
           const amount = parseFloat(value)
@@ -87,10 +96,10 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
             return 'Amount must be a valid number'
           }
           if (amount > config.MAX_BRIDGE_AMOUNT) {
-            return `Maximum amount is ${config.MAX_BRIDGE_AMOUNT} ${fromToken}`
+            return `Max amount is ${config.MAX_BRIDGE_AMOUNT} ${fromToken}`
           }
           if (amount > available_balance) {
-            return `Amount exceeds your wallet balance`
+            return `Not enough ${fromToken}`
           }
           return true
         },
@@ -111,7 +120,7 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
               inputMode: 'decimal',
               inputProps: {
                 style: {
-                  fontSize: '30px',
+                  fontSize: getFontSize(valueLength),
                   fontWeight: 500,
                   minWidth: '180px',
                   width: '100%',

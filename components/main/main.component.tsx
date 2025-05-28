@@ -101,7 +101,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
     return fromNetwork.name === 'Tari'
       ? formatted
         ? formatNumber(available_balance || 0, FormatPreset.XTM_COMPACT)
-        : available_balance.toLocaleString()
+        : (available_balance / 1_000_000).toString()
       : evm_balance
   }
 
@@ -189,7 +189,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
 
                     {/* Box 3 - Amount */}
                     <div className="flex-1">
-                      <div className="flex justify-between items-center p-2 px-2 2xl:px-4 rounded-xl bg-white border border-gray-200 min-h-[80px] max-h-[80px]">
+                      <div className="flex justify-between items-center p-2 px-2 2xl:px-4 rounded-xl bg-white border border-gray-200 min-h-[90px] max-h-[90px]">
                         <div className="space-y-[-8px] mr-[-10px]">
                           <div className="font-medium text-xs text-gray-500">
                             Amount to Bridge
