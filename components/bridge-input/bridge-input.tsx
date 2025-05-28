@@ -15,6 +15,31 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
   const { fromToken } = useBridgeInfo(fromNetwork)
   const { available_balance } = useTariAccount()
 
+  // Helper to block invalid keys
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const allowedKeys = [
+      'Backspace',
+      'Tab',
+      'ArrowLeft',
+      'ArrowRight',
+      'Delete',
+      'Home',
+      'End',
+      '.', // Allow decimal point
+    ]
+    // Allow Ctrl/Cmd + A,C,V,X for copy/paste/select all
+    if (
+      (e.ctrlKey || e.metaKey) &&
+      ['a', 'c', 'v', 'x'].includes(e.key.toLowerCase())
+    ) {
+      return
+    }
+    // Allow digits and allowed keys only
+    if (!allowedKeys.includes(e.key) && (e.key < '0' || e.key > '9')) {
+      e.preventDefault()
+    }
+  }
+
   return (
     <Controller
       name="amount"
@@ -55,9 +80,11 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
           placeholder="0"
           error={Boolean(errors.amount)}
           helperText={errors.amount?.message}
+          onKeyDown={handleKeyDown}
           slotProps={{
             input: {
               disableUnderline: true,
+              inputMode: 'decimal',
               inputProps: {
                 style: {
                   fontSize: '30px',
