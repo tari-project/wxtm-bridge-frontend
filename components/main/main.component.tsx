@@ -140,7 +140,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="w-full flex flex-col p-1">
               <div className="relative">
-                <div className="flex items-center">
+                <div className="flex items-center justify-center">
                   <div className="relative flex gap-[2px] w-full items-stretch">
                     {/* Wrap Box 1 and Box 2 in a relative container for precise arrow positioning */}
                     <div className="relative flex flex-[2] gap-[2px]">
@@ -231,19 +231,26 @@ export const MainComponent: React.FC<MainComponentProps> = ({
                     </div>
                   </div>
 
-                  {!isConnected ? (
-                    <MainButton onClick={onConnectClick} subText="ETH MAINNET">
-                      Connect Wallet
-                    </MainButton>
-                  ) : (
-                    <MainButton
-                      endIcon={<FaArrowRight className="" />}
-                      onClick={onContinueClick}
-                      disabled={!isValid || isDisabled}
-                    >
-                      Continue
-                    </MainButton>
-                  )}
+                  <div className="flex items-center justify-center">
+                    {!isConnected ? (
+                      <MainButton
+                        onClick={onConnectClick}
+                        subText="ETH MAINNET"
+                      >
+                        Connect Wallet
+                      </MainButton>
+                    ) : (
+                      <MainButton
+                        onClick={onContinueClick}
+                        disabled={!isValid || isDisabled}
+                      >
+                        <div className="flex">
+                          Continue
+                          <FaArrowRight className="ml-2" />
+                        </div>
+                      </MainButton>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
