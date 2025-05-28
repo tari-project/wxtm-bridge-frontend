@@ -71,7 +71,7 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
         required: 'Amount is required',
         min: {
           value: config.MIN_BRIDGE_AMOUNT,
-          message: `You must bridge at least ${config.MIN_BRIDGE_AMOUNT.toLocaleString()} ${fromToken}`,
+          message: `Min amount is ${config.MIN_BRIDGE_AMOUNT.toLocaleString()} ${fromToken}`,
         },
         max: {
           value: config.MAX_BRIDGE_AMOUNT,
@@ -79,7 +79,7 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
         },
         pattern: {
           value: /^\d+(\.\d{0,6})?$/,
-          message: 'Maximum 6 decimal places allowed',
+          message: 'Max 6 decimal places allowed',
         },
         validate: (value) => {
           const amount = parseFloat(value)
@@ -87,10 +87,10 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
             return 'Amount must be a valid number'
           }
           if (amount > config.MAX_BRIDGE_AMOUNT) {
-            return `Maximum amount is ${config.MAX_BRIDGE_AMOUNT} ${fromToken}`
+            return `Max amount is ${config.MAX_BRIDGE_AMOUNT} ${fromToken}`
           }
           if (amount > available_balance) {
-            return `Amount exceeds your wallet balance`
+            return `Not enough ${fromToken}`
           }
           return true
         },
