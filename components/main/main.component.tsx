@@ -265,10 +265,20 @@ export const MainComponent: React.FC<MainComponentProps> = ({
           href="https://tarilabs.notion.site/Tari-Universe-Bridge-x-User-Guide-FAQs-2014e6c995c38094b4e4e98a1a3e8ec1"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-black underline"
+          className="underline"
         >
-          see our FAQ.
+          see our FAQ
         </a>
+        .{' '}
+        <a
+          href="https://www.coinspect.com/doc/Coinspect%20-%20Smart%20Contract%20Audit%20-%20Tari%20-%20wXTM%20Bridge%20-%20Fix%20Review%20-%20v250528.pdf"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline"
+        >
+          View smart contract audit
+        </a>
+        .
       </div>
     </section>
   )
