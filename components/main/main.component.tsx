@@ -17,6 +17,8 @@ import {
   DeployedChains,
   getDeployments,
 } from '@tari-project/wxtm-bridge-contracts/deployments'
+import { parseToMaxAllowed } from '@/utils/parse-wxtm-token-amount'
+import { formatNumber, FormatPreset } from '@/utils/formatters'
 
 export const MainComponent: React.FC<MainComponentProps> = ({
   onConnectClick,
@@ -47,7 +49,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
 
   const evm_balance = data?.value
     ? parseFloat(ethers.formatEther(data?.value)).toPrecision(4)
-    : 0
+    : '0'
   const isDisabled = chain === undefined || isProcessingTransaction
 
   const fromNetworks = networks.filter(
@@ -85,9 +87,9 @@ export const MainComponent: React.FC<MainComponentProps> = ({
 
   const handleMaxAmount = () => {
     const balance = getBalance()
-
-    if (balance && Number(balance) > 0) {
-      setValue('amount', balance.toString(), {
+    const parsedRounded = parseToMaxAllowed(balance)
+    if (balance && parsedRounded > 0) {
+      setValue('amount', parsedRounded.toString(), {
         shouldValidate: true,
         shouldDirty: true,
         shouldTouch: true,
@@ -95,9 +97,11 @@ export const MainComponent: React.FC<MainComponentProps> = ({
     }
   }
 
-  const getBalance = () => {
+  const getBalance = (formatted = false) => {
     return fromNetwork.name === 'Tari'
-      ? available_balance.toLocaleString()
+      ? formatted
+        ? formatNumber(available_balance || 0, FormatPreset.XTM_COMPACT)
+        : available_balance.toLocaleString()
       : evm_balance
   }
 
@@ -136,7 +140,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="w-full flex flex-col p-1">
               <div className="relative">
-                <div className="flex items-center">
+                <div className="flex items-center justify-center">
                   <div className="relative flex gap-[2px] w-full items-stretch">
                     {/* Wrap Box 1 and Box 2 in a relative container for precise arrow positioning */}
                     <div className="relative flex flex-[2] gap-[2px]">
@@ -213,7 +217,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
                           </div>
                           <div className="flex justify-end mt-2 gap-1 items-center">
                             <div className="font-semibold text-[9px] 2xl:text-xs text-gray-500">
-                              {getBalance()} {fromToken}
+                              {getBalance(true)} {fromToken}
                             </div>
                             <button
                               className="border border-gray-500/50 rounded-3xl text-xs font-medium px-1.5 hover:cursor-pointer"
@@ -227,19 +231,26 @@ export const MainComponent: React.FC<MainComponentProps> = ({
                     </div>
                   </div>
 
-                  {!isConnected ? (
-                    <MainButton onClick={onConnectClick}>
-                      Connect Wallet
-                    </MainButton>
-                  ) : (
-                    <MainButton
-                      endIcon={<FaArrowRight className="" />}
-                      onClick={onContinueClick}
-                      disabled={!isValid || isDisabled}
-                    >
-                      Continue
-                    </MainButton>
-                  )}
+                  <div className="flex items-center justify-center">
+                    {!isConnected ? (
+                      <MainButton
+                        onClick={onConnectClick}
+                        subText="ETH MAINNET"
+                      >
+                        Connect Wallet
+                      </MainButton>
+                    ) : (
+                      <MainButton
+                        onClick={onContinueClick}
+                        disabled={!isValid || isDisabled}
+                      >
+                        <div className="flex">
+                          Continue
+                          <FaArrowRight className="ml-2" />
+                        </div>
+                      </MainButton>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

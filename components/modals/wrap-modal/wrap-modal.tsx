@@ -13,7 +13,6 @@ export const WrapModal: React.FC<WrapModalProps> = ({
   feesData: { amountAfterFee },
 }) => {
   const { pendingBridgeTx } = useTariAccount()
-  console.debug('[WRAP MODAL] pending tx backend:', { pendingBridgeTx })
   const { fromToken, toToken, destAddress } = useBridgeInfo(
     fromNetwork,
     ethereumAddress!,

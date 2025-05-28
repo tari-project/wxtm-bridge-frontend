@@ -15,6 +15,54 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
   const { fromToken } = useBridgeInfo(fromNetwork)
   const { available_balance } = useTariAccount()
 
+  // Helper to block invalid keys
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const allowedKeys = [
+      'Backspace',
+      'Tab',
+      'ArrowLeft',
+      'ArrowRight',
+      'Delete',
+      'Home',
+      'End',
+      '.', // Allow decimal point
+    ]
+    // Allow Ctrl/Cmd + A,C,V,X for copy/paste/select all
+    if (
+      (e.ctrlKey || e.metaKey) &&
+      ['a', 'c', 'v', 'x'].includes(e.key.toLowerCase())
+    ) {
+      return
+    }
+    // Allow digits and allowed keys only
+    if (!allowedKeys.includes(e.key) && (e.key < '0' || e.key > '9')) {
+      e.preventDefault()
+    }
+  }
+
+  const handleChange =
+    (onChange: (value: string) => void) =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      let value = e.target.value
+
+      // Remove non-digit characters except decimal point
+      const parts = value.split('.')
+      const integerPart = parts[0].replace(/\D/g, '') // digits only
+      const decimalPart = parts[1] ? parts[1].replace(/\D/g, '') : ''
+
+      // Limit integer part to max 10 digits
+      const limitedInteger = integerPart.slice(0, 10)
+
+      // Reconstruct value with decimal part if any
+      if (parts.length > 1) {
+        value = limitedInteger + '.' + decimalPart
+      } else {
+        value = limitedInteger
+      }
+
+      onChange(value)
+    }
+
   return (
     <Controller
       name="amount"
@@ -27,7 +75,7 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
         },
         max: {
           value: config.MAX_BRIDGE_AMOUNT,
-          message: `Maximum amount is ${config.MAX_BRIDGE_AMOUNT} ${fromToken}`,
+          message: `Max amount is ${config.MAX_BRIDGE_AMOUNT} ${fromToken}`,
         },
         pattern: {
           value: /^\d+(\.\d{0,6})?$/,
@@ -55,14 +103,18 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
           placeholder="0"
           error={Boolean(errors.amount)}
           helperText={errors.amount?.message}
+          onKeyDown={handleKeyDown}
+          onChange={handleChange(field.onChange)}
           slotProps={{
             input: {
               disableUnderline: true,
+              inputMode: 'decimal',
               inputProps: {
                 style: {
                   fontSize: '30px',
                   fontWeight: 500,
-                  width: '130px',
+                  minWidth: '180px',
+                  width: '100%',
                   padding: 0,
                   appearance: 'textfield',
                 },

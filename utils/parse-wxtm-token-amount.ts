@@ -1,3 +1,4 @@
+import { config } from '@/config'
 import { parseUnits } from 'ethers'
 
 export function parseWxtmTokenAmount(amount: string): string {
@@ -9,4 +10,28 @@ export function parseWxtmTokenAmount(amount: string): string {
 
   const parsed = parseUnits(sanitizedAmount, 6)
   return parsed.toString()
+}
+
+export function parseToMaxAllowed(
+  input: string,
+  maxValue = config.MAX_BRIDGE_AMOUNT,
+  maxDecimals: number = 6,
+): number {
+  const cleaned = input.replace(/,/g, '')
+  let num = Number(cleaned)
+
+  if (isNaN(num)) {
+    throw new Error(`Invalid number input: ${input}`)
+  }
+
+  // Round to maxDecimals decimal places
+  const factor = Math.pow(10, maxDecimals)
+  num = Math.round(num * factor) / factor
+
+  // Cap to maxValue
+  if (num > maxValue) {
+    num = maxValue
+  }
+
+  return num
 }
