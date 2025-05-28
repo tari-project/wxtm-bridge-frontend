@@ -97,6 +97,17 @@ export const WrapModal: React.FC<WrapModalProps> = ({
 
           {/* Section 1 */}
           {/* <ModalButton label="Done" onClick={closeModal} disabled={false} /> */}
+          <div className="mt-8 text-center text-xs text-gray-500">
+            Having trouble?{' '}
+            <a
+              href="https://tarilabs.notion.site/Tari-Universe-Bridge-x-User-Guide-FAQs-2014e6c995c38094b4e4e98a1a3e8ec1"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-black underline"
+            >
+              View FAQs
+            </a>
+          </div>
         </div>
       </div>
     </div>

@@ -257,6 +257,19 @@ export const MainComponent: React.FC<MainComponentProps> = ({
           </div>
         </div>
       </div>
+      <div className="mt-8 text-center text-xs text-gray-500">
+        Tari Bridge currently operates one way (XTM to wXTM). Tari contributors
+        expect to launch wXTM unwrapping in July 2025 or sooner. <br /> For more
+        information about Tari Bridge please{' '}
+        <a
+          href="https://tarilabs.notion.site/Tari-Universe-Bridge-x-User-Guide-FAQs-2014e6c995c38094b4e4e98a1a3e8ec1"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-black underline"
+        >
+          see our FAQ.
+        </a>
+      </div>
     </section>
   )
 }
