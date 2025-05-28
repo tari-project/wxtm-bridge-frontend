@@ -40,6 +40,29 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
     }
   }
 
+  const handleChange =
+    (onChange: (value: string) => void) =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      let value = e.target.value
+
+      // Remove non-digit characters except decimal point
+      const parts = value.split('.')
+      const integerPart = parts[0].replace(/\D/g, '') // digits only
+      const decimalPart = parts[1] ? parts[1].replace(/\D/g, '') : ''
+
+      // Limit integer part to max 10 digits
+      const limitedInteger = integerPart.slice(0, 10)
+
+      // Reconstruct value with decimal part if any
+      if (parts.length > 1) {
+        value = limitedInteger + '.' + decimalPart
+      } else {
+        value = limitedInteger
+      }
+
+      onChange(value)
+    }
+
   return (
     <Controller
       name="amount"
@@ -52,7 +75,7 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
         },
         max: {
           value: config.MAX_BRIDGE_AMOUNT,
-          message: `Maximum amount is ${config.MAX_BRIDGE_AMOUNT} ${fromToken}`,
+          message: `Max amount is ${config.MAX_BRIDGE_AMOUNT} ${fromToken}`,
         },
         pattern: {
           value: /^\d+(\.\d{0,6})?$/,
@@ -81,6 +104,7 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
           error={Boolean(errors.amount)}
           helperText={errors.amount?.message}
           onKeyDown={handleKeyDown}
+          onChange={handleChange(field.onChange)}
           slotProps={{
             input: {
               disableUnderline: true,
