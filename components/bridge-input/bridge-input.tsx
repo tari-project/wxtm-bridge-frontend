@@ -89,7 +89,8 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
                 style: {
                   fontSize: '30px',
                   fontWeight: 500,
-                  width: '130px',
+                  minWidth: '180px',
+                  width: '100%',
                   padding: 0,
                   appearance: 'textfield',
                 },
