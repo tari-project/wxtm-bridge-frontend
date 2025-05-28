@@ -103,7 +103,7 @@ export const WrapModal: React.FC<WrapModalProps> = ({
               href="https://tarilabs.notion.site/Tari-Universe-Bridge-x-User-Guide-FAQs-2014e6c995c38094b4e4e98a1a3e8ec1"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-black underline"
+              className="underline"
             >
               View FAQs
             </a>
