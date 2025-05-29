@@ -11,6 +11,7 @@ declare global {
 
 export function getConfig(id?: string) {
   const project_id = id || useTariAccount.getState().walletconnect_id
+  console.log('[ TAPPLET-BRIDGE ][getConfig]', globalThis.wagmiConfig)
   if (!globalThis.wagmiConfig) {
     globalThis.wagmiConfig = createConfig({
       chains: [mainnet, baseSepolia, sepolia],
@@ -29,8 +30,13 @@ export function getConfig(id?: string) {
       }),
       ssr: true,
     })
+    console.log(
+      '[ TAPPLET-BRIDGE ][getConfig] new config',
+      globalThis.wagmiConfig,
+    )
   }
 
+  console.log('[ TAPPLET-BRIDGE ][getConfig] config', globalThis.wagmiConfig)
   return globalThis.wagmiConfig
 }
 

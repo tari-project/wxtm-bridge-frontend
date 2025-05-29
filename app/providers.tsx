@@ -19,15 +19,20 @@ export const Providers = ({ children }: { children: ReactNode }) => {
   const { signer, setSigner } = useTariSigner()
 
   useEffect(() => {
+    console.log('[ TAPPLET-BRIDGE ] projectId', projectId)
     if (projectId) {
+      console.log('[ TAPPLET-BRIDGE ] projectId set config', projectId)
       setConfig(getConfig())
     }
   }, [projectId])
 
   useEffect(() => {
+    console.log('[ TAPPLET-BRIDGE ] id & config', projectId, config)
     if (projectId && config) {
       const cookieHeader = document.cookie
+      console.log('[ TAPPLET-BRIDGE ] set cookie header', cookieHeader)
       const state = cookieToInitialState(config, cookieHeader)
+      console.log('[ TAPPLET-BRIDGE ] set initial state', state)
       setInitialState(state)
     }
   }, [config, projectId])
@@ -45,7 +50,12 @@ export const Providers = ({ children }: { children: ReactNode }) => {
         }
 
         const id = await setTariAccount()
+        const config = await signer?.getAppWalletSession()
+        const wagmiConfig = getConfig(id)
         setConfig(getConfig(id))
+        console.log('[ TAPPLET-BRIDGE ] tari account id', id)
+        console.error('[ TAPPLET-BRIDGE ][INIT CONFIG]', config)
+        console.error('[ TAPPLET-BRIDGE ][INIT CONFIG]', wagmiConfig)
       } catch (error) {
         console.error('[ TAPPLET-BRIDGE ] Failed to set Tari Account:', error)
       }

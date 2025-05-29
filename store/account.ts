@@ -12,6 +12,7 @@ interface State {
   pendingBridgeTxFromTU?: BridgeTxDetails
   language: string
   walletconnect_id: string
+  walletconnect_state?: State
   bridge_api: string
   wrapTokenFeePercentageBps: number
   tariColdWalletAddress: string
@@ -38,6 +39,7 @@ const initialState: State = {
   pendingBridgeTxFromTU: undefined,
   language: '',
   walletconnect_id: '',
+  walletconnect_state: undefined,
   bridge_api: '',
   wrapTokenFeePercentageBps: 50, // 0.5% fee
   tariColdWalletAddress: '',
@@ -57,6 +59,8 @@ export const useTariAccount = create<OotleWalletStoreState>()((set) => ({
       const balance = await signer.getTariBalance()
       const language = await signer.getAppLanguage()
       const envs = await signer.getBridgeEnvs()
+      const walletSession = await signer.getAppWalletSession()
+      console.warn('[ TAPPLET-BRIDGE ] wallet session from TU: ', walletSession)
       const id = envs?.[0] ?? ''
       set({
         tariAccount: {
@@ -99,6 +103,40 @@ export const useTariAccount = create<OotleWalletStoreState>()((set) => ({
     set({
       tariColdWalletAddress: address,
     })
+  },
+  setAppWalletSession: async () => {
+    const signer = useTariSigner.getState().signer
+
+    try {
+      if (!signer) {
+        console.error('[ TAPPLET-BRIDGE ] signer undefined')
+        return
+      }
+      const account = await signer.getAccount()
+      const balance = await signer.getTariBalance()
+      const language = await signer.getAppLanguage()
+      const envs = await signer.getBridgeEnvs()
+      const walletSession = await signer.getAppWalletSession()
+      console.warn('[ TAPPLET-BRIDGE ] wallet session from TU: ', walletSession)
+      const id = envs?.[0] ?? ''
+      set({
+        tariAccount: {
+          account_id: account.account_id,
+          address: account.address,
+        },
+        available_balance: balance?.available_balance ?? 0,
+        language: language,
+        walletconnect_id: envs?.[0] ?? '',
+        bridge_api: envs?.[1] ?? '',
+      })
+      OpenAPI.BASE = envs?.[1] ?? ''
+      return id ?? ''
+    } catch (error) {
+      console.error(
+        '[ TAPPLET-BRIDGE ] error setting the Tari account: ',
+        error,
+      )
+    }
   },
 }))
 

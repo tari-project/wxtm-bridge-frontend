@@ -1,3 +1,4 @@
+import { Config } from 'wagmi'
 import {
   TariL1SignerParameters,
   SignerMethodNames,
@@ -161,6 +162,29 @@ export class TariL1Signer {
     return this.sendRequest({
       methodName: 'getBridgeEnvs',
       args: [],
+    })
+  }
+
+  /**
+   * @description get Tari Universe wallet session
+   * @returns wallet session
+   */
+
+  public async getAppWalletSession(): Promise<Config | undefined> {
+    return this.sendRequest({
+      methodName: 'getAppWalletSession',
+      args: [],
+    })
+  }
+
+  /**
+   * @description get Tari Universe wallet session
+   * @returns wallet session
+   */
+  public async setAppWalletSession(wagmiConfig: Config): Promise<void> {
+    return this.sendRequest({
+      methodName: 'setAppWalletSession',
+      args: [wagmiConfig],
     })
   }
 }
