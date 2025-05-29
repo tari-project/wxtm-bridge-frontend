@@ -9,6 +9,7 @@ import useTariAccount from '@/store/account'
 import useTariSigner from '@/store/signer'
 import { TariL1SignerParameters } from '@/types/tapplet'
 import TariL1Signer from '@/clients/tari-l1-signer'
+import { useWagmiAdapter } from './useWagmiAdapter'
 
 export const Providers = ({ children }: { children: ReactNode }) => {
   const projectId = useTariAccount((s) => s.walletconnect_id)
@@ -17,6 +18,7 @@ export const Providers = ({ children }: { children: ReactNode }) => {
   const [initialState, setInitialState] = useState<State | undefined>(undefined)
   const { setTariAccount } = useTariAccount()
   const { signer, setSigner } = useTariSigner()
+  const wagmiAdapter = useWagmiAdapter()
 
   useEffect(() => {
     console.log('[ TAPPLET-BRIDGE ] projectId', projectId)
@@ -69,8 +71,11 @@ export const Providers = ({ children }: { children: ReactNode }) => {
 
   return (
     <>
-      {projectId.length ? (
-        <WagmiProvider config={getConfig()} initialState={initialState}>
+      {projectId.length && wagmiAdapter ? (
+        <WagmiProvider
+          config={wagmiAdapter?.wagmiConfig}
+          initialState={initialState}
+        >
           <QueryClientProvider client={queryClient}>
             {children}
           </QueryClientProvider>
