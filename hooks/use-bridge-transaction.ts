@@ -48,9 +48,14 @@ export const useBridgeTransaction = () => {
 
       if (
         currentPendingTx &&
-        currentPendingTx.createdAt === success?.createdAt
+        currentPendingTx.paymentId === success?.paymentId
       ) {
+        console.warn(
+          '!!!!! [ TAPPLET-BRIDGE ][getTxs backend] SUCCESS:',
+          success,
+        )
         removePendingTransaction()
+        return success
       }
     } else {
       // No transactions found, clear any pending transaction

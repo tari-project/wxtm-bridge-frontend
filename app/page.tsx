@@ -13,12 +13,13 @@ import { Network } from '@/components/network-box'
 import useTariAccount from '@/store/account'
 import { useBridgeToEthereumFees } from '@/hooks/use-bridge-to-ethereum-fees'
 import { useBridgeTransaction } from '@/hooks/use-bridge-transaction'
+import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
 
 export default function Home() {
   const { isConnected, address: ethAddress } = useAccount()
   const [modalOpen, setModalOpen] = useState(false)
   const [modalStep, setModalStep] = useState<number>(1)
-  const [success] = useState(false)
+  const [success, setSuccess] = useState(false)
   const [fromNetwork, setFromNetwork] = useState<Network>({
     name: 'Tari',
     icon: '/icons/tari.png',
@@ -110,13 +111,29 @@ export default function Home() {
           updatedPendingTx,
         )
 
-        if (updatedPendingTx && currentTxStatus !== updatedTxStatus) {
+        if (
+          updatedPendingTx &&
+          currentTxStatus !== updatedTxStatus &&
+          updatedPendingTx.status === UserTransactionDTO.status.PENDING
+        ) {
           console.warn(
             '!!!!! [ TAPPLET-BRIDGE ][useEffect] STATUS CHANGED',
             updatedPendingTx,
           )
 
           setPendingTransaction(updatedPendingTx)
+        }
+        if (
+          updatedPendingTx &&
+          currentTxStatus !== updatedTxStatus &&
+          updatedPendingTx.status === UserTransactionDTO.status.SUCCESS
+        ) {
+          console.warn(
+            '!!!!! [ TAPPLET-BRIDGE ][useEffect] STATUS CHANGED',
+            updatedPendingTx,
+          )
+
+          setSuccess(true)
         }
       } catch (error) {
         console.error(
