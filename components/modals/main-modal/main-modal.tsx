@@ -8,10 +8,12 @@ import { ReviewModal } from '@/components/modals/review-modal'
 import { SuccessModal } from '@/components/modals/success-modal'
 import { WrapModal } from '@/components/modals/wrap-modal'
 import { MainModalProps } from './main-modal.types'
+import { FailedModal } from '../failed-modal'
 
 export const MainModal: React.FC<MainModalProps> = ({
   setModalOpen,
   success,
+  failed,
   step,
   setStep,
   handleBridgeToEthereum,
@@ -26,7 +28,6 @@ export const MainModal: React.FC<MainModalProps> = ({
 }) => {
   const { isConnected } = useAccount()
   const modalRef = useRef<HTMLDivElement>(null)
-  // const feesData = useBridgeToEthereumFees(amount)
 
   const closeModal = () => {
     setModalOpen(false)
@@ -53,6 +54,8 @@ export const MainModal: React.FC<MainModalProps> = ({
           feesData={feesData}
         />
       )
+
+    if (failed) return <FailedModal closeModal={closeModal} />
 
     if (!isConnected && step === 0)
       return <ConnectionModal closeModal={closeModal} />

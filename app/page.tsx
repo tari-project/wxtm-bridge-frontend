@@ -218,6 +218,9 @@ export default function Home() {
           success={
             inProgressBridgeTx?.status === UserTransactionDTO.status.SUCCESS
           }
+          failed={
+            inProgressBridgeTx?.status === UserTransactionDTO.status.TIMEOUT
+          }
           step={modalStep}
           setStep={setModalStep}
           handleBridgeToEthereum={handleBridgeToEthereum}
