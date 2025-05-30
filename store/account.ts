@@ -25,7 +25,7 @@ interface Actions {
   setTariColdWalletAddress: (address: string) => void
 }
 
-type OotleWalletStoreState = State & Actions
+type TariL1WalletStoreState = State & Actions
 
 const initialState: State = {
   tariAccount: {
@@ -43,7 +43,7 @@ const initialState: State = {
   tariColdWalletAddress: '',
 }
 
-export const useTariAccount = create<OotleWalletStoreState>()((set) => ({
+export const useTariAccount = create<TariL1WalletStoreState>()((set) => ({
   ...initialState,
   setTariAccount: async () => {
     const signer = useTariSigner.getState().signer
