@@ -19,7 +19,6 @@ export default function Home() {
   const { isConnected, address: ethAddress } = useAccount()
   const [modalOpen, setModalOpen] = useState(false)
   const [modalStep, setModalStep] = useState<number>(1)
-  const [success, setSuccess] = useState(false)
   const [fromNetwork, setFromNetwork] = useState<Network>({
     name: 'Tari',
     icon: '/icons/tari.png',
@@ -132,8 +131,6 @@ export default function Home() {
             '!!!!! [ TAPPLET-BRIDGE ][useEffect] STATUS CHANGED',
             updatedPendingTx,
           )
-
-          setSuccess(true)
         }
       } catch (error) {
         console.error(
@@ -219,7 +216,9 @@ export default function Home() {
       {modalOpen && (
         <MainModal
           setModalOpen={setModalOpen}
-          success={success}
+          success={
+            pendingBridgeTx?.status === UserTransactionDTO.status.SUCCESS
+          }
           step={modalStep}
           setStep={setModalStep}
           handleBridgeToEthereum={handleBridgeToEthereum}

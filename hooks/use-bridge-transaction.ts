@@ -32,30 +32,32 @@ export const useBridgeTransaction = () => {
 
     if (Array.isArray(transactions) && transactions.length > 0) {
       // Find a pending transaction
-      const pending = transactions.find(
-        (tx) => tx.status === UserTransactionDTO.status.PENDING,
+      const inProgress = transactions.find(
+        (tx) =>
+          tx.status === UserTransactionDTO.status.PENDING ||
+          tx.status === UserTransactionDTO.status.PROCESSING ||
+          tx.status === UserTransactionDTO.status.TOKENS_RECEIVED,
       )
 
-      if (pending) {
-        setPendingTransaction(pending)
-        return pending
+      if (inProgress) {
+        setPendingTransaction(inProgress)
+        return inProgress
       }
 
-      // If no pending tx found, but previously had one, check if it succeeded and remove it
-      const success = transactions.find(
-        (tx) => tx.status === UserTransactionDTO.status.SUCCESS,
+      // If no pending tx found, but previously had one, check if it succeeded/failed
+      const completed = transactions.find(
+        (tx) =>
+          (tx.status === UserTransactionDTO.status.SUCCESS ||
+            tx.status === UserTransactionDTO.status.TIMEOUT) &&
+          tx.paymentId === currentPendingTx?.paymentId,
       )
 
       if (
         currentPendingTx &&
-        currentPendingTx.paymentId === success?.paymentId
+        currentPendingTx.paymentId === completed?.paymentId
       ) {
-        console.warn(
-          '!!!!! [ TAPPLET-BRIDGE ][getTxs backend] SUCCESS:',
-          success,
-        )
-        removePendingTransaction()
-        return success
+        setPendingTransaction(completed)
+        return completed
       }
     } else {
       // No transactions found, clear any pending transaction

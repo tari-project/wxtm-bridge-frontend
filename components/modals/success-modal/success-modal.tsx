@@ -1,9 +1,10 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import Image from 'next/image'
 import { HiArrowRightOnRectangle } from 'react-icons/hi2'
 import { SuccessModalProps } from './success-modal.types'
 import { ModalButton } from '@/components/modals/modal-button'
 import { useBridgeInfo } from '@/hooks/use-bridge-info'
+import useTariAccount from '@/store/account'
 
 export const SuccessModal: React.FC<SuccessModalProps> = ({
   closeModal,
@@ -14,14 +15,19 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
   feesData: { amountAfterFee },
 }) => {
   /** @dev Tmp hardcoded tx hash */
-  const txhash =
-    '0x0bec7941a37c07ec7cd408b3478c66ac7a26c4e48c2fd22577bb2c9c44cb4ae8'
+  const txhash = ''
+  const { removePendingTransaction, pendingBridgeTx } = useTariAccount()
 
   const { fromToken, toToken, destAddress } = useBridgeInfo(
     fromNetwork,
     ethereumAddress!,
     tariWalletAddress!,
   )
+
+  const handleOnClick = useCallback(() => {
+    closeModal()
+    removePendingTransaction()
+  }, [closeModal, removePendingTransaction])
 
   return (
     <div className="w-full flex flex-col p-6">
@@ -63,6 +69,13 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
             <div className="text-sm">{destAddress}</div>
           </div>
 
+          <div className="font-medium">
+            <div className="text-xs text-gray-500">
+              Transaction completed with status{' '}
+            </div>
+            <div className="text-sm">{pendingBridgeTx?.status}</div>
+          </div>
+
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
 
           <div className="font-medium">
@@ -88,7 +101,7 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
           <div className="py-[0.5px] w-full bg-gray-300 mt-2 mb-4"></div> */}
 
           {/* Section 1 */}
-          <ModalButton label="Close" onClick={closeModal} disabled={false} />
+          <ModalButton label="Close" onClick={handleOnClick} disabled={false} />
         </div>
       </div>
     </div>
