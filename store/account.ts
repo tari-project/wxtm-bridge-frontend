@@ -35,7 +35,9 @@ const initialState: State = {
   available_balance: 0,
   pendingBridgeTx: undefined,
   isProcessingTransaction: false,
+  // can be removed since we don't need to fetch any txs data from TU
   pendingBridgeTxFromTU: undefined,
+  // all below can be moved to separate store
   language: '',
   walletconnect_id: '',
   bridge_api: '',

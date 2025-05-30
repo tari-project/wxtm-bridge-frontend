@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { useAccount } from 'wagmi'
 import { useForm } from 'react-hook-form'
 
@@ -30,8 +30,12 @@ export default function Home() {
 
   const { bridgeToEthereum, isBridging, getBridgeTxParams } =
     useBridgeToEthereum()
-  const { tariAccount, isProcessingTransaction, pendingBridgeTx } =
-    useTariAccount()
+  const {
+    tariAccount,
+    isProcessingTransaction,
+    pendingBridgeTx,
+    setPendingTransaction,
+  } = useTariAccount()
   const { getUserTransactions } = useBridgeTransaction()
 
   const {
@@ -47,21 +51,89 @@ export default function Home() {
   const amount = watch('amount')
   const feesData = useBridgeToEthereumFees(amount)
 
-  useEffect(() => {
-    if (tariAccount) {
-      const fetchUserTransactions = async () => {
-        try {
-          await getUserTransactions(tariAccount.address, pendingBridgeTx)
-          await getBridgeTxParams()
-        } catch (error) {
-          console.error(
-            '[ TAPPLET-BRIDGE ] Failed to get user transactions:',
-            error,
-          )
-        }
-      }
+  // Ref to keep track of latest pendingBridgeTx for comparison
+  const pendingBridgeTxRef = useRef(pendingBridgeTx)
 
-      fetchUserTransactions()
+  useEffect(() => {
+    console.warn(
+      '[ TAPPLET-BRIDGE ][useEffect] pendingBridgeTx:',
+      pendingBridgeTx,
+    )
+    pendingBridgeTxRef.current = pendingBridgeTx
+  }, [pendingBridgeTx])
+
+  // Fetch bridge transaction parameters once on mount or when tariAccount changes
+  useEffect(() => {
+    console.warn(
+      '!!!!! [ TAPPLET-BRIDGE ][useEffect] get bridge tx params',
+      tariAccount,
+    )
+
+    if (!tariAccount) return
+
+    const fetchBridgeTxParams = async () => {
+      try {
+        await getBridgeTxParams()
+      } catch (error) {
+        console.error(
+          '[ TAPPLET-BRIDGE ] Failed to get bridge transaction params:',
+          error,
+        )
+      }
+    }
+
+    fetchBridgeTxParams()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tariAccount])
+
+  // Fetch user transactions every 1 minute and update only if changed
+  useEffect(() => {
+    console.warn(
+      '!!!!! [ TAPPLET-BRIDGE ][useEffect] update state current tx:',
+      pendingBridgeTxRef,
+    )
+
+    if (!tariAccount) return
+
+    const fetchUserTransactions = async () => {
+      try {
+        const updatedPendingTx = await getUserTransactions(
+          tariAccount.address,
+          pendingBridgeTxRef.current,
+        )
+
+        // Compare previous and updated pending tx by id (adjust as needed)
+        const currentTxStatus = pendingBridgeTxRef.current?.status
+        const updatedTxStatus = updatedPendingTx?.status
+        console.warn(
+          '!!!!! [ TAPPLET-BRIDGE ][useEffect] update state new status:',
+          updatedPendingTx,
+        )
+
+        if (updatedPendingTx && currentTxStatus !== updatedTxStatus) {
+          console.warn(
+            '!!!!! [ TAPPLET-BRIDGE ][useEffect] STATUS CHANGED',
+            updatedPendingTx,
+          )
+
+          setPendingTransaction(updatedPendingTx)
+        }
+      } catch (error) {
+        console.error(
+          '[ TAPPLET-BRIDGE ] Failed to get user transactions:',
+          error,
+        )
+      }
+    }
+
+    // Initial fetch
+    fetchUserTransactions()
+
+    // Poll every 60 seconds
+    const intervalId = setInterval(fetchUserTransactions, 10000)
+
+    return () => {
+      clearInterval(intervalId)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tariAccount])

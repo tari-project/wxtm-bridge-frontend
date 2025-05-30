@@ -15,33 +15,51 @@ export const useBridgeTransaction = () => {
 
   const { setPendingTransaction, removePendingTransaction } = useTariAccount()
 
+  /**
+   * Fetch user transactions and update the store's pending transaction state.
+   * Returns the updated pending transaction or null if none.
+   */
   const getUserTransactions = async (
     walletAddress: string,
-    pendingBridgeTx?: PendingUserTransaction,
-  ) => {
+    currentPendingTx?: PendingUserTransaction,
+  ): Promise<PendingUserTransaction | null> => {
     const { transactions } = await getUserTxs.mutateAsync(walletAddress)
 
+    console.warn(
+      '!!!!! [ TAPPLET-BRIDGE ][getTxs backend] all transactions:',
+      transactions,
+    )
+
     if (Array.isArray(transactions) && transactions.length > 0) {
-      // check if new tx has status PENDING and if so, add to store
+      // Find a pending transaction
       const pending = transactions.find(
         (tx) => tx.status === UserTransactionDTO.status.PENDING,
       )
+
       if (pending) {
         setPendingTransaction(pending)
-        return
+        return pending
       }
 
-      // double check to remove pending tx which is already success
+      // If no pending tx found, but previously had one, check if it succeeded and remove it
       const success = transactions.find(
         (tx) => tx.status === UserTransactionDTO.status.SUCCESS,
       )
-      if (pendingBridgeTx && pendingBridgeTx.createdAt == success?.createdAt)
+
+      if (
+        currentPendingTx &&
+        currentPendingTx.createdAt === success?.createdAt
+      ) {
         removePendingTransaction()
+      }
+    } else {
+      // No transactions found, clear any pending transaction
+      if (currentPendingTx) {
+        removePendingTransaction()
+      }
     }
 
-    return {
-      transactions,
-    }
+    return null
   }
 
   return {

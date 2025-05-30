@@ -86,6 +86,11 @@ export const useBridgeToEthereum = () => {
 
       setTariColdWalletAddress(coldWalletAddress)
       setWrapTokenFeePercentageBps(wrapTokenFeePercentageBps)
+      console.warn(
+        '!!!!! [ TAPPLET-BRIDGE ][gettxparams] set bridge tx params',
+        coldWalletAddress,
+        wrapTokenFeePercentageBps,
+      )
     } catch (error) {
       console.error('[ TAPPLET-BRIDGE ] Failed to fetch token params:', error)
     }
