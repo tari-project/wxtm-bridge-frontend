@@ -7,7 +7,6 @@ import { formatUnits } from 'ethers'
 import { getModalTitle } from '@/utils/transaction'
 
 export const WrapModal: React.FC<WrapModalProps> = ({
-  amount,
   tariWalletAddress,
   ethereumAddress,
   fromNetwork,
@@ -19,8 +18,6 @@ export const WrapModal: React.FC<WrapModalProps> = ({
     ethereumAddress!,
     tariWalletAddress!,
   )
-
-  console.log('amount wrap modal', amount)
 
   const amountAfterFeePending = inProgressBridgeTx?.amountAfterFee
     ? formatUnits(inProgressBridgeTx.amountAfterFee, 6)
@@ -69,13 +66,6 @@ export const WrapModal: React.FC<WrapModalProps> = ({
           <div className="font-medium">
             <div className="text-xs text-gray-500">Destination address</div>
             <div className="text-sm">{destAddressPending}</div>
-          </div>
-
-          <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
-
-          <div className="font-medium">
-            <div className="text-xs text-gray-500">Current status</div>
-            <div className="text-sm">{inProgressBridgeTx?.status}</div>
           </div>
 
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>

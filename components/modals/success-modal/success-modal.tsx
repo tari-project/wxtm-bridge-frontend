@@ -5,18 +5,17 @@ import { SuccessModalProps } from './success-modal.types'
 import { ModalButton } from '@/components/modals/modal-button'
 import { useBridgeInfo } from '@/hooks/use-bridge-info'
 import useTariAccount from '@/store/account'
+import { formatUnits } from 'ethers'
 
 export const SuccessModal: React.FC<SuccessModalProps> = ({
   closeModal,
-  amount,
   tariWalletAddress,
   ethereumAddress,
   fromNetwork,
-  feesData: { amountAfterFee },
 }) => {
   const { removePendingTransaction, inProgressBridgeTx } = useTariAccount()
 
-  const { fromToken, toToken, destAddress } = useBridgeInfo(
+  const { fromToken, toToken } = useBridgeInfo(
     fromNetwork,
     ethereumAddress!,
     tariWalletAddress!,
@@ -26,6 +25,16 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
     closeModal()
     removePendingTransaction()
   }, [closeModal, removePendingTransaction])
+
+  const amount = inProgressBridgeTx?.tokenAmount
+    ? parseFloat(formatUnits(inProgressBridgeTx?.tokenAmount, 6)).toPrecision()
+    : '0'
+
+  const amountToReceive = inProgressBridgeTx?.amountAfterFee
+    ? parseFloat(
+        formatUnits(inProgressBridgeTx?.amountAfterFee, 6),
+      ).toPrecision()
+    : '0'
 
   return (
     <div className="w-full flex flex-col p-6">
@@ -43,7 +52,7 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
           </div>
           <div className="font-semibold text-lg mt-2">
             We&apos;ve {fromToken === 'wXTM' ? 'unwrapped' : 'wrapped'} your{' '}
-            {parseFloat(amount).toPrecision()} {fromToken}!
+            {amount} {fromToken}!
           </div>
           <div className="font-normal text-xs mt-2 text-center px-3">
             Your {toToken} conversion has been complete and your funds have been
@@ -56,7 +65,7 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
           <div className="font-medium">
             <div className="text-xs text-gray-500">Amount to receive</div>
             <div className="text-sm">
-              {parseFloat(amountAfterFee).toPrecision()} {toToken}
+              {amountToReceive} {toToken}
             </div>
           </div>
 
@@ -64,16 +73,9 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
 
           <div className="font-medium">
             <div className="text-xs text-gray-500">Destination address</div>
-            <div className="text-sm">{destAddress}</div>
-          </div>
-
-          <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
-
-          <div className="font-medium">
-            <div className="text-xs text-gray-500">
-              Transaction completed with status{' '}
+            <div className="text-sm">
+              {inProgressBridgeTx?.destinationAddress}
             </div>
-            <div className="text-sm">{inProgressBridgeTx?.status}</div>
           </div>
 
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>

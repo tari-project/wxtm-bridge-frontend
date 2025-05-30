@@ -26,7 +26,7 @@ export function getModalTitle(
         title: `We're ${
           isUnwrapping ? 'unwrapping' : 'wrapping'
         } your ${amount} ${fromToken}`,
-        subtext: `You'll receive ${amount} ${fromToken} in no more than ${bridgingTime}  Funds are automatically transferred from your linked Tari Universe wallet. You don't need to do anything else.`,
+        subtext: `You'll receive ${amount} ${fromToken} in no more than ${bridgingTime}.  Funds are automatically transferred from your linked Tari Universe wallet. You don't need to do anything else.`,
       }
     case UserTransactionDTO.status.PROCESSING:
       return {

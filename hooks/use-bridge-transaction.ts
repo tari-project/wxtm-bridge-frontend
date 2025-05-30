@@ -13,22 +13,23 @@ export const useBridgeTransaction = () => {
     mutationFn: WrapTokenService.getUserTransactions,
   })
 
-  const { setPendingTransaction, removePendingTransaction } = useTariAccount()
+  const {
+    setPendingTransaction,
+    removePendingTransaction,
+
+    tariAccount,
+  } = useTariAccount()
 
   /**
-   * Fetch user transactions and update the store's pending transaction state.
-   * Returns the updated pending transaction or null if none.
+   * Fetch user transactions and update the store's `in progress` transaction state.
+   * Returns the updated transaction or null if none.
    */
   const getUserTransactions = async (
-    walletAddress: string,
     currentPendingTx?: PendingUserTransaction,
   ): Promise<PendingUserTransaction | null> => {
+    if (!tariAccount) return null
+    const walletAddress = tariAccount.address
     const { transactions } = await getUserTxs.mutateAsync(walletAddress)
-
-    console.warn(
-      '!!!!! [ TAPPLET-BRIDGE ][getTxs backend] all transactions:',
-      transactions,
-    )
 
     if (Array.isArray(transactions) && transactions.length > 0) {
       // Find a pending transaction
