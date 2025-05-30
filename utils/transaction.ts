@@ -3,11 +3,17 @@ import { PendingUserTransaction } from '@/types/tapplet'
 import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
 import { formatUnits } from 'ethers'
 
-export function getWrapModalStatusTitle(
-  tx: PendingUserTransaction,
+export function getModalTitle(
   fromToken: string,
   feeData: BridgeToEthereumFees,
+  tx?: PendingUserTransaction,
 ): { title: string; subtext: string } {
+  if (!tx)
+    return {
+      title: 'Unknown transaction status.',
+      subtext: ``,
+    }
+
   const amount = parseFloat(
     formatUnits(tx.tokenAmount, 6).toString(),
   ).toPrecision()

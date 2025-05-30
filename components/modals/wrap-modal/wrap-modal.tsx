@@ -4,7 +4,7 @@ import { WrapModalProps } from './wrap-modal.types'
 import { useBridgeInfo } from '@/hooks/use-bridge-info'
 import useTariAccount from '@/store/account'
 import { formatUnits } from 'ethers'
-import { getWrapModalStatusTitle } from '@/utils/transaction'
+import { getModalTitle } from '@/utils/transaction'
 
 export const WrapModal: React.FC<WrapModalProps> = ({
   amount,
@@ -20,12 +20,6 @@ export const WrapModal: React.FC<WrapModalProps> = ({
     tariWalletAddress!,
   )
 
-  if (!inProgressBridgeTx) return
-  // // if pending tx exists use its amounts
-  // const amountPending = inProgressBridgeTx?.tokenAmount
-  //   ? formatUnits(inProgressBridgeTx.tokenAmount, 6)
-  //   : amount
-
   console.log('amount wrap modal', amount)
 
   const amountAfterFeePending = inProgressBridgeTx?.amountAfterFee
@@ -35,10 +29,10 @@ export const WrapModal: React.FC<WrapModalProps> = ({
   const destAddressPending =
     inProgressBridgeTx?.destinationAddress ?? destAddress
 
-  const { title, subtext } = getWrapModalStatusTitle(
-    inProgressBridgeTx,
+  const { title, subtext } = getModalTitle(
     fromToken,
     feesData,
+    inProgressBridgeTx,
   )
 
   return (
