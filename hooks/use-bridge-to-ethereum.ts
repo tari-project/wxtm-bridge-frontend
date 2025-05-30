@@ -28,11 +28,9 @@ export const useBridgeToEthereum = () => {
 
   const bridgeToEthereum = async ({
     amount,
-    amountAfterFee,
     ethAddress,
   }: {
     amount: string
-    amountAfterFee: string
     ethAddress: `0x${string}`
   }) => {
     setIsBridging(true)
@@ -60,12 +58,12 @@ export const useBridgeToEthereum = () => {
       paymentId: paymentId,
     })
 
-    await signer?.addPendingTappletTx({
-      amount: amount,
-      amountToReceive: amountAfterFee,
-      destinationAddress: ethAddress,
-      paymentId: paymentId,
-    })
+    // await signer?.addPendingTappletTx({
+    //   amount: amount,
+    //   amountToReceive: amountAfterFee,
+    //   destinationAddress: ethAddress,
+    //   paymentId: paymentId,
+    // })
 
     if (!isSend) {
       console.error('[ TAPPLET-BRIDGE ] send one sided failed')

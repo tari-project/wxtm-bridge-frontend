@@ -182,7 +182,6 @@ export default function Home() {
 
     bridgeToEthereum({
       amount,
-      amountAfterFee: feesData.amountAfterFee,
       ethAddress: ethAddress,
     })
       .then(() => {
@@ -191,7 +190,7 @@ export default function Home() {
       .catch((error) => {
         console.error('[ TAPPLET-BRIDGE ] Bridge operation failed:', error)
       })
-  }, [amount, ethAddress, bridgeToEthereum, feesData])
+  }, [amount, ethAddress, bridgeToEthereum])
 
   const handleBridgeToTari = () => {
     setModalStep(2)
