@@ -12,7 +12,7 @@ export const WrapModal: React.FC<WrapModalProps> = ({
   fromNetwork,
   feesData: { amountAfterFee },
 }) => {
-  const { pendingBridgeTx } = useTariAccount()
+  const { inProgressBridgeTx } = useTariAccount()
   const { fromToken, toToken, destAddress } = useBridgeInfo(
     fromNetwork,
     ethereumAddress!,
@@ -20,15 +20,16 @@ export const WrapModal: React.FC<WrapModalProps> = ({
   )
 
   // if pending tx exists use its amounts
-  const amountPending = pendingBridgeTx?.tokenAmount
-    ? formatUnits(pendingBridgeTx.tokenAmount, 6)
+  const amountPending = inProgressBridgeTx?.tokenAmount
+    ? formatUnits(inProgressBridgeTx.tokenAmount, 6)
     : amount
 
-  const amountAfterFeePending = pendingBridgeTx?.amountAfterFee
-    ? formatUnits(pendingBridgeTx.amountAfterFee, 6)
+  const amountAfterFeePending = inProgressBridgeTx?.amountAfterFee
+    ? formatUnits(inProgressBridgeTx.amountAfterFee, 6)
     : amountAfterFee
 
-  const destAddressPending = pendingBridgeTx?.destinationAddress ?? destAddress
+  const destAddressPending =
+    inProgressBridgeTx?.destinationAddress ?? destAddress
 
   return (
     <div className="w-full flex flex-col p-6">
@@ -70,6 +71,13 @@ export const WrapModal: React.FC<WrapModalProps> = ({
           <div className="font-medium">
             <div className="text-xs text-gray-500">Destination address</div>
             <div className="text-sm">{destAddressPending}</div>
+          </div>
+
+          <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
+
+          <div className="font-medium">
+            <div className="text-xs text-gray-500">Current status</div>
+            <div className="text-sm">{inProgressBridgeTx?.status}</div>
           </div>
 
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>

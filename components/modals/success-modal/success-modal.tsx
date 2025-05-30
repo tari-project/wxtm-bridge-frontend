@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react'
 import Image from 'next/image'
-import { HiArrowRightOnRectangle } from 'react-icons/hi2'
+// import { HiArrowRightOnRectangle } from 'react-icons/hi2'
 import { SuccessModalProps } from './success-modal.types'
 import { ModalButton } from '@/components/modals/modal-button'
 import { useBridgeInfo } from '@/hooks/use-bridge-info'
@@ -14,9 +14,7 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
   fromNetwork,
   feesData: { amountAfterFee },
 }) => {
-  /** @dev Tmp hardcoded tx hash */
-  const txhash = ''
-  const { removePendingTransaction, pendingBridgeTx } = useTariAccount()
+  const { removePendingTransaction, inProgressBridgeTx } = useTariAccount()
 
   const { fromToken, toToken, destAddress } = useBridgeInfo(
     fromNetwork,
@@ -69,16 +67,18 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
             <div className="text-sm">{destAddress}</div>
           </div>
 
+          <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
+
           <div className="font-medium">
             <div className="text-xs text-gray-500">
               Transaction completed with status{' '}
             </div>
-            <div className="text-sm">{pendingBridgeTx?.status}</div>
+            <div className="text-sm">{inProgressBridgeTx?.status}</div>
           </div>
 
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
 
-          <div className="font-medium">
+          {/* <div className="font-medium">
             <div className="text-xs text-gray-500">Transaction Details</div>
             <a
               href="https://sepolia.etherscan.io/tx/0x0bec7941a37c07ec7cd408b3478c66ac7a26c4e48c2fd22577bb2c9c44cb4ae8"
@@ -91,7 +91,7 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
             </a>
           </div>
 
-          <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
+          <div className="py-[0.5px] w-full bg-gray-300 my-2"></div> */}
 
           {/* <div className="font-medium">
             <div className="text-xs text-gray-500">Transaction ID</div>

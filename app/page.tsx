@@ -32,8 +32,8 @@ export default function Home() {
     useBridgeToEthereum()
   const {
     tariAccount,
-    isProcessingTransaction,
-    pendingBridgeTx,
+    isInProgressBridgeTx,
+    inProgressBridgeTx,
     setPendingTransaction,
   } = useTariAccount()
   const { getUserTransactions } = useBridgeTransaction()
@@ -51,16 +51,16 @@ export default function Home() {
   const amount = watch('amount')
   const feesData = useBridgeToEthereumFees(amount)
 
-  // Ref to keep track of latest pendingBridgeTx for comparison
-  const pendingBridgeTxRef = useRef(pendingBridgeTx)
+  // Ref to keep track of latest inProgressBridgeTx for comparison
+  const pendingBridgeTxRef = useRef(inProgressBridgeTx)
 
   useEffect(() => {
     console.warn(
-      '[ TAPPLET-BRIDGE ][useEffect] pendingBridgeTx:',
-      pendingBridgeTx,
+      '[ TAPPLET-BRIDGE ][useEffect] inProgressBridgeTx:',
+      inProgressBridgeTx,
     )
-    pendingBridgeTxRef.current = pendingBridgeTx
-  }, [pendingBridgeTx])
+    pendingBridgeTxRef.current = inProgressBridgeTx
+  }, [inProgressBridgeTx])
 
   // Fetch bridge transaction parameters once on mount or when tariAccount changes
   useEffect(() => {
@@ -157,11 +157,11 @@ export default function Home() {
     if (modalOpen && modalStep === 0 && isConnected) {
       setModalOpen(false)
       setModalStep(1)
-    } else if (isProcessingTransaction) {
+    } else if (isInProgressBridgeTx) {
       setModalStep(2)
       setModalOpen(true)
     }
-  }, [isConnected, modalOpen, modalStep, isProcessingTransaction])
+  }, [isConnected, modalOpen, modalStep, isInProgressBridgeTx])
 
   const handleConnectClick = () => {
     if (!isConnected) {
@@ -211,13 +211,13 @@ export default function Home() {
         setFromNetwork={setFromNetwork}
         toNetwork={toNetwork}
         setToNetwork={setToNetwork}
-        isProcessingTransaction={isProcessingTransaction || isBridging}
+        isInProgressBridgeTx={isInProgressBridgeTx || isBridging}
       />
       {modalOpen && (
         <MainModal
           setModalOpen={setModalOpen}
           success={
-            pendingBridgeTx?.status === UserTransactionDTO.status.SUCCESS
+            inProgressBridgeTx?.status === UserTransactionDTO.status.SUCCESS
           }
           step={modalStep}
           setStep={setModalStep}

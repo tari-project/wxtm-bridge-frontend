@@ -31,7 +31,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
   setFromNetwork,
   toNetwork,
   setToNetwork,
-  isProcessingTransaction,
+  isInProgressBridgeTx,
 }) => {
   const [openDropdown, setOpenDropdown] = useState<'from' | 'to' | null>(null)
 
@@ -50,7 +50,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
   const evm_balance = data?.value
     ? parseFloat(ethers.formatEther(data?.value)).toPrecision(4)
     : '0'
-  const isDisabled = chain === undefined || isProcessingTransaction
+  const isDisabled = chain === undefined || isInProgressBridgeTx
 
   const fromNetworks = networks.filter(
     (n) => n.name === 'Ethereum' || n.name === 'Tari',

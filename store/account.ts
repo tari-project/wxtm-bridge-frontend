@@ -1,15 +1,13 @@
 import { AccountData, PendingUserTransaction } from '@/types/tapplet'
 import { create } from 'zustand'
 import useTariSigner from './signer'
-import { BridgeTxDetails } from '@/clients/tari-l1-signer'
 import { OpenAPI } from '@tari-project/wxtm-bridge-backend-api'
 
 interface State {
   tariAccount?: AccountData
   available_balance: number
-  isProcessingTransaction: boolean
-  pendingBridgeTx?: PendingUserTransaction
-  pendingBridgeTxFromTU?: BridgeTxDetails
+  isInProgressBridgeTx: boolean
+  inProgressBridgeTx?: PendingUserTransaction
   language: string
   walletconnect_id: string
   bridge_api: string
@@ -33,10 +31,9 @@ const initialState: State = {
     address: '',
   },
   available_balance: 0,
-  pendingBridgeTx: undefined,
-  isProcessingTransaction: false,
-  // can be removed since we don't need to fetch any txs data from TU
-  pendingBridgeTxFromTU: undefined,
+  inProgressBridgeTx: undefined,
+  // this can be replaced by check !!inProgressBridgeTx
+  isInProgressBridgeTx: false,
   // all below can be moved to separate store
   language: '',
   walletconnect_id: '',
@@ -82,14 +79,14 @@ export const useTariAccount = create<TariL1WalletStoreState>()((set) => ({
 
   setPendingTransaction: (tx: PendingUserTransaction) => {
     set({
-      pendingBridgeTx: tx,
-      isProcessingTransaction: true,
+      inProgressBridgeTx: tx,
+      isInProgressBridgeTx: true,
     })
   },
   removePendingTransaction: () => {
     set({
-      pendingBridgeTx: undefined,
-      isProcessingTransaction: false,
+      inProgressBridgeTx: undefined,
+      isInProgressBridgeTx: false,
     })
   },
   setWrapTokenFeePercentageBps: (fee: number) => {
