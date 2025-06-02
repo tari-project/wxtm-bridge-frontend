@@ -3,8 +3,8 @@ import Image from 'next/image'
 import { WrapModalProps } from './wrap-modal.types'
 import { useBridgeInfo } from '@/hooks/use-bridge-info'
 import useTariAccount from '@/store/account'
-import { formatUnits } from 'ethers'
 import { getModalTitle } from '@/utils/transaction'
+import { formatUnits } from 'ethers'
 
 export const WrapModal: React.FC<WrapModalProps> = ({
   tariWalletAddress,
@@ -12,15 +12,14 @@ export const WrapModal: React.FC<WrapModalProps> = ({
   fromNetwork,
   feesData,
 }) => {
-  const { ongoingBridgeTx } = useTariAccount()
+  const ongoingBridgeTx = useTariAccount.getState().ongoingBridgeTx
   const { fromToken, toToken, destAddress } = useBridgeInfo(
     fromNetwork,
     ethereumAddress!,
     tariWalletAddress!,
   )
-
   const amountAfterFeePending = ongoingBridgeTx?.amountAfterFee
-    ? formatUnits(ongoingBridgeTx.amountAfterFee, 6)
+    ? parseFloat(formatUnits(ongoingBridgeTx.amountAfterFee, 6)).toPrecision()
     : feesData.amountAfterFee
 
   const destAddressPending = ongoingBridgeTx?.destinationAddress ?? destAddress
@@ -52,7 +51,7 @@ export const WrapModal: React.FC<WrapModalProps> = ({
           <div className="font-medium">
             <div className="text-xs text-gray-500">Amount to receive</div>
             <div className="text-sm">
-              {parseFloat(amountAfterFeePending).toPrecision()} {toToken}
+              {amountAfterFeePending} {toToken}
             </div>
           </div>
 

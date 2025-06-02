@@ -29,8 +29,9 @@ export default function Home() {
   })
 
   const { bridgeToEthereum, getBridgeTxParams } = useBridgeToEthereum()
-  const { tariAccount, isOngoingBridgeTx, ongoingBridgeTx } = useTariAccount()
+  const { tariAccount, isOngoingBridgeTx } = useTariAccount()
   const { getUserTransactions } = useBridgeTransaction()
+  const ongoingBridgeTx = useTariAccount.getState().ongoingBridgeTx
 
   const {
     watch,
@@ -79,8 +80,8 @@ export default function Home() {
     }
 
     fetchUserTransactions()
-    // Poll every 1 min
-    const intervalId = setInterval(fetchUserTransactions, 60000)
+    // Poll every 30 sec
+    const intervalId = setInterval(fetchUserTransactions, 30000)
 
     return () => {
       clearInterval(intervalId)
@@ -118,6 +119,7 @@ export default function Home() {
     bridgeToEthereum({
       amount,
       ethAddress: ethAddress,
+      amountAfterFee: feesData.amountAfterFee,
     })
       .then(() => {
         getUserTransactions()
@@ -125,7 +127,13 @@ export default function Home() {
       .catch((error) => {
         console.error('[ TAPPLET-BRIDGE ] Bridge operation failed:', error)
       })
-  }, [amount, ethAddress, bridgeToEthereum, getUserTransactions])
+  }, [
+    amount,
+    ethAddress,
+    bridgeToEthereum,
+    feesData.amountAfterFee,
+    getUserTransactions,
+  ])
 
   const handleBridgeToTari = () => {
     setModalStep(2)
