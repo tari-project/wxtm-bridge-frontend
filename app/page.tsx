@@ -33,8 +33,8 @@ export default function Home() {
   const {
     tariAccount,
     isInProgressBridgeTx,
-    inProgressBridgeTx,
-    setPendingTransaction,
+    ongoingBridgeTx,
+    setOngoingTransaction,
   } = useTariAccount()
   const { getUserTransactions } = useBridgeTransaction()
 
@@ -51,11 +51,11 @@ export default function Home() {
   const amount = watch('amount')
   const feesData = useBridgeToEthereumFees(amount)
 
-  const pendingBridgeTxRef = useRef(inProgressBridgeTx)
+  const pendingBridgeTxRef = useRef(ongoingBridgeTx)
 
   useEffect(() => {
-    pendingBridgeTxRef.current = inProgressBridgeTx
-  }, [inProgressBridgeTx])
+    pendingBridgeTxRef.current = ongoingBridgeTx
+  }, [ongoingBridgeTx])
 
   // Fetch bridge transaction parameters once on mount or when tariAccount changes
   useEffect(() => {
@@ -91,7 +91,7 @@ export default function Home() {
           currentTxStatus !== updatedPendingTx?.status &&
           updatedPendingTx.status === UserTransactionDTO.status.PENDING
         ) {
-          setPendingTransaction(updatedPendingTx)
+          setOngoingTransaction(updatedPendingTx)
         }
       } catch (error) {
         console.error(
@@ -183,16 +183,14 @@ export default function Home() {
         <MainModal
           setModalOpen={setModalOpen}
           success={
-            inProgressBridgeTx?.status === UserTransactionDTO.status.SUCCESS
+            ongoingBridgeTx?.status === UserTransactionDTO.status.SUCCESS
           }
-          failed={
-            inProgressBridgeTx?.status === UserTransactionDTO.status.TIMEOUT
-          }
+          failed={ongoingBridgeTx?.status === UserTransactionDTO.status.TIMEOUT}
           step={modalStep}
           setStep={setModalStep}
           handleBridgeToEthereum={handleBridgeToEthereum}
           handleBridgeToTari={handleBridgeToTari}
-          isBridging={isBridging}
+          isBridging={isInProgressBridgeTx || isBridging}
           amount={amount}
           ethereumAddress={ethAddress}
           tariWalletAddress={tariAccount?.address}

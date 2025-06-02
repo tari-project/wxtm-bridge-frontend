@@ -13,7 +13,7 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
   ethereumAddress,
   fromNetwork,
 }) => {
-  const { removePendingTransaction, inProgressBridgeTx } = useTariAccount()
+  const { removePendingTransaction, ongoingBridgeTx } = useTariAccount()
 
   const { fromToken, toToken } = useBridgeInfo(
     fromNetwork,
@@ -26,14 +26,12 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
     removePendingTransaction()
   }, [closeModal, removePendingTransaction])
 
-  const amount = inProgressBridgeTx?.tokenAmount
-    ? parseFloat(formatUnits(inProgressBridgeTx?.tokenAmount, 6)).toPrecision()
+  const amount = ongoingBridgeTx?.tokenAmount
+    ? parseFloat(formatUnits(ongoingBridgeTx?.tokenAmount, 6)).toPrecision()
     : '0'
 
-  const amountToReceive = inProgressBridgeTx?.amountAfterFee
-    ? parseFloat(
-        formatUnits(inProgressBridgeTx?.amountAfterFee, 6),
-      ).toPrecision()
+  const amountToReceive = ongoingBridgeTx?.amountAfterFee
+    ? parseFloat(formatUnits(ongoingBridgeTx?.amountAfterFee, 6)).toPrecision()
     : '0'
 
   return (
@@ -73,9 +71,7 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
 
           <div className="font-medium">
             <div className="text-xs text-gray-500">Destination address</div>
-            <div className="text-sm">
-              {inProgressBridgeTx?.destinationAddress}
-            </div>
+            <div className="text-sm">{ongoingBridgeTx?.destinationAddress}</div>
           </div>
 
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>

@@ -12,25 +12,20 @@ export const WrapModal: React.FC<WrapModalProps> = ({
   fromNetwork,
   feesData,
 }) => {
-  const { inProgressBridgeTx } = useTariAccount()
+  const { ongoingBridgeTx } = useTariAccount()
   const { fromToken, toToken, destAddress } = useBridgeInfo(
     fromNetwork,
     ethereumAddress!,
     tariWalletAddress!,
   )
 
-  const amountAfterFeePending = inProgressBridgeTx?.amountAfterFee
-    ? formatUnits(inProgressBridgeTx.amountAfterFee, 6)
+  const amountAfterFeePending = ongoingBridgeTx?.amountAfterFee
+    ? formatUnits(ongoingBridgeTx.amountAfterFee, 6)
     : feesData.amountAfterFee
 
-  const destAddressPending =
-    inProgressBridgeTx?.destinationAddress ?? destAddress
+  const destAddressPending = ongoingBridgeTx?.destinationAddress ?? destAddress
 
-  const { title, subtext } = getModalTitle(
-    fromToken,
-    feesData,
-    inProgressBridgeTx,
-  )
+  const { title, subtext } = getModalTitle(fromToken, feesData, ongoingBridgeTx)
 
   return (
     <div className="w-full flex flex-col p-6">

@@ -7,7 +7,7 @@ interface State {
   tariAccount?: AccountData
   available_balance: number
   isInProgressBridgeTx: boolean
-  inProgressBridgeTx?: PendingUserTransaction
+  ongoingBridgeTx?: PendingUserTransaction
   language: string
   walletconnect_id: string
   bridge_api: string
@@ -17,7 +17,7 @@ interface State {
 
 interface Actions {
   setTariAccount: () => Promise<string | undefined>
-  setPendingTransaction: (tx: PendingUserTransaction) => void
+  setOngoingTransaction: (tx: PendingUserTransaction) => void
   removePendingTransaction: () => void
   setWrapTokenFeePercentageBps: (fee: number) => void
   setTariColdWalletAddress: (address: string) => void
@@ -31,8 +31,8 @@ const initialState: State = {
     address: '',
   },
   available_balance: 0,
-  inProgressBridgeTx: undefined,
-  // this can be replaced by check !!inProgressBridgeTx
+  ongoingBridgeTx: undefined,
+  // this can be replaced by check !!ongoingBridgeTx
   isInProgressBridgeTx: false,
   // all below can be moved to separate store
   language: '',
@@ -77,15 +77,15 @@ export const useTariAccount = create<TariL1WalletStoreState>()((set) => ({
     }
   },
 
-  setPendingTransaction: (tx: PendingUserTransaction) => {
+  setOngoingTransaction: (tx: PendingUserTransaction) => {
     set({
-      inProgressBridgeTx: tx,
+      ongoingBridgeTx: tx,
       isInProgressBridgeTx: true,
     })
   },
   removePendingTransaction: () => {
     set({
-      inProgressBridgeTx: undefined,
+      ongoingBridgeTx: undefined,
       isInProgressBridgeTx: false,
     })
   },

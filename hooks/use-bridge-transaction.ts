@@ -14,7 +14,7 @@ export const useBridgeTransaction = () => {
   })
 
   const {
-    setPendingTransaction,
+    setOngoingTransaction,
     removePendingTransaction,
 
     tariAccount,
@@ -33,16 +33,16 @@ export const useBridgeTransaction = () => {
 
     if (Array.isArray(transactions) && transactions.length > 0) {
       // Find a pending transaction
-      const inProgress = transactions.find(
+      const ongoing = transactions.find(
         (tx) =>
           tx.status === UserTransactionDTO.status.PENDING ||
           tx.status === UserTransactionDTO.status.PROCESSING ||
           tx.status === UserTransactionDTO.status.TOKENS_RECEIVED,
       )
 
-      if (inProgress) {
-        setPendingTransaction(inProgress)
-        return inProgress
+      if (ongoing) {
+        setOngoingTransaction(ongoing)
+        return ongoing
       }
 
       // If no pending tx found, but previously had one, check if it succeeded/failed
@@ -57,7 +57,7 @@ export const useBridgeTransaction = () => {
         currentPendingTx &&
         currentPendingTx.paymentId === completed?.paymentId
       ) {
-        setPendingTransaction(completed)
+        setOngoingTransaction(completed)
         return completed
       }
     } else {
