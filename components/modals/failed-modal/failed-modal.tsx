@@ -6,12 +6,12 @@ import { ModalButton } from '@/components/modals/modal-button'
 import useTariAccount from '@/store/account'
 
 export const FailedModal: React.FC<FailedModalProps> = ({ closeModal }) => {
-  const { removePendingTransaction, ongoingBridgeTx } = useTariAccount()
+  const { removeOngoingTransaction, ongoingBridgeTx } = useTariAccount()
 
   const handleOnClick = useCallback(() => {
     closeModal()
-    removePendingTransaction()
-  }, [closeModal, removePendingTransaction])
+    removeOngoingTransaction()
+  }, [closeModal, removeOngoingTransaction])
 
   return (
     <div className="w-full flex flex-col p-6">

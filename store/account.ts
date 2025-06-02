@@ -6,7 +6,7 @@ import { OpenAPI } from '@tari-project/wxtm-bridge-backend-api'
 interface State {
   tariAccount?: AccountData
   available_balance: number
-  isInProgressBridgeTx: boolean
+  isOngoingBridgeTx: boolean
   ongoingBridgeTx?: PendingUserTransaction
   language: string
   walletconnect_id: string
@@ -18,9 +18,10 @@ interface State {
 interface Actions {
   setTariAccount: () => Promise<string | undefined>
   setOngoingTransaction: (tx: PendingUserTransaction) => void
-  removePendingTransaction: () => void
+  removeOngoingTransaction: () => void
   setWrapTokenFeePercentageBps: (fee: number) => void
   setTariColdWalletAddress: (address: string) => void
+  setIsOngoingBridgeTx: (isOngoing: boolean) => void
 }
 
 type TariL1WalletStoreState = State & Actions
@@ -33,7 +34,7 @@ const initialState: State = {
   available_balance: 0,
   ongoingBridgeTx: undefined,
   // this can be replaced by check !!ongoingBridgeTx
-  isInProgressBridgeTx: false,
+  isOngoingBridgeTx: false,
   // all below can be moved to separate store
   language: '',
   walletconnect_id: '',
@@ -80,13 +81,15 @@ export const useTariAccount = create<TariL1WalletStoreState>()((set) => ({
   setOngoingTransaction: (tx: PendingUserTransaction) => {
     set({
       ongoingBridgeTx: tx,
-      isInProgressBridgeTx: true,
+      isOngoingBridgeTx: true,
     })
   },
-  removePendingTransaction: () => {
+  removeOngoingTransaction: () => {
+    console.error('[ TAPPLET-BRIDGE ] remove Ongoing TX store')
+
     set({
       ongoingBridgeTx: undefined,
-      isInProgressBridgeTx: false,
+      isOngoingBridgeTx: false,
     })
   },
   setWrapTokenFeePercentageBps: (fee: number) => {
@@ -97,6 +100,11 @@ export const useTariAccount = create<TariL1WalletStoreState>()((set) => ({
   setTariColdWalletAddress: (address: string) => {
     set({
       tariColdWalletAddress: address,
+    })
+  },
+  setIsOngoingBridgeTx: (isOngoing: boolean) => {
+    set({
+      isOngoingBridgeTx: isOngoing,
     })
   },
 }))

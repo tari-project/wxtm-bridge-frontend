@@ -11,5 +11,5 @@ export type MainComponentProps = {
   setFromNetwork: React.Dispatch<React.SetStateAction<Network>>
   toNetwork: Network
   setToNetwork: React.Dispatch<React.SetStateAction<Network>>
-  isInProgressBridgeTx: boolean
+  isOngoingBridgeTx: boolean
 } & Pick<BridgeInputProps, 'control' | 'errors'>

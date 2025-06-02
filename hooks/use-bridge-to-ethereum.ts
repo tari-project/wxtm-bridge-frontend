@@ -23,6 +23,7 @@ export const useBridgeToEthereum = () => {
     tariColdWalletAddress,
     setWrapTokenFeePercentageBps,
     setTariColdWalletAddress,
+    setIsOngoingBridgeTx,
   } = useTariAccount()
   const [isBridging, setIsBridging] = useState(false)
 
@@ -34,6 +35,7 @@ export const useBridgeToEthereum = () => {
     ethAddress: `0x${string}`
   }) => {
     setIsBridging(true)
+    setIsOngoingBridgeTx(true)
     if (!tariAccount || !signer) return
 
     const parsedAmount = parseWxtmTokenAmount(amount)

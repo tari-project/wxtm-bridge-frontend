@@ -28,11 +28,10 @@ export default function Home() {
     icon: '/icons/eth.png',
   })
 
-  const { bridgeToEthereum, isBridging, getBridgeTxParams } =
-    useBridgeToEthereum()
+  const { bridgeToEthereum, getBridgeTxParams } = useBridgeToEthereum()
   const {
     tariAccount,
-    isInProgressBridgeTx,
+    isOngoingBridgeTx,
     ongoingBridgeTx,
     setOngoingTransaction,
   } = useTariAccount()
@@ -103,7 +102,7 @@ export default function Home() {
 
     fetchUserTransactions()
     // Poll every 1 min
-    const intervalId = setInterval(fetchUserTransactions, 60000)
+    const intervalId = setInterval(fetchUserTransactions, 10000)
 
     return () => {
       clearInterval(intervalId)
@@ -115,11 +114,12 @@ export default function Home() {
     if (modalOpen && modalStep === 0 && isConnected) {
       setModalOpen(false)
       setModalStep(1)
-    } else if (isInProgressBridgeTx) {
+    } else if (isOngoingBridgeTx && ongoingBridgeTx) {
+      console.error('[ TAPPLET-BRIDGE ] set step 2')
       setModalStep(2)
       setModalOpen(true)
     }
-  }, [isConnected, modalOpen, modalStep, isInProgressBridgeTx])
+  }, [isConnected, modalOpen, modalStep, isOngoingBridgeTx, ongoingBridgeTx])
 
   const handleConnectClick = () => {
     if (!isConnected) {
@@ -144,15 +144,17 @@ export default function Home() {
     })
       .then(() => {
         getUserTransactions()
-          .then(() => {
-            setModalStep(2)
-          })
-          .catch((error) => {
-            console.error(
-              '[ TAPPLET-BRIDGE ] failed to get user transactions:',
-              error,
-            )
-          })
+        // .then(() => {
+        //   console.error('[ TAPPLET-BRIDGE ] set step 2 after bridgeToEth')
+
+        //   setModalStep(2)
+        // })
+        // .catch((error) => {
+        //   console.error(
+        //     '[ TAPPLET-BRIDGE ] failed to get user transactions:',
+        //     error,
+        //   )
+        // })
       })
       .catch((error) => {
         console.error('[ TAPPLET-BRIDGE ] Bridge operation failed:', error)
@@ -177,7 +179,7 @@ export default function Home() {
         setFromNetwork={setFromNetwork}
         toNetwork={toNetwork}
         setToNetwork={setToNetwork}
-        isInProgressBridgeTx={isInProgressBridgeTx || isBridging}
+        isOngoingBridgeTx={isOngoingBridgeTx}
       />
       {modalOpen && (
         <MainModal
@@ -190,7 +192,7 @@ export default function Home() {
           setStep={setModalStep}
           handleBridgeToEthereum={handleBridgeToEthereum}
           handleBridgeToTari={handleBridgeToTari}
-          isBridging={isInProgressBridgeTx || isBridging}
+          isBridging={isOngoingBridgeTx}
           amount={amount}
           ethereumAddress={ethAddress}
           tariWalletAddress={tariAccount?.address}

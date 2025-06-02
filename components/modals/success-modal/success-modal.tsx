@@ -13,7 +13,7 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
   ethereumAddress,
   fromNetwork,
 }) => {
-  const { removePendingTransaction, ongoingBridgeTx } = useTariAccount()
+  const { removeOngoingTransaction, ongoingBridgeTx } = useTariAccount()
 
   const { fromToken, toToken } = useBridgeInfo(
     fromNetwork,
@@ -23,8 +23,8 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
 
   const handleOnClick = useCallback(() => {
     closeModal()
-    removePendingTransaction()
-  }, [closeModal, removePendingTransaction])
+    removeOngoingTransaction()
+  }, [closeModal, removeOngoingTransaction])
 
   const amount = ongoingBridgeTx?.tokenAmount
     ? parseFloat(formatUnits(ongoingBridgeTx?.tokenAmount, 6)).toPrecision()
