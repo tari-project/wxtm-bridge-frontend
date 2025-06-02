@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useCallback, useRef } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useAccount } from 'wagmi'
 import { useForm } from 'react-hook-form'
 
@@ -29,12 +29,7 @@ export default function Home() {
   })
 
   const { bridgeToEthereum, getBridgeTxParams } = useBridgeToEthereum()
-  const {
-    tariAccount,
-    isOngoingBridgeTx,
-    ongoingBridgeTx,
-    setOngoingTransaction,
-  } = useTariAccount()
+  const { tariAccount, isOngoingBridgeTx, ongoingBridgeTx } = useTariAccount()
   const { getUserTransactions } = useBridgeTransaction()
 
   const {
@@ -49,12 +44,6 @@ export default function Home() {
 
   const amount = watch('amount')
   const feesData = useBridgeToEthereumFees(amount)
-
-  const pendingBridgeTxRef = useRef(ongoingBridgeTx)
-
-  useEffect(() => {
-    pendingBridgeTxRef.current = ongoingBridgeTx
-  }, [ongoingBridgeTx])
 
   // Fetch bridge transaction parameters once on mount or when tariAccount changes
   useEffect(() => {
@@ -80,18 +69,7 @@ export default function Home() {
 
     const fetchUserTransactions = async () => {
       try {
-        const updatedPendingTx = await getUserTransactions(
-          pendingBridgeTxRef.current,
-        )
-
-        const currentTxStatus = pendingBridgeTxRef.current?.status
-        if (
-          updatedPendingTx &&
-          currentTxStatus !== updatedPendingTx?.status &&
-          updatedPendingTx.status === UserTransactionDTO.status.PENDING
-        ) {
-          setOngoingTransaction(updatedPendingTx)
-        }
+        await getUserTransactions()
       } catch (error) {
         console.error(
           '[ TAPPLET-BRIDGE ] Failed to get user transactions:',
@@ -102,7 +80,7 @@ export default function Home() {
 
     fetchUserTransactions()
     // Poll every 1 min
-    const intervalId = setInterval(fetchUserTransactions, 10000)
+    const intervalId = setInterval(fetchUserTransactions, 60000)
 
     return () => {
       clearInterval(intervalId)
@@ -115,7 +93,6 @@ export default function Home() {
       setModalOpen(false)
       setModalStep(1)
     } else if (isOngoingBridgeTx && ongoingBridgeTx) {
-      console.error('[ TAPPLET-BRIDGE ] set step 2')
       setModalStep(2)
       setModalOpen(true)
     }
@@ -144,17 +121,6 @@ export default function Home() {
     })
       .then(() => {
         getUserTransactions()
-        // .then(() => {
-        //   console.error('[ TAPPLET-BRIDGE ] set step 2 after bridgeToEth')
-
-        //   setModalStep(2)
-        // })
-        // .catch((error) => {
-        //   console.error(
-        //     '[ TAPPLET-BRIDGE ] failed to get user transactions:',
-        //     error,
-        //   )
-        // })
       })
       .catch((error) => {
         console.error('[ TAPPLET-BRIDGE ] Bridge operation failed:', error)
