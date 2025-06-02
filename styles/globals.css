@@ -37,14 +37,42 @@ body {
   background-attachment: fixed;
 }
 
-@media (max-height: 800px) {
-  .mt-shrink {
-    margin-top: 4rem;
+@media (max-width: 1000px) {
+  .this-hide {
+    display: none;
   }
 }
 
-@media (max-width: 1000px) {
+@media (max-height: 800px) {
+  .text-small {
+    font-size: 30px;
+    --tw-leading: 40px;
+    line-height: 40px;
+    --tw-tracking: 0px;
+    letter-spacing: 0px;
+  }
+
+  .text-very-small {
+    font-size: 20px;
+    --tw-leading: 30px;
+    line-height: 30px;
+    --tw-tracking: 0px;
+    letter-spacing: 0px;
+  }
+
+  .gap-small {
+    gap: 15px;
+  }
+
   .mt-small {
-    display: none;
+    margin-top: 1rem;
+  }
+
+  .short\:hidden {
+    display: none !important;
+  }
+
+  .short\:inline {
+    display: inline !important;
   }
 }

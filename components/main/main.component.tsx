@@ -107,7 +107,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
 
   return (
     <section className="w-[90%] max-w-[83rem] mx-auto">
-      <div className="flex flex-col gap-9">
+      <div className="flex flex-col gap-9 gap-small">
         <div className="w-[116px] h-[126.07px] relative">
           <Image
             src="/icons/coin.png"
@@ -117,11 +117,14 @@ export const MainComponent: React.FC<MainComponentProps> = ({
             className="object-cover"
           />
         </div>
-        <div className="font-light text-4xl lg:text-[67.64px] leading-[40px] lg:leading-[71.5px] tracking-[0px] lg:tracking-[-3.98px] max-w-[30rem] lg:max-w-[40rem]">
-          Bridge your <span className="font-semibold">XTM</span> to <br /> any
-          chain
+        <div className="font-light text-4xl lg:text-[67.64px] text-small leading-[40px] lg:leading-[71.5px] tracking-[0px] lg:tracking-[-3.98px] max-w-[30rem] lg:max-w-[40rem]">
+          Bridge your <span className="font-semibold">XTM</span>{' '}
+          <span className="hidden short:inline">to any chain</span>
+          <span className="inline short:hidden">
+            to <br /> any chain
+          </span>
         </div>
-        <div className="font-normal text-lg lg:text-[24px] leading-[30px] tracking-[0px] lg:tracking-[-1px] max-w-[25rem] lg:max-w-[35rem] whitespace-pre">
+        <div className="font-normal text-lg lg:text-[24px] text-very-small leading-[30px] tracking-[0px] lg:tracking-[-1px] max-w-[25rem] lg:max-w-[35rem] whitespace-pre">
           Wrap XTM to create wXTM on Ethereum. wXTM isn&apos;t your <br />
           everyday Ethereum token anon. It&apos;s a powerful{' '}
           <span className="font-semibold">
@@ -132,7 +135,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
         </div>
       </div>
 
-      <div className="mt-[4rem] mt-shrink">
+      <div className="mt-[4rem] mt-small">
         <div className="mb-4 font-medium text-xl leading-[30px] tracking-[-1px]">
           Start Bridging
         </div>
@@ -180,7 +183,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
                       </div>
 
                       {/* Arrow — Between Box 1 and Box 2 */}
-                      <div className="mt-small absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+                      <div className="this-hide absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
                         <div className="w-8 h-8 rounded-md border-2 border-gray-300 bg-white flex items-center justify-center shadow-sm">
                           <FaArrowRight className="text-[15px] text-[#171717]" />
                         </div>
@@ -257,7 +260,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
           </div>
         </div>
       </div>
-      <div className="mt-8 text-center text-xs text-gray-500">
+      <div className="fixed bottom-0 mb-4 left-0 w-full text-center text-xs text-gray-500 items-center justify-center">
         Tari Bridge currently operates one way (XTM to wXTM). Tari contributors
         expect to launch wXTM unwrapping in July 2025 or sooner. <br /> For more
         information about Tari Bridge please{' '}
