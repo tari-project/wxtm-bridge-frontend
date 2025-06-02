@@ -1,15 +1,13 @@
 import { AccountData, PendingUserTransaction } from '@/types/tapplet'
 import { create } from 'zustand'
 import useTariSigner from './signer'
-import { BridgeTxDetails } from '@/clients/tari-l1-signer'
 import { OpenAPI } from '@tari-project/wxtm-bridge-backend-api'
 
 interface State {
   tariAccount?: AccountData
   available_balance: number
-  isProcessingTransaction: boolean
-  pendingBridgeTx?: PendingUserTransaction
-  pendingBridgeTxFromTU?: BridgeTxDetails
+  isOngoingBridgeTx: boolean
+  ongoingBridgeTx?: PendingUserTransaction
   language: string
   walletconnect_id: string
   bridge_api: string
@@ -19,13 +17,14 @@ interface State {
 
 interface Actions {
   setTariAccount: () => Promise<string | undefined>
-  setPendingTransaction: (tx: PendingUserTransaction) => void
-  removePendingTransaction: () => void
+  setOngoingTransaction: (tx: PendingUserTransaction) => void
+  removeOngoingTransaction: () => void
   setWrapTokenFeePercentageBps: (fee: number) => void
   setTariColdWalletAddress: (address: string) => void
+  setIsOngoingBridgeTx: (isOngoing: boolean) => void
 }
 
-type OotleWalletStoreState = State & Actions
+type TariL1WalletStoreState = State & Actions
 
 const initialState: State = {
   tariAccount: {
@@ -33,9 +32,10 @@ const initialState: State = {
     address: '',
   },
   available_balance: 0,
-  pendingBridgeTx: undefined,
-  isProcessingTransaction: false,
-  pendingBridgeTxFromTU: undefined,
+  ongoingBridgeTx: undefined,
+  // this can be replaced by check !!ongoingBridgeTx
+  isOngoingBridgeTx: false,
+  // all below can be moved to separate store
   language: '',
   walletconnect_id: '',
   bridge_api: '',
@@ -43,7 +43,7 @@ const initialState: State = {
   tariColdWalletAddress: '',
 }
 
-export const useTariAccount = create<OotleWalletStoreState>()((set) => ({
+export const useTariAccount = create<TariL1WalletStoreState>()((set) => ({
   ...initialState,
   setTariAccount: async () => {
     const signer = useTariSigner.getState().signer
@@ -78,16 +78,18 @@ export const useTariAccount = create<OotleWalletStoreState>()((set) => ({
     }
   },
 
-  setPendingTransaction: (tx: PendingUserTransaction) => {
+  setOngoingTransaction: (tx: PendingUserTransaction) => {
     set({
-      pendingBridgeTx: tx,
-      isProcessingTransaction: true,
+      ongoingBridgeTx: tx,
+      isOngoingBridgeTx: true,
     })
   },
-  removePendingTransaction: () => {
+  removeOngoingTransaction: () => {
+    console.error('[ TAPPLET-BRIDGE ] remove Ongoing TX store')
+
     set({
-      pendingBridgeTx: undefined,
-      isProcessingTransaction: false,
+      ongoingBridgeTx: undefined,
+      isOngoingBridgeTx: false,
     })
   },
   setWrapTokenFeePercentageBps: (fee: number) => {
@@ -98,6 +100,11 @@ export const useTariAccount = create<OotleWalletStoreState>()((set) => ({
   setTariColdWalletAddress: (address: string) => {
     set({
       tariColdWalletAddress: address,
+    })
+  },
+  setIsOngoingBridgeTx: (isOngoing: boolean) => {
+    set({
+      isOngoingBridgeTx: isOngoing,
     })
   },
 }))

@@ -23,19 +23,19 @@ export const useBridgeToEthereum = () => {
     tariColdWalletAddress,
     setWrapTokenFeePercentageBps,
     setTariColdWalletAddress,
+    setIsOngoingBridgeTx,
   } = useTariAccount()
   const [isBridging, setIsBridging] = useState(false)
 
   const bridgeToEthereum = async ({
     amount,
-    amountAfterFee,
     ethAddress,
   }: {
     amount: string
-    amountAfterFee: string
     ethAddress: `0x${string}`
   }) => {
     setIsBridging(true)
+    setIsOngoingBridgeTx(true)
     if (!tariAccount || !signer) return
 
     const parsedAmount = parseWxtmTokenAmount(amount)
@@ -60,12 +60,12 @@ export const useBridgeToEthereum = () => {
       paymentId: paymentId,
     })
 
-    await signer?.addPendingTappletTx({
-      amount: amount,
-      amountToReceive: amountAfterFee,
-      destinationAddress: ethAddress,
-      paymentId: paymentId,
-    })
+    // await signer?.addPendingTappletTx({
+    //   amount: amount,
+    //   amountToReceive: amountAfterFee,
+    //   destinationAddress: ethAddress,
+    //   paymentId: paymentId,
+    // })
 
     if (!isSend) {
       console.error('[ TAPPLET-BRIDGE ] send one sided failed')
@@ -86,6 +86,11 @@ export const useBridgeToEthereum = () => {
 
       setTariColdWalletAddress(coldWalletAddress)
       setWrapTokenFeePercentageBps(wrapTokenFeePercentageBps)
+      console.warn(
+        '!!!!! [ TAPPLET-BRIDGE ][gettxparams] set bridge tx params',
+        coldWalletAddress,
+        wrapTokenFeePercentageBps,
+      )
     } catch (error) {
       console.error('[ TAPPLET-BRIDGE ] Failed to fetch token params:', error)
     }

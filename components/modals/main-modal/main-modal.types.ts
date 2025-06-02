@@ -4,6 +4,7 @@ import { BridgeToEthereumFees } from '@/hooks/use-bridge-to-ethereum-fees'
 export type MainModalProps = {
   setModalOpen: (open: boolean) => void
   success: boolean
+  failed: boolean
   step: number
   setStep: (step: number) => void
   handleBridgeToEthereum: () => void

@@ -6,5 +6,5 @@ export type WrapModalProps = {
   feesData: BridgeToEthereumFees
 } & Pick<
   MainModalProps,
-  'amount' | 'tariWalletAddress' | 'ethereumAddress' | 'fromNetwork'
+  'tariWalletAddress' | 'ethereumAddress' | 'fromNetwork'
 >

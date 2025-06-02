@@ -4,31 +4,28 @@ import { WrapModalProps } from './wrap-modal.types'
 import { useBridgeInfo } from '@/hooks/use-bridge-info'
 import useTariAccount from '@/store/account'
 import { formatUnits } from 'ethers'
+import { getModalTitle } from '@/utils/transaction'
 
 export const WrapModal: React.FC<WrapModalProps> = ({
-  amount,
   tariWalletAddress,
   ethereumAddress,
   fromNetwork,
-  feesData: { amountAfterFee },
+  feesData,
 }) => {
-  const { pendingBridgeTx } = useTariAccount()
+  const { ongoingBridgeTx } = useTariAccount()
   const { fromToken, toToken, destAddress } = useBridgeInfo(
     fromNetwork,
     ethereumAddress!,
     tariWalletAddress!,
   )
 
-  // if pending tx exists use its amounts
-  const amountPending = pendingBridgeTx?.tokenAmount
-    ? formatUnits(pendingBridgeTx.tokenAmount, 6)
-    : amount
+  const amountAfterFeePending = ongoingBridgeTx?.amountAfterFee
+    ? formatUnits(ongoingBridgeTx.amountAfterFee, 6)
+    : feesData.amountAfterFee
 
-  const amountAfterFeePending = pendingBridgeTx?.amountAfterFee
-    ? formatUnits(pendingBridgeTx.amountAfterFee, 6)
-    : amountAfterFee
+  const destAddressPending = ongoingBridgeTx?.destinationAddress ?? destAddress
 
-  const destAddressPending = pendingBridgeTx?.destinationAddress ?? destAddress
+  const { title, subtext } = getModalTitle(fromToken, feesData, ongoingBridgeTx)
 
   return (
     <div className="w-full flex flex-col p-6">
@@ -44,22 +41,16 @@ export const WrapModal: React.FC<WrapModalProps> = ({
               className="rounded-full object-cover"
             />
           </div>
-          <div className="font-semibold text-lg mt-2">
-            We&apos;re {fromToken === 'wXTM' ? 'unwrapping' : 'wrapping'} your{' '}
-            {parseFloat(amountPending).toPrecision()} {fromToken}
-          </div>
+          <div className="font-semibold text-lg mt-2">{title}</div>
           <div className="font-normal text-xs mt-2 text-center px-5">
-            You&apos;ll receive{' '}
-            {parseFloat(amountAfterFeePending).toPrecision()} {toToken} in no
-            more than 12h. Funds are automatically transferred from your linked
-            Tari Universe wallet. You don&apos;t need to do anything else.
+            {subtext}
           </div>
         </div>
 
         {/* Section 1 */}
         <div className="flex flex-col my-4">
           <div className="font-medium">
-            <div className="text-xs text-gray-500">You will receive</div>
+            <div className="text-xs text-gray-500">Amount to receive</div>
             <div className="text-sm">
               {parseFloat(amountAfterFeePending).toPrecision()} {toToken}
             </div>

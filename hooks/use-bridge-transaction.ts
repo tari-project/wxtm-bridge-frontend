@@ -13,36 +13,53 @@ export const useBridgeTransaction = () => {
     mutationFn: WrapTokenService.getUserTransactions,
   })
 
-  const { setPendingTransaction, removePendingTransaction } = useTariAccount()
+  const { setOngoingTransaction, removeOngoingTransaction } = useTariAccount()
 
-  const getUserTransactions = async (
-    walletAddress: string,
-    pendingBridgeTx?: PendingUserTransaction,
-  ) => {
-    const { transactions } = await getUserTxs.mutateAsync(walletAddress)
+  /**
+   * Fetch user transactions and update the store's ongoing transaction state.
+   * Returns the updated ongoing transaction or null if none.
+   */
+  const getUserTransactions =
+    async (): Promise<PendingUserTransaction | null> => {
+      const ongoingBridgeTx = useTariAccount.getState().ongoingBridgeTx
+      const tariAccount = useTariAccount.getState().tariAccount
 
-    if (Array.isArray(transactions) && transactions.length > 0) {
-      // check if new tx has status PENDING and if so, add to store
-      const pending = transactions.find(
-        (tx) => tx.status === UserTransactionDTO.status.PENDING,
-      )
-      if (pending) {
-        setPendingTransaction(pending)
-        return
+      if (!tariAccount) return null
+      const walletAddress = tariAccount.address
+      const { transactions } = await getUserTxs.mutateAsync(walletAddress)
+
+      if (Array.isArray(transactions) && transactions.length > 0) {
+        // Find a pending transaction
+        const ongoing = transactions.find(
+          (tx) =>
+            tx.status === UserTransactionDTO.status.PENDING ||
+            tx.status === UserTransactionDTO.status.PROCESSING ||
+            tx.status === UserTransactionDTO.status.TOKENS_RECEIVED,
+        )
+        if (ongoing) {
+          setOngoingTransaction(ongoing)
+          return ongoing
+        }
+
+        // If no pending tx found, but previously had one, check if it succeeded/failed
+        const ongoingCompleted = transactions.find(
+          (tx) =>
+            (tx.status === UserTransactionDTO.status.SUCCESS ||
+              tx.status === UserTransactionDTO.status.TIMEOUT) &&
+            tx.paymentId === ongoingBridgeTx?.paymentId,
+        )
+
+        if (ongoingCompleted) {
+          setOngoingTransaction(ongoingCompleted)
+          return ongoingCompleted
+        }
+      } else {
+        // No transactions found, clear any pending transaction
+        removeOngoingTransaction()
       }
 
-      // double check to remove pending tx which is already success
-      const success = transactions.find(
-        (tx) => tx.status === UserTransactionDTO.status.SUCCESS,
-      )
-      if (pendingBridgeTx && pendingBridgeTx.createdAt == success?.createdAt)
-        removePendingTransaction()
+      return null
     }
-
-    return {
-      transactions,
-    }
-  }
 
   return {
     getUserTransactions,

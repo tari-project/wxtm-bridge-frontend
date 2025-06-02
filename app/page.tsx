@@ -13,12 +13,12 @@ import { Network } from '@/components/network-box'
 import useTariAccount from '@/store/account'
 import { useBridgeToEthereumFees } from '@/hooks/use-bridge-to-ethereum-fees'
 import { useBridgeTransaction } from '@/hooks/use-bridge-transaction'
+import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
 
 export default function Home() {
   const { isConnected, address: ethAddress } = useAccount()
   const [modalOpen, setModalOpen] = useState(false)
   const [modalStep, setModalStep] = useState<number>(1)
-  const [success] = useState(false)
   const [fromNetwork, setFromNetwork] = useState<Network>({
     name: 'Tari',
     icon: '/icons/tari.png',
@@ -28,10 +28,8 @@ export default function Home() {
     icon: '/icons/eth.png',
   })
 
-  const { bridgeToEthereum, isBridging, getBridgeTxParams } =
-    useBridgeToEthereum()
-  const { tariAccount, isProcessingTransaction, pendingBridgeTx } =
-    useTariAccount()
+  const { bridgeToEthereum, getBridgeTxParams } = useBridgeToEthereum()
+  const { tariAccount, isOngoingBridgeTx, ongoingBridgeTx } = useTariAccount()
   const { getUserTransactions } = useBridgeTransaction()
 
   const {
@@ -47,35 +45,58 @@ export default function Home() {
   const amount = watch('amount')
   const feesData = useBridgeToEthereumFees(amount)
 
+  // Fetch bridge transaction parameters once on mount or when tariAccount changes
   useEffect(() => {
-    if (tariAccount) {
-      const fetchUserTransactions = async () => {
-        try {
-          await getUserTransactions(tariAccount.address, pendingBridgeTx)
-          await getBridgeTxParams()
-        } catch (error) {
-          console.error(
-            '[ TAPPLET-BRIDGE ] Failed to get user transactions:',
-            error,
-          )
-        }
-      }
+    if (!tariAccount) return
 
-      fetchUserTransactions()
+    const fetchBridgeTxParams = async () => {
+      try {
+        await getBridgeTxParams()
+      } catch (error) {
+        console.error(
+          '[ TAPPLET-BRIDGE ] Failed to get bridge transaction params:',
+          error,
+        )
+      }
+    }
+
+    fetchBridgeTxParams()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tariAccount])
+
+  useEffect(() => {
+    if (!tariAccount) return
+
+    const fetchUserTransactions = async () => {
+      try {
+        await getUserTransactions()
+      } catch (error) {
+        console.error(
+          '[ TAPPLET-BRIDGE ] Failed to get user transactions:',
+          error,
+        )
+      }
+    }
+
+    fetchUserTransactions()
+    // Poll every 1 min
+    const intervalId = setInterval(fetchUserTransactions, 60000)
+
+    return () => {
+      clearInterval(intervalId)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tariAccount])
 
-  // Auto-close modal when connected and on connect step
   useEffect(() => {
     if (modalOpen && modalStep === 0 && isConnected) {
       setModalOpen(false)
       setModalStep(1)
-    } else if (isProcessingTransaction) {
+    } else if (isOngoingBridgeTx && ongoingBridgeTx) {
       setModalStep(2)
       setModalOpen(true)
     }
-  }, [isConnected, modalOpen, modalStep, isProcessingTransaction])
+  }, [isConnected, modalOpen, modalStep, isOngoingBridgeTx, ongoingBridgeTx])
 
   const handleConnectClick = () => {
     if (!isConnected) {
@@ -96,16 +117,15 @@ export default function Home() {
 
     bridgeToEthereum({
       amount,
-      amountAfterFee: feesData.amountAfterFee,
       ethAddress: ethAddress,
     })
       .then(() => {
-        setModalStep(2)
+        getUserTransactions()
       })
       .catch((error) => {
         console.error('[ TAPPLET-BRIDGE ] Bridge operation failed:', error)
       })
-  }, [amount, ethAddress, bridgeToEthereum, feesData])
+  }, [amount, ethAddress, bridgeToEthereum, getUserTransactions])
 
   const handleBridgeToTari = () => {
     setModalStep(2)
@@ -125,17 +145,20 @@ export default function Home() {
         setFromNetwork={setFromNetwork}
         toNetwork={toNetwork}
         setToNetwork={setToNetwork}
-        isProcessingTransaction={isProcessingTransaction || isBridging}
+        isOngoingBridgeTx={isOngoingBridgeTx}
       />
       {modalOpen && (
         <MainModal
           setModalOpen={setModalOpen}
-          success={success}
+          success={
+            ongoingBridgeTx?.status === UserTransactionDTO.status.SUCCESS
+          }
+          failed={ongoingBridgeTx?.status === UserTransactionDTO.status.TIMEOUT}
           step={modalStep}
           setStep={setModalStep}
           handleBridgeToEthereum={handleBridgeToEthereum}
           handleBridgeToTari={handleBridgeToTari}
-          isBridging={isBridging}
+          isBridging={isOngoingBridgeTx}
           amount={amount}
           ethereumAddress={ethAddress}
           tariWalletAddress={tariAccount?.address}
