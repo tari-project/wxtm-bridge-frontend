@@ -13,7 +13,10 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
   ethereumAddress,
   fromNetwork,
 }) => {
-  const { removeOngoingTransaction, ongoingBridgeTx } = useTariAccount()
+  const ongoingBridgeTx = useTariAccount((s) => s.ongoingBridgeTx)
+  const removeOngoingTransaction = useTariAccount(
+    (s) => s.removeOngoingTransaction,
+  )
 
   const { fromToken, toToken } = useBridgeInfo(
     fromNetwork,

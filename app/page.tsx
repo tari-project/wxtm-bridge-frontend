@@ -29,7 +29,9 @@ export default function Home() {
   })
 
   const { bridgeToEthereum, getBridgeTxParams } = useBridgeToEthereum()
-  const { tariAccount, isOngoingBridgeTx } = useTariAccount()
+  const tariAccount = useTariAccount((s) => s.tariAccount)
+  const isOngoingBridgeTx = useTariAccount((s) => s.isOngoingBridgeTx)
+
   const { getUserTransactions } = useBridgeTransaction()
   const ongoingBridgeTx = useTariAccount.getState().ongoingBridgeTx
 

@@ -12,7 +12,7 @@ export const WrapModal: React.FC<WrapModalProps> = ({
   fromNetwork,
   feesData,
 }) => {
-  const ongoingBridgeTx = useTariAccount.getState().ongoingBridgeTx
+  const ongoingBridgeTx = useTariAccount((s) => s.ongoingBridgeTx)
   const { fromToken, toToken, destAddress } = useBridgeInfo(
     fromNetwork,
     ethereumAddress!,

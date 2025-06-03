@@ -20,16 +20,19 @@ export const useBridgeToEthereum = () => {
   const getWrapTokenParams = useMutation({
     mutationFn: WrapTokenService.getWrapTokenParams,
   })
-  const { signer } = useTariSigner()
-  const {
-    tariAccount,
-    tariColdWalletAddress,
-    setWrapTokenFeePercentageBps,
-    setTariColdWalletAddress,
-    setIsOngoingBridgeTx,
-    setOngoingTransaction,
-  } = useTariAccount()
-  const [isBridging, setIsBridging] = useState(false)
+
+  const [isBridging, setIsBridging] = useState(false) //TODO can be removed since the store is used
+  const signer = useTariSigner((s) => s.signer)
+  const tariAccount = useTariAccount((s) => s.tariAccount)
+  const tariColdWalletAddress = useTariAccount((s) => s.tariColdWalletAddress)
+  const setWrapTokenFeePercentageBps = useTariAccount(
+    (s) => s.setWrapTokenFeePercentageBps,
+  )
+  const setTariColdWalletAddress = useTariAccount(
+    (s) => s.setTariColdWalletAddress,
+  )
+  const setIsOngoingBridgeTx = useTariAccount((s) => s.setIsOngoingBridgeTx)
+  const setOngoingTransaction = useTariAccount((s) => s.setOngoingTransaction)
 
   const bridgeToEthereum = async ({
     amount,
@@ -45,20 +48,21 @@ export const useBridgeToEthereum = () => {
     if (!tariAccount || !signer) return
 
     const parsedAmount = parseWxtmTokenAmount(amount)
-    // temporary solution to display wrapping modal
+
+    const { paymentId } = await createTransaction.mutateAsync({
+      to: ethAddress,
+      from: tariAccount.address,
+      tokenAmount: parsedAmount,
+    })
+
+    // set ongoing to immediately display wrap modal
     setOngoingTransaction({
       destinationAddress: ethAddress,
       tokenAmount: parsedAmount,
       amountAfterFee: parseWxtmTokenAmount(amountAfterFee),
       status: UserTransactionDTO.status.PENDING,
       createdAt: '',
-      paymentId: '',
-    })
-
-    const { paymentId } = await createTransaction.mutateAsync({
-      to: ethAddress,
-      from: tariAccount.address,
-      tokenAmount: parsedAmount,
+      paymentId: paymentId,
     })
     console.debug('[ TAPPLET-BRIDGE ] created tx with id: ', paymentId)
 

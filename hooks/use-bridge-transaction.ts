@@ -13,7 +13,9 @@ export const useBridgeTransaction = () => {
     mutationFn: WrapTokenService.getUserTransactions,
   })
 
-  const { setOngoingTransaction, removeOngoingTransaction } = useTariAccount()
+  const setOngoingTransaction = useTariAccount.getState().setOngoingTransaction
+  const removeOngoingTransaction =
+    useTariAccount.getState().removeOngoingTransaction
 
   /**
    * Fetch user transactions and update the store's ongoing transaction state.
