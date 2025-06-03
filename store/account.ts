@@ -85,8 +85,6 @@ export const useTariAccount = create<TariL1WalletStoreState>()((set) => ({
     })
   },
   removeOngoingTransaction: () => {
-    console.error('[ TAPPLET-BRIDGE ] remove Ongoing TX store')
-
     set({
       ongoingBridgeTx: undefined,
       isOngoingBridgeTx: false,
