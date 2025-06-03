@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next'
+import createNextIntlPlugin from 'next-intl/plugin'
 
 const nextConfig: NextConfig = {
   webpack: (config) => {
@@ -10,8 +11,9 @@ const nextConfig: NextConfig = {
   images: {
     loaderFile: './utils/imageLoader.ts',
     path: process.env.NEXT_PUBLIC_PATH,
-  }
-
+  },
 }
 
-export default nextConfig
+const withNextIntl = createNextIntlPlugin()
+
+export default withNextIntl(nextConfig)

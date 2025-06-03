@@ -2,6 +2,8 @@ import '@/styles/globals.css'
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Providers } from './providers'
+import { NextIntlClientProvider } from 'next-intl'
+import { getLocale } from 'next-intl/server'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -23,13 +25,17 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const locale = await getLocale()
+
   return (
-    <html lang="en">
+    <html lang={locale}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col items-center justify-center bg-[url('/background.png')]
         bg-no-repeat bg-cover bg-center min-h-screen`}
       >
-        <Providers>{children}</Providers>
+        <NextIntlClientProvider>
+          <Providers>{children}</Providers>
+        </NextIntlClientProvider>
       </body>
     </html>
   )

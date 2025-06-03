@@ -19,6 +19,7 @@ import {
 } from '@tari-project/wxtm-bridge-contracts/deployments'
 import { parseToMaxAllowed } from '@/utils/parse-wxtm-token-amount'
 import { formatNumber, FormatPreset } from '@/utils/formatters'
+import { useTranslations } from 'next-intl'
 
 export const MainComponent: React.FC<MainComponentProps> = ({
   onConnectClick,
@@ -46,6 +47,8 @@ export const MainComponent: React.FC<MainComponentProps> = ({
     address: address,
     token: wXTM,
   })
+
+  const t = useTranslations('HomePage')
 
   const evm_balance = data?.value
     ? parseFloat(ethers.formatEther(data?.value)).toPrecision(4)
@@ -117,6 +120,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
             className="object-cover"
           />
         </div>
+        <div>{t('title')}</div>
         <div className="font-light text-4xl lg:text-[67.64px] text-small leading-[40px] lg:leading-[71.5px] tracking-[0px] lg:tracking-[-3.98px] max-w-[30rem] lg:max-w-[40rem]">
           Bridge your <span className="font-semibold">XTM</span>{' '}
           <span className="hidden short:inline">to any chain</span>
