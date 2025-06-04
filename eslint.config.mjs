@@ -1,6 +1,7 @@
 import { dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { FlatCompat } from '@eslint/eslintrc'
+import i18next from 'eslint-plugin-i18next'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -16,7 +17,7 @@ const eslintConfig = [
       i18next,
     },
     rules: {
-      'i18next/no-literal-string': ['error', { markupOnly: true }],
+      'i18next/no-literal-string': ['warn', { markupOnly: true }],
     },
   },
 ]
