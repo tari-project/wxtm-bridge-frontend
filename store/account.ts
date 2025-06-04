@@ -22,6 +22,7 @@ interface Actions {
   setWrapTokenFeePercentageBps: (fee: number) => void
   setTariColdWalletAddress: (address: string) => void
   setIsOngoingBridgeTx: (isOngoing: boolean) => void
+  setLanguage: (language: string) => void
 }
 
 type TariL1WalletStoreState = State & Actions
@@ -36,7 +37,7 @@ const initialState: State = {
   // this can be replaced by check !!ongoingBridgeTx
   isOngoingBridgeTx: false,
   // all below can be moved to separate store
-  language: '',
+  language: 'en',
   walletconnect_id: '',
   bridge_api: '',
   wrapTokenFeePercentageBps: 50, // 0.5% fee
@@ -55,7 +56,8 @@ export const useTariAccount = create<TariL1WalletStoreState>()((set) => ({
       }
       const account = await signer.getAccount()
       const balance = await signer.getTariBalance()
-      const language = await signer.getAppLanguage()
+      // TODO move this app config data to separate store and init fct
+      const appLanguage = await signer.getAppLanguage()
       const envs = await signer.getBridgeEnvs()
       const id = envs?.[0] ?? ''
       set({
@@ -64,7 +66,7 @@ export const useTariAccount = create<TariL1WalletStoreState>()((set) => ({
           address: account.address,
         },
         available_balance: balance?.available_balance ?? 0,
-        language: language,
+        language: appLanguage,
         walletconnect_id: envs?.[0] ?? '',
         bridge_api: envs?.[1] ?? '',
       })
@@ -105,6 +107,11 @@ export const useTariAccount = create<TariL1WalletStoreState>()((set) => ({
   setIsOngoingBridgeTx: (isOngoing: boolean) => {
     set({
       isOngoingBridgeTx: isOngoing,
+    })
+  },
+  setLanguage: (languageCode: string) => {
+    set({
+      language: languageCode,
     })
   },
 }))
