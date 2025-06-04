@@ -1,5 +1,4 @@
 import { useMutation } from '@tanstack/react-query'
-import { useState } from 'react'
 
 import {
   UserTransactionDTO,
@@ -21,7 +20,6 @@ export const useBridgeToEthereum = () => {
     mutationFn: WrapTokenService.getWrapTokenParams,
   })
 
-  const [isBridging, setIsBridging] = useState(false) //TODO can be removed since the store is used
   const signer = useTariSigner((s) => s.signer)
   const tariAccount = useTariAccount((s) => s.tariAccount)
   const tariColdWalletAddress = useTariAccount((s) => s.tariColdWalletAddress)
@@ -31,7 +29,6 @@ export const useBridgeToEthereum = () => {
   const setTariColdWalletAddress = useTariAccount(
     (s) => s.setTariColdWalletAddress,
   )
-  const setIsOngoingBridgeTx = useTariAccount((s) => s.setIsOngoingBridgeTx)
   const setOngoingTransaction = useTariAccount((s) => s.setOngoingTransaction)
 
   const bridgeToEthereum = async ({
@@ -43,8 +40,6 @@ export const useBridgeToEthereum = () => {
     ethAddress: `0x${string}`
     amountAfterFee: string
   }) => {
-    setIsBridging(true)
-    setIsOngoingBridgeTx(true)
     if (!tariAccount || !signer) return
 
     const parsedAmount = parseWxtmTokenAmount(amount)
@@ -91,8 +86,6 @@ export const useBridgeToEthereum = () => {
     if (!success) {
       console.error('[ TAPPLET-BRIDGE ] confirm token sent failed')
     }
-
-    setIsBridging(false)
   }
 
   const getBridgeTxParams = async () => {
@@ -109,7 +102,6 @@ export const useBridgeToEthereum = () => {
 
   return {
     bridgeToEthereum,
-    isBridging,
     getBridgeTxParams,
   }
 }

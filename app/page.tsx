@@ -30,10 +30,11 @@ export default function Home() {
 
   const { bridgeToEthereum, getBridgeTxParams } = useBridgeToEthereum()
   const tariAccount = useTariAccount((s) => s.tariAccount)
-  const isOngoingBridgeTx = useTariAccount((s) => s.isOngoingBridgeTx)
+  // const isOngoingBridgeTx = useTariAccount((s) => s.isOngoingBridgeTx) //TODO NOT NEEDED - CAN BE REMOVED
 
   const { getUserTransactions } = useBridgeTransaction()
-  const ongoingBridgeTx = useTariAccount.getState().ongoingBridgeTx
+  // const ongoingBridgeTx = useTariAccount.getState().ongoingBridgeTx
+  const ongoingBridgeTx = useTariAccount((s) => s.ongoingBridgeTx)
 
   const {
     watch,
@@ -72,7 +73,11 @@ export default function Home() {
 
     const fetchUserTransactions = async () => {
       try {
-        await getUserTransactions()
+        const txs = await getUserTransactions()
+        console.info(
+          '[ TAPPLET-BRIDGE ] successfully get user transactions:',
+          txs,
+        )
       } catch (error) {
         console.error(
           '[ TAPPLET-BRIDGE ] Failed to get user transactions:',
@@ -95,11 +100,11 @@ export default function Home() {
     if (modalOpen && modalStep === 0 && isConnected) {
       setModalOpen(false)
       setModalStep(1)
-    } else if (isOngoingBridgeTx && ongoingBridgeTx) {
+    } else if (ongoingBridgeTx) {
       setModalStep(2)
       setModalOpen(true)
     }
-  }, [isConnected, modalOpen, modalStep, isOngoingBridgeTx, ongoingBridgeTx])
+  }, [isConnected, modalOpen, modalStep, ongoingBridgeTx])
 
   const handleConnectClick = () => {
     if (!isConnected) {
@@ -155,7 +160,7 @@ export default function Home() {
         setFromNetwork={setFromNetwork}
         toNetwork={toNetwork}
         setToNetwork={setToNetwork}
-        isOngoingBridgeTx={isOngoingBridgeTx}
+        isOngoingBridgeTx={!!ongoingBridgeTx}
       />
       {modalOpen && (
         <MainModal
@@ -168,7 +173,7 @@ export default function Home() {
           setStep={setModalStep}
           handleBridgeToEthereum={handleBridgeToEthereum}
           handleBridgeToTari={handleBridgeToTari}
-          isBridging={isOngoingBridgeTx}
+          isBridging={!!ongoingBridgeTx}
           amount={amount}
           ethereumAddress={ethAddress}
           tariWalletAddress={tariAccount?.address}
