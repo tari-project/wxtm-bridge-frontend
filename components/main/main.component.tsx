@@ -19,6 +19,8 @@ import {
 } from '@tari-project/wxtm-bridge-contracts/deployments'
 import { parseToMaxAllowed } from '@/utils/parse-wxtm-token-amount'
 import { formatNumber, FormatPreset } from '@/utils/formatters'
+import { openExternalLink } from '@/utils/universe'
+import { config } from '@/config'
 
 export const MainComponent: React.FC<MainComponentProps> = ({
   onConnectClick,
@@ -265,19 +267,17 @@ export const MainComponent: React.FC<MainComponentProps> = ({
         expect to launch wXTM unwrapping in July 2025 or sooner. <br /> For more
         information about Tari Bridge please{' '}
         <a
-          href="https://tarilabs.notion.site/Tari-Universe-Bridge-x-User-Guide-FAQs-2014e6c995c38094b4e4e98a1a3e8ec1"
-          target="_blank"
+          onClick={(e) => openExternalLink(config.TARI_BRIDGE_FAQ_URL, e)}
           rel="noopener noreferrer"
-          className="underline"
+          className="underline cursor-pointer"
         >
           see our FAQ
         </a>
         .{' '}
         <a
-          href="https://www.coinspect.com/doc/Coinspect%20-%20Smart%20Contract%20Audit%20-%20Tari%20-%20wXTM%20Bridge%20-%20Fix%20Review%20-%20v250528.pdf"
-          target="_blank"
+          onClick={(e) => openExternalLink(config.TARI_SC_AUDIT_URL, e)}
           rel="noopener noreferrer"
-          className="underline"
+          className="underline cursor-pointer"
         >
           View smart contract audit
         </a>

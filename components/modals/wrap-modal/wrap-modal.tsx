@@ -4,6 +4,8 @@ import { WrapModalProps } from './wrap-modal.types'
 import { useBridgeInfo } from '@/hooks/use-bridge-info'
 import useTariAccount from '@/store/account'
 import { getModalTitle } from '@/utils/transaction'
+import { openExternalLink } from '@/utils/universe'
+import { config } from '@/config'
 import { formatUnits } from 'ethers'
 
 export const WrapModal: React.FC<WrapModalProps> = ({
@@ -96,10 +98,9 @@ export const WrapModal: React.FC<WrapModalProps> = ({
           <div className="mt-8 text-center text-xs text-gray-500">
             Having trouble?{' '}
             <a
-              href="https://tarilabs.notion.site/Tari-Universe-Bridge-x-User-Guide-FAQs-2014e6c995c38094b4e4e98a1a3e8ec1"
-              target="_blank"
+              onClick={(e) => openExternalLink(config.TARI_BRIDGE_FAQ_URL, e)}
               rel="noopener noreferrer"
-              className="underline"
+              className="underline cursor-pointer"
             >
               View FAQs
             </a>
