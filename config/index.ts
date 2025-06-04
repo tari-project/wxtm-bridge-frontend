@@ -6,4 +6,8 @@ export const config = {
   MIN_BRIDGE_AMOUNT: 1000,
   MAX_BRIDGE_AMOUNT: 1000000000,
   HIGH_BRIDGE_THRESHOLD: 100000,
+  TARI_BRIDGE_FAQ_URL:
+    'https://tarilabs.notion.site/Tari-Universe-Bridge-x-User-Guide-FAQs-2014e6c995c38094b4e4e98a1a3e8ec1',
+  TARI_SC_AUDIT_URL:
+    'https://www.coinspect.com/doc/Coinspect%20-%20Smart%20Contract%20Audit%20-%20Tari%20-%20wXTM%20Bridge%20-%20Fix%20Review%20-%20v250528.pdf',
 }
