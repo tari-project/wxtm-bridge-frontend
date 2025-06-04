@@ -46,13 +46,19 @@ export const useBridgeTransaction = () => {
         }
 
         // If no pending tx found, but previously had one, check if it succeeded/failed
-        // check also with the paymentId from the TU to display modal after the bridge restart
+        // check also with the paymentId from the TU to display modal after the bridge relaunch
+        const validPaymentIds = new Set([
+          ongoingBridgeTx?.paymentId,
+          lastOngoingPaymentIdFromTU,
+        ])
+        const validStatuses = new Set([
+          UserTransactionDTO.status.SUCCESS,
+          UserTransactionDTO.status.TIMEOUT,
+        ])
+
         const ongoingCompleted = transactions.find(
-          (tx) =>
-            (tx.status === UserTransactionDTO.status.SUCCESS ||
-              tx.status === UserTransactionDTO.status.TIMEOUT) &&
-            (tx.paymentId === ongoingBridgeTx?.paymentId ||
-              lastOngoingPaymentIdFromTU === ongoingBridgeTx?.paymentId),
+          ({ paymentId, status }) =>
+            validPaymentIds.has(paymentId) && validStatuses.has(status),
         )
 
         if (ongoingCompleted) {

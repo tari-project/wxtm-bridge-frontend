@@ -70,11 +70,7 @@ export default function Home() {
 
     const fetchUserTransactions = async () => {
       try {
-        const txs = await getUserTransactions()
-        console.info(
-          '[ TAPPLET-BRIDGE ] successfully get user transactions:',
-          txs,
-        )
+        await getUserTransactions()
       } catch (error) {
         console.error(
           '[ TAPPLET-BRIDGE ] Failed to get user transactions:',

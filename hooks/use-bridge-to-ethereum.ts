@@ -69,7 +69,7 @@ export const useBridgeToEthereum = () => {
       paymentId: paymentId,
     })
 
-    // TODO add this line to store ongoing tx also in the TU to check on tapplet reload
+    // add this line to store ongoing tx also in the TU to check on tapplet reload
     // if any previous tx was finished with success/fail status to display it to a user
     await signer?.setOngoingBridgeTx({
       amount: amount,
