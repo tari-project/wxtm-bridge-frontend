@@ -86,6 +86,7 @@ export const useTariAccount = create<TariL1WalletStoreState>()((set) => ({
   removeOngoingTransaction: () => {
     set({
       ongoingBridgeTx: undefined,
+      lastOngoingPaymentIdFromTU: '',
     })
   },
   setWrapTokenFeePercentageBps: (fee: number) => {
