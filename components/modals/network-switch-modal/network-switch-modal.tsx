@@ -4,12 +4,14 @@ import Image from 'next/image'
 import { useSwitchChain } from 'wagmi'
 import { IoCloseOutline } from 'react-icons/io5'
 import { NetworkSwitchModalProps } from './network-switch-modal.types'
+import { useTranslation } from 'react-i18next'
 
 export const NetworkSwitchModal: React.FC<NetworkSwitchModalProps> = ({
   closeModal,
   supportedChains,
 }) => {
   const { switchChain } = useSwitchChain()
+  const { t } = useTranslation('main', { useSuspense: false })
 
   const handleSwitchNetwork = (chainId: number) => {
     switchChain({ chainId })
@@ -22,14 +24,15 @@ export const NetworkSwitchModal: React.FC<NetworkSwitchModalProps> = ({
         <button
           className="text-black font-bold absolute top-4 right-4 cursor-pointer flex text-xl rounded-full p-1 bg-black/10 hover:bg-black/20"
           onClick={closeModal}
+          aria-label={t('close')}
         >
           <IoCloseOutline />
         </button>
 
         <div className="mt-2 mb-4">
-          <h2 className="text-xl font-bold">Switch Network</h2>
+          <h2 className="text-xl font-bold">{t('switch_network')}</h2>
           <p className="text-sm text-gray-600 mt-1">
-            Please connect to one of our supported networks to continue
+            {t('please_connect_supported_network')}
           </p>
         </div>
 
@@ -58,7 +61,9 @@ export const NetworkSwitchModal: React.FC<NetworkSwitchModalProps> = ({
                 </div>
                 <div>
                   <div className="font-bold">{chain.name}</div>
-                  <div className="text-xs text-gray-500">Click to switch</div>
+                  <div className="text-xs text-gray-500">
+                    {t('click_to_switch')}
+                  </div>
                 </div>
               </button>
             </div>

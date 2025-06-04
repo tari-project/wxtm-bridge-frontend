@@ -6,6 +6,7 @@ import { ModalButton } from '@/components/modals/modal-button'
 import { useBridgeInfo } from '@/hooks/use-bridge-info'
 import useTariAccount from '@/store/account'
 import { formatUnits } from 'ethers'
+import { useTranslation } from 'react-i18next'
 
 export const SuccessModal: React.FC<SuccessModalProps> = ({
   closeModal,
@@ -13,6 +14,7 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
   ethereumAddress,
   fromNetwork,
 }) => {
+  const { t } = useTranslation('main', { useSuspense: false })
   const { removeOngoingTransaction, ongoingBridgeTx } = useTariAccount()
 
   const { fromToken, toToken } = useBridgeInfo(
@@ -49,19 +51,22 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
             />
           </div>
           <div className="font-semibold text-lg mt-2">
-            We&apos;ve {fromToken === 'wXTM' ? 'unwrapped' : 'wrapped'} your{' '}
-            {amount} {fromToken}!
+            {t(fromToken === 'wXTM' ? 'success_unwrapped' : 'success_wrapped', {
+              amount,
+              fromToken,
+            })}
           </div>
           <div className="font-normal text-xs mt-2 text-center px-3">
-            Your {toToken} conversion has been complete and your funds have been
-            deposited into the address specified.
+            {t('conversion_complete', { toToken })}
           </div>
         </div>
 
         {/* Section 1 */}
         <div className="flex flex-col my-4">
           <div className="font-medium">
-            <div className="text-xs text-gray-500">Amount to receive</div>
+            <div className="text-xs text-gray-500">
+              {t('amount_to_receive')}
+            </div>
             <div className="text-sm">
               {amountToReceive} {toToken}
             </div>
@@ -70,14 +75,16 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
 
           <div className="font-medium">
-            <div className="text-xs text-gray-500">Destination address</div>
+            <div className="text-xs text-gray-500">
+              {t('destination_address')}
+            </div>
             <div className="text-sm">{ongoingBridgeTx?.destinationAddress}</div>
           </div>
 
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
 
           {/* <div className="font-medium">
-            <div className="text-xs text-gray-500">Transaction Details</div>
+            <div className="text-xs text-gray-500">{t('transaction_details')}</div>
             <a
               href="https://sepolia.etherscan.io/tx/0x0bec7941a37c07ec7cd408b3478c66ac7a26c4e48c2fd22577bb2c9c44cb4ae8"
               target="_blank"
@@ -92,7 +99,7 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div> */}
 
           {/* <div className="font-medium">
-            <div className="text-xs text-gray-500">Transaction ID</div>
+            <div className="text-xs text-gray-500">{t('transaction_id')}</div>
             <div className="text-sm">GH7SLK9087</div>
           </div>
 

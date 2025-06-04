@@ -5,6 +5,7 @@ import { useBridgeInfo } from '@/hooks/use-bridge-info'
 import useTariAccount from '@/store/account'
 import { formatUnits } from 'ethers'
 import { getModalTitle } from '@/utils/transaction'
+import { useTranslation } from 'react-i18next'
 
 export const WrapModal: React.FC<WrapModalProps> = ({
   tariWalletAddress,
@@ -12,6 +13,7 @@ export const WrapModal: React.FC<WrapModalProps> = ({
   fromNetwork,
   feesData,
 }) => {
+  const { i18n, t } = useTranslation('main', { useSuspense: false })
   const { ongoingBridgeTx } = useTariAccount()
   const { fromToken, toToken, destAddress } = useBridgeInfo(
     fromNetwork,
@@ -25,7 +27,13 @@ export const WrapModal: React.FC<WrapModalProps> = ({
 
   const destAddressPending = ongoingBridgeTx?.destinationAddress ?? destAddress
 
-  const { title, subtext } = getModalTitle(fromToken, feesData, ongoingBridgeTx)
+  // Pass the current language to getModalTitle
+  const { title, subtext } = getModalTitle(
+    fromToken,
+    feesData,
+    ongoingBridgeTx,
+    i18n.language,
+  )
 
   return (
     <div className="w-full flex flex-col p-6">
@@ -37,7 +45,7 @@ export const WrapModal: React.FC<WrapModalProps> = ({
               src="/icons/clock.png"
               fill
               sizes="63px"
-              alt="Clock"
+              alt={t('clock_icon_alt')}
               className="rounded-full object-cover"
             />
           </div>
@@ -50,7 +58,9 @@ export const WrapModal: React.FC<WrapModalProps> = ({
         {/* Section 1 */}
         <div className="flex flex-col my-4">
           <div className="font-medium">
-            <div className="text-xs text-gray-500">Amount to receive</div>
+            <div className="text-xs text-gray-500">
+              {t('amount_to_receive')}
+            </div>
             <div className="text-sm">
               {parseFloat(amountAfterFeePending).toPrecision()} {toToken}
             </div>
@@ -59,14 +69,16 @@ export const WrapModal: React.FC<WrapModalProps> = ({
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
 
           <div className="font-medium">
-            <div className="text-xs text-gray-500">Destination address</div>
+            <div className="text-xs text-gray-500">
+              {t('destination_address')}
+            </div>
             <div className="text-sm">{destAddressPending}</div>
           </div>
 
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
 
           {/* <div className="font-medium">
-            <div className="text-xs text-gray-500">Transaction Details</div>
+            <div className="text-xs text-gray-500">{t('transaction_details')}</div>
             <a
               href="https://sepolia.etherscan.io/tx/0x0bec7941a37c07ec7cd408b3478c66ac7a26c4e48c2fd22577bb2c9c44cb4ae8"
               target="_blank"
@@ -81,23 +93,23 @@ export const WrapModal: React.FC<WrapModalProps> = ({
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
 
           <div className="font-medium">
-            <div className="text-xs text-gray-500">Transaction ID</div>
+            <div className="text-xs text-gray-500">{t('transaction_id')}</div>
             <div className="text-sm">GH7SLK9087</div>
           </div>
 
           <div className="py-[0.5px] w-full bg-gray-300 mt-2 mb-4"></div> */}
 
           {/* Section 1 */}
-          {/* <ModalButton label="Done" onClick={closeModal} disabled={false} /> */}
+          {/* <ModalButton label={t('done')} onClick={closeModal} disabled={false} /> */}
           <div className="mt-8 text-center text-xs text-gray-500">
-            Having trouble?{' '}
+            {t('having_trouble')}{' '}
             <a
               href="https://tarilabs.notion.site/Tari-Universe-Bridge-x-User-Guide-FAQs-2014e6c995c38094b4e4e98a1a3e8ec1"
               target="_blank"
               rel="noopener noreferrer"
               className="underline"
             >
-              View FAQs
+              {t('view_faqs')}
             </a>
           </div>
         </div>

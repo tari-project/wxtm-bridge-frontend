@@ -2,11 +2,12 @@ import React, { useCallback } from 'react'
 import Image from 'next/image'
 import { FailedModalProps } from './failed-modal.types'
 import { ModalButton } from '@/components/modals/modal-button'
-
 import useTariAccount from '@/store/account'
+import { useTranslation } from 'react-i18next'
 
 export const FailedModal: React.FC<FailedModalProps> = ({ closeModal }) => {
   const { removeOngoingTransaction, ongoingBridgeTx } = useTariAccount()
+  const { t } = useTranslation('main', { useSuspense: false })
 
   const handleOnClick = useCallback(() => {
     closeModal()
@@ -27,23 +28,27 @@ export const FailedModal: React.FC<FailedModalProps> = ({ closeModal }) => {
               className="rounded-full object-cover"
             />
           </div>
-          <div className="font-semibold text-lg mt-2">Something went wrong</div>
+          <div className="font-semibold text-lg mt-2">
+            {t('something_went_wrong')}
+          </div>
           <div className="font-normal text-xs mt-2 text-center px-3">
-            We couldn&apos;t complete your wrapping request in time. <br /> Your
-            XTM remains safe in your Tari wallet — it hasn&apos;t been deducted
-            or moved.
+            {t('wrap_failed_message')}
           </div>
         </div>
 
         {/* Section 1 */}
         <div className="flex flex-col my-4">
           <div className="font-medium">
-            <div className="text-xs text-gray-500">Transaction ID</div>
+            <div className="text-xs text-gray-500">{t('transaction_id')}</div>
             <div className="text-sm">{ongoingBridgeTx?.paymentId}</div>
           </div>
 
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
-          <ModalButton label="Retry" onClick={handleOnClick} disabled={false} />
+          <ModalButton
+            label={t('retry')}
+            onClick={handleOnClick}
+            disabled={false}
+          />
         </div>
       </div>
     </div>

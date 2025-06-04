@@ -2,15 +2,19 @@ import { BridgeToEthereumFees } from '@/hooks/use-bridge-to-ethereum-fees'
 import { PendingUserTransaction } from '@/types/tapplet'
 import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
 import { formatUnits } from 'ethers'
+import i18n from 'i18next'
 
 export function getModalTitle(
   fromToken: string,
   feeData: BridgeToEthereumFees,
   tx?: PendingUserTransaction,
+  language?: string, // <-- add language param
 ): { title: string; subtext: string } {
+  const t = i18n.getFixedT(language || null, 'main') // <-- use language if provided
+
   if (!tx)
     return {
-      title: 'Unknown transaction status.',
+      title: t('unknown_transaction_status'),
       subtext: ``,
     }
 
@@ -23,36 +27,40 @@ export function getModalTitle(
   switch (tx.status) {
     case UserTransactionDTO.status.PENDING:
       return {
-        title: `We're ${
-          isUnwrapping ? 'unwrapping' : 'wrapping'
-        } your ${amount} ${fromToken}`,
-        subtext: `You'll receive ${amount} ${fromToken} in no more than ${bridgingTime}.  Funds are automatically transferred from your linked Tari Universe wallet. You don't need to do anything else.`,
+        title: t('pending_title', {
+          action: isUnwrapping ? t('unwrapping') : t('wrapping'),
+          amount,
+          fromToken,
+        }),
+        subtext: t('pending_subtext', { amount, fromToken, bridgingTime }),
       }
     case UserTransactionDTO.status.PROCESSING:
       return {
-        title: 'Waiting for confirmation...',
-        subtext: `We've received your request. Your funds will be wrapped as soon as the process begins. No action is needed.`,
+        title: t('processing_title'),
+        subtext: t('processing_subtext'),
       }
     case UserTransactionDTO.status.SUCCESS:
       return {
-        title: `We've ${
-          isUnwrapping ? 'unwrapped' : 'wrapped'
-        } your ${amount} ${fromToken}!`,
-        subtext: `Your wXTM conversion has been complete and your funds have been deposited into the address specified.`,
+        title: t('success_title', {
+          action: isUnwrapping ? t('unwrapped') : t('wrapped'),
+          amount,
+          fromToken,
+        }),
+        subtext: t('success_subtext'),
       }
     case UserTransactionDTO.status.TIMEOUT:
       return {
-        title: `Oops! Your transaction has timed out!`,
-        subtext: `We couldn't complete your wrapping request in time. Your XTM remains safe in your Tari wallet — it hasn't been deducted or moved.`,
+        title: t('timeout_title'),
+        subtext: t('timeout_subtext'),
       }
     case UserTransactionDTO.status.TOKENS_RECEIVED:
       return {
-        title: `${fromToken} received - wrapping soon`,
-        subtext: `We've received your ${fromToken}. Wrapping is queued and will begin shortly. You'll get wXTM at your Ethereum address once complete.`,
+        title: t('tokens_received_title', { fromToken }),
+        subtext: t('tokens_received_subtext', { fromToken }),
       }
     default:
       return {
-        title: 'Unknown transaction status.',
+        title: t('unknown_transaction_status'),
         subtext: ``,
       }
   }

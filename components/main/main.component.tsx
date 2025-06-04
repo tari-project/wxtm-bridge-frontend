@@ -19,6 +19,7 @@ import {
 } from '@tari-project/wxtm-bridge-contracts/deployments'
 import { parseToMaxAllowed } from '@/utils/parse-wxtm-token-amount'
 import { formatNumber, FormatPreset } from '@/utils/formatters'
+import { useTranslation } from 'react-i18next'
 
 export const MainComponent: React.FC<MainComponentProps> = ({
   onConnectClick,
@@ -33,6 +34,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
   setToNetwork,
   isOngoingBridgeTx,
 }) => {
+  const { t } = useTranslation('main', { useSuspense: false })
   const [openDropdown, setOpenDropdown] = useState<'from' | 'to' | null>(null)
 
   const { isConnected, chain, address } = useAccount()
@@ -118,26 +120,25 @@ export const MainComponent: React.FC<MainComponentProps> = ({
           />
         </div>
         <div className="font-light text-4xl lg:text-[67.64px] text-small leading-[40px] lg:leading-[71.5px] tracking-[0px] lg:tracking-[-3.98px] max-w-[30rem] lg:max-w-[40rem]">
-          Bridge your <span className="font-semibold">XTM</span>{' '}
-          <span className="hidden short:inline">to any chain</span>
+          {t('bridge_title_prefix')}{' '}
+          <span className="font-semibold">{t('xtm_token')}</span>{' '}
+          <span className="hidden short:inline">
+            {t('bridge_title_suffix_inline')}
+          </span>
           <span className="inline short:hidden">
-            to <br /> any chain
+            {t('bridge_title_suffix_break')}
           </span>
         </div>
         <div className="font-normal text-lg lg:text-[24px] text-very-small leading-[30px] tracking-[0px] lg:tracking-[-1px] max-w-[25rem] lg:max-w-[35rem] whitespace-pre">
-          Wrap XTM to create wXTM on Ethereum. wXTM isn&apos;t your <br />
-          everyday Ethereum token anon. It&apos;s a powerful{' '}
-          <span className="font-semibold">
-            LayerZero <br />
-            OFT
-          </span>{' '}
-          that in future can exist on nearly any chain you desire.
+          {t('bridge_description_prefix')}
+          <span className="font-semibold">{t('layerzero_oft')}</span>{' '}
+          {t('bridge_description_suffix')}
         </div>
       </div>
 
       <div className="mt-[4rem] mt-small">
         <div className="mb-4 font-medium text-xl leading-[30px] tracking-[-1px]">
-          Start Bridging
+          {t('start_bridging')}
         </div>
         <div className="bg-white/50 backdrop-blur-sm shadow-xl rounded-2xl p-4 mx-auto">
           <div className="flex flex-wrap items-center justify-between gap-4">
@@ -195,7 +196,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
                       <div className="flex justify-between items-center p-2 px-2 2xl:px-4 rounded-xl bg-white border border-gray-200 min-h-[90px] max-h-[90px]">
                         <div className="space-y-[-8px] mr-[-10px]">
                           <div className="font-medium text-xs text-gray-500">
-                            Amount to Bridge
+                            {t('amount_to_bridge')}
                           </div>
                           <BridgeInput
                             fromNetwork={fromNetwork}
@@ -210,7 +211,9 @@ export const MainComponent: React.FC<MainComponentProps> = ({
                                 src={fromNetwork.icon}
                                 fill
                                 sizes="20px"
-                                alt={`${fromNetwork.name} icon`}
+                                alt={t('network_icon_alt', {
+                                  network: fromNetwork.name,
+                                })}
                                 className="rounded-full object-cover"
                               />
                             </div>
@@ -226,7 +229,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
                               className="border border-gray-500/50 rounded-3xl text-xs font-medium px-1.5 hover:cursor-pointer"
                               onClick={handleMaxAmount}
                             >
-                              MAX
+                              {t('max')}
                             </button>
                           </div>
                         </div>
@@ -238,9 +241,9 @@ export const MainComponent: React.FC<MainComponentProps> = ({
                     {!isConnected ? (
                       <MainButton
                         onClick={onConnectClick}
-                        subText="ETH MAINNET"
+                        subText={t('eth_mainnet')}
                       >
-                        Connect Wallet
+                        {t('connect_wallet')}
                       </MainButton>
                     ) : (
                       <MainButton
@@ -248,7 +251,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
                         disabled={!isValid || isDisabled}
                       >
                         <div className="flex">
-                          Continue
+                          {t('continue')}
                           <FaArrowRight className="ml-2" />
                         </div>
                       </MainButton>
@@ -261,16 +264,14 @@ export const MainComponent: React.FC<MainComponentProps> = ({
         </div>
       </div>
       <div className="fixed bottom-0 mb-4 left-0 w-full text-center text-xs text-gray-500 items-center justify-center">
-        Tari Bridge currently operates one way (XTM to wXTM). Tari contributors
-        expect to launch wXTM unwrapping in July 2025 or sooner. <br /> For more
-        information about Tari Bridge please{' '}
+        {t('bridge_one_way_notice')}{' '}
         <a
           href="https://tarilabs.notion.site/Tari-Universe-Bridge-x-User-Guide-FAQs-2014e6c995c38094b4e4e98a1a3e8ec1"
           target="_blank"
           rel="noopener noreferrer"
           className="underline"
         >
-          see our FAQ
+          {t('see_faq')}
         </a>
         .{' '}
         <a
@@ -279,7 +280,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
           rel="noopener noreferrer"
           className="underline"
         >
-          View smart contract audit
+          {t('view_smart_contract_audit')}
         </a>
         .
       </div>
