@@ -2,6 +2,7 @@ import { AccountData, PendingUserTransaction } from '@/types/tapplet'
 import { create } from 'zustand'
 import useTariSigner from './signer'
 import { OpenAPI } from '@tari-project/wxtm-bridge-backend-api'
+import i18next, { changeLanguage } from 'i18next'
 
 interface State {
   tariAccount?: AccountData
@@ -22,7 +23,7 @@ interface Actions {
   setWrapTokenFeePercentageBps: (fee: number) => void
   setTariColdWalletAddress: (address: string) => void
   setIsOngoingBridgeTx: (isOngoing: boolean) => void
-  setLanguage: (language: string) => void
+  setLanguage: (language: string) => Promise<void>
 }
 
 type TariL1WalletStoreState = State & Actions
@@ -109,10 +110,20 @@ export const useTariAccount = create<TariL1WalletStoreState>()((set) => ({
       isOngoingBridgeTx: isOngoing,
     })
   },
-  setLanguage: (languageCode: string) => {
-    set({
-      language: languageCode,
-    })
+  setLanguage: async (languageCode: string) => {
+    try {
+      if (i18next.language !== languageCode) {
+        set({
+          language: languageCode,
+        })
+        console.info(
+          `Changing current language ${i18next.language} to ${languageCode}`,
+        )
+        await changeLanguage(languageCode)
+      }
+    } catch (e) {
+      console.error('Could not set language:', e)
+    }
   },
 }))
 
