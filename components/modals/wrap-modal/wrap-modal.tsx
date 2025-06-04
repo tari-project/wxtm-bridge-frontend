@@ -13,7 +13,7 @@ export const WrapModal: React.FC<WrapModalProps> = ({
   feesData,
 }) => {
   const ongoingBridgeTx = useTariAccount((s) => s.ongoingBridgeTx)
-  const { fromToken, toToken, destAddress } = useBridgeInfo(
+  const bridgeInfo = useBridgeInfo(
     fromNetwork,
     ethereumAddress!,
     tariWalletAddress!,
@@ -22,9 +22,14 @@ export const WrapModal: React.FC<WrapModalProps> = ({
     ? parseFloat(formatUnits(ongoingBridgeTx.amountAfterFee, 6)).toPrecision()
     : feesData.amountAfterFee
 
-  const destAddressPending = ongoingBridgeTx?.destinationAddress ?? destAddress
+  const destAddressPending =
+    ongoingBridgeTx?.destinationAddress ?? bridgeInfo.destAddress
 
-  const { title, subtext } = getModalTitle(fromToken, feesData, ongoingBridgeTx)
+  const { title, subtext } = getModalTitle(
+    bridgeInfo,
+    feesData,
+    ongoingBridgeTx,
+  )
 
   return (
     <div className="w-full flex flex-col p-6">
@@ -51,7 +56,7 @@ export const WrapModal: React.FC<WrapModalProps> = ({
           <div className="font-medium">
             <div className="text-xs text-gray-500">Amount to receive</div>
             <div className="text-sm">
-              {amountAfterFeePending} {toToken}
+              {amountAfterFeePending} {bridgeInfo.toToken}
             </div>
           </div>
 
