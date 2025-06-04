@@ -1,5 +1,5 @@
 'use client'
-
+import './i18initializer'
 import React, { useState, useEffect, useCallback } from 'react'
 import { useAccount } from 'wagmi'
 import { useForm } from 'react-hook-form'
