@@ -13,6 +13,7 @@ interface State {
   bridge_api: string
   wrapTokenFeePercentageBps: number
   tariColdWalletAddress: string
+  lastOngoingPaymentIdFromTU: string
 }
 
 interface Actions {
@@ -41,6 +42,7 @@ const initialState: State = {
   bridge_api: '',
   wrapTokenFeePercentageBps: 50, // 0.5% fee
   tariColdWalletAddress: '',
+  lastOngoingPaymentIdFromTU: '',
 }
 
 export const useTariAccount = create<TariL1WalletStoreState>()((set) => ({
@@ -57,6 +59,7 @@ export const useTariAccount = create<TariL1WalletStoreState>()((set) => ({
       const balance = await signer.getTariBalance()
       const language = await signer.getAppLanguage()
       const envs = await signer.getBridgeEnvs()
+      const ongoingBridgeTx = await signer.getOngoingBridgeTx()
       const id = envs?.[0] ?? ''
       set({
         tariAccount: {
@@ -67,6 +70,7 @@ export const useTariAccount = create<TariL1WalletStoreState>()((set) => ({
         language: language,
         walletconnect_id: envs?.[0] ?? '',
         bridge_api: envs?.[1] ?? '',
+        lastOngoingPaymentIdFromTU: ongoingBridgeTx?.paymentId ?? '',
       })
       OpenAPI.BASE = envs?.[1] ?? ''
       return id ?? ''
