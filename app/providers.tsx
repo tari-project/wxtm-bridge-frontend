@@ -66,7 +66,7 @@ export const Providers = ({ children }: { children: ReactNode }) => {
           </QueryClientProvider>
         </WagmiProvider>
       ) : (
-        <h1>Bridge initialization in progress</h1>
+        <h1>...</h1>
       )}
     </>
   )
