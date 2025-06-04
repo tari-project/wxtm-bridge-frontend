@@ -24,6 +24,8 @@ export const useBridgeTransaction = () => {
   const getUserTransactions =
     async (): Promise<PendingUserTransaction | null> => {
       const ongoingBridgeTx = useTariAccount.getState().ongoingBridgeTx
+      const lastOngoingPaymentIdFromTU =
+        useTariAccount.getState().lastOngoingPaymentIdFromTU
       const tariAccount = useTariAccount.getState().tariAccount
 
       if (!tariAccount) return null
@@ -44,11 +46,13 @@ export const useBridgeTransaction = () => {
         }
 
         // If no pending tx found, but previously had one, check if it succeeded/failed
+        // check also with the paymentId from the TU to display modal after the bridge restart
         const ongoingCompleted = transactions.find(
           (tx) =>
             (tx.status === UserTransactionDTO.status.SUCCESS ||
               tx.status === UserTransactionDTO.status.TIMEOUT) &&
-            tx.paymentId === ongoingBridgeTx?.paymentId,
+            (tx.paymentId === ongoingBridgeTx?.paymentId ||
+              lastOngoingPaymentIdFromTU === ongoingBridgeTx?.paymentId),
         )
 
         if (ongoingCompleted) {

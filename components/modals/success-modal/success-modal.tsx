@@ -6,6 +6,7 @@ import { ModalButton } from '@/components/modals/modal-button'
 import { useBridgeInfo } from '@/hooks/use-bridge-info'
 import useTariAccount from '@/store/account'
 import { formatUnits } from 'ethers'
+import useTariSigner from '@/store/signer'
 
 export const SuccessModal: React.FC<SuccessModalProps> = ({
   closeModal,
@@ -13,6 +14,7 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
   ethereumAddress,
   fromNetwork,
 }) => {
+  const signer = useTariSigner((s) => s.signer)
   const ongoingBridgeTx = useTariAccount((s) => s.ongoingBridgeTx)
   const removeOngoingTransaction = useTariAccount(
     (s) => s.removeOngoingTransaction,
@@ -24,10 +26,11 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
     tariWalletAddress!,
   )
 
-  const handleOnClick = useCallback(() => {
+  const handleOnClick = useCallback(async () => {
     closeModal()
     removeOngoingTransaction()
-  }, [closeModal, removeOngoingTransaction])
+    if (signer) await signer.removeOngoingBridgeTx()
+  }, [closeModal, removeOngoingTransaction, signer])
 
   const amount = ongoingBridgeTx?.tokenAmount
     ? parseFloat(formatUnits(ongoingBridgeTx?.tokenAmount, 6)).toPrecision()
