@@ -7,7 +7,8 @@
     "build": "next build --debug",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "translate": "node ./scripts/translator.js"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
