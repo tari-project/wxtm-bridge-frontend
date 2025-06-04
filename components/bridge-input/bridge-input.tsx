@@ -14,7 +14,7 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
 }) => {
   const [valueLength, setValueLength] = useState(5)
   const { fromToken } = useBridgeInfo(fromNetwork)
-  const { available_balance } = useTariAccount()
+  const available_balance = useTariAccount((s) => s.available_balance)
 
   // Helper to block invalid keys
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {

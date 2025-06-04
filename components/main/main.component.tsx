@@ -39,7 +39,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
 
   const { isConnected, chain, address } = useAccount()
   const { fromToken } = useBridgeInfo(fromNetwork)
-  const { available_balance } = useTariAccount()
+  const available_balance = useTariAccount((s) => s.available_balance)
 
   const chainId = (chain?.id ?? 1) as DeployedChains
   const deployments = getDeployments(chainId)

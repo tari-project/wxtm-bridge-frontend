@@ -113,9 +113,9 @@ export class TariL1Signer {
    * @description add to TU store pending transaction
    * @returns true or false
    */
-  public async addPendingTappletTx(tx: BridgeTxDetails): Promise<boolean> {
+  public async setOngoingBridgeTx(tx: BridgeTxDetails): Promise<boolean> {
     return this.sendRequest({
-      methodName: 'addPendingTappletTx',
+      methodName: 'setOngoingBridgeTx',
       args: [tx],
     })
   }
@@ -124,9 +124,9 @@ export class TariL1Signer {
    * @description check if there is any pending transaction
    * @returns true or false
    */
-  public async getPendingTappletTx(): Promise<BridgeTxDetails | undefined> {
+  public async getOngoingBridgeTx(): Promise<BridgeTxDetails | undefined> {
     return this.sendRequest({
-      methodName: 'getPendingTappletTx',
+      methodName: 'getOngoingBridgeTx',
       args: [],
     })
   }
@@ -135,10 +135,10 @@ export class TariL1Signer {
    * @description check if there is any pending transaction
    * @returns true or false
    */
-  public async removePendingTappletTx(paymentId: string): Promise<boolean> {
+  public async removeOngoingBridgeTx(): Promise<boolean> {
     return this.sendRequest({
-      methodName: 'removePendingTappletTx',
-      args: [paymentId],
+      methodName: 'removeOngoingBridgeTx',
+      args: [],
     })
   }
 

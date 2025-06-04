@@ -4,14 +4,20 @@ import { FailedModalProps } from './failed-modal.types'
 import { ModalButton } from '@/components/modals/modal-button'
 
 import useTariAccount from '@/store/account'
+import useTariSigner from '@/store/signer'
 
 export const FailedModal: React.FC<FailedModalProps> = ({ closeModal }) => {
-  const { removeOngoingTransaction, ongoingBridgeTx } = useTariAccount()
+  const signer = useTariSigner((s) => s.signer)
+  const ongoingBridgeTx = useTariAccount((s) => s.ongoingBridgeTx)
+  const removeOngoingTransaction = useTariAccount(
+    (s) => s.removeOngoingTransaction,
+  )
 
-  const handleOnClick = useCallback(() => {
+  const handleOnClick = useCallback(async () => {
     closeModal()
     removeOngoingTransaction()
-  }, [closeModal, removeOngoingTransaction])
+    if (signer) await signer.removeOngoingBridgeTx()
+  }, [closeModal, removeOngoingTransaction, signer])
 
   return (
     <div className="w-full flex flex-col p-6">

@@ -3,10 +3,10 @@ import Image from 'next/image'
 import { WrapModalProps } from './wrap-modal.types'
 import { useBridgeInfo } from '@/hooks/use-bridge-info'
 import useTariAccount from '@/store/account'
-import { formatUnits } from 'ethers'
 import { getModalTitle } from '@/utils/transaction'
 import { openExternalLink } from '@/utils/universe'
 import { config } from '@/config'
+import { formatUnits } from 'ethers'
 
 export const WrapModal: React.FC<WrapModalProps> = ({
   tariWalletAddress,
@@ -14,20 +14,24 @@ export const WrapModal: React.FC<WrapModalProps> = ({
   fromNetwork,
   feesData,
 }) => {
-  const { ongoingBridgeTx } = useTariAccount()
-  const { fromToken, toToken, destAddress } = useBridgeInfo(
+  const ongoingBridgeTx = useTariAccount((s) => s.ongoingBridgeTx)
+  const bridgeInfo = useBridgeInfo(
     fromNetwork,
     ethereumAddress!,
     tariWalletAddress!,
   )
-
   const amountAfterFeePending = ongoingBridgeTx?.amountAfterFee
-    ? formatUnits(ongoingBridgeTx.amountAfterFee, 6)
+    ? parseFloat(formatUnits(ongoingBridgeTx.amountAfterFee, 6)).toPrecision()
     : feesData.amountAfterFee
 
-  const destAddressPending = ongoingBridgeTx?.destinationAddress ?? destAddress
+  const destAddressPending =
+    ongoingBridgeTx?.destinationAddress ?? bridgeInfo.destAddress
 
-  const { title, subtext } = getModalTitle(fromToken, feesData, ongoingBridgeTx)
+  const { title, subtext } = getModalTitle(
+    bridgeInfo,
+    feesData,
+    ongoingBridgeTx,
+  )
 
   return (
     <div className="w-full flex flex-col p-6">
@@ -54,7 +58,7 @@ export const WrapModal: React.FC<WrapModalProps> = ({
           <div className="font-medium">
             <div className="text-xs text-gray-500">Amount to receive</div>
             <div className="text-sm">
-              {parseFloat(amountAfterFeePending).toPrecision()} {toToken}
+              {amountAfterFeePending} {bridgeInfo.toToken}
             </div>
           </div>
 

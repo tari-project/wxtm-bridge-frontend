@@ -8,7 +8,10 @@ import useTariAccount from '@/store/account'
 export const useBridgeToEthereumFees = (
   tokenAmount: string,
 ): BridgeToEthereumFees => {
-  const { wrapTokenFeePercentageBps } = useTariAccount()
+  const wrapTokenFeePercentageBps = useTariAccount(
+    (s) => s.wrapTokenFeePercentageBps,
+  )
+
   return useMemo(() => {
     try {
       if (!tokenAmount || tokenAmount.trim() === '') {

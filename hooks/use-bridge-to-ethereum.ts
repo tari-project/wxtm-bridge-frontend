@@ -1,7 +1,9 @@
 import { useMutation } from '@tanstack/react-query'
-import { useState } from 'react'
 
-import { WrapTokenService } from '@tari-project/wxtm-bridge-backend-api'
+import {
+  UserTransactionDTO,
+  WrapTokenService,
+} from '@tari-project/wxtm-bridge-backend-api'
 
 import { parseWxtmTokenAmount } from '@/utils/parse-wxtm-token-amount'
 import useTariSigner from '@/store/signer'
@@ -17,38 +19,45 @@ export const useBridgeToEthereum = () => {
   const getWrapTokenParams = useMutation({
     mutationFn: WrapTokenService.getWrapTokenParams,
   })
-  const { signer } = useTariSigner()
-  const {
-    tariAccount,
-    tariColdWalletAddress,
-    setWrapTokenFeePercentageBps,
-    setTariColdWalletAddress,
-    setIsOngoingBridgeTx,
-  } = useTariAccount()
-  const [isBridging, setIsBridging] = useState(false)
+
+  const signer = useTariSigner((s) => s.signer)
+  const tariAccount = useTariAccount((s) => s.tariAccount)
+  const tariColdWalletAddress = useTariAccount((s) => s.tariColdWalletAddress)
+  const setWrapTokenFeePercentageBps = useTariAccount(
+    (s) => s.setWrapTokenFeePercentageBps,
+  )
+  const setTariColdWalletAddress = useTariAccount(
+    (s) => s.setTariColdWalletAddress,
+  )
+  const setOngoingTransaction = useTariAccount((s) => s.setOngoingTransaction)
 
   const bridgeToEthereum = async ({
     amount,
     ethAddress,
+    amountAfterFee,
   }: {
     amount: string
     ethAddress: `0x${string}`
+    amountAfterFee: string
   }) => {
-    setIsBridging(true)
-    setIsOngoingBridgeTx(true)
     if (!tariAccount || !signer) return
 
     const parsedAmount = parseWxtmTokenAmount(amount)
-
-    console.debug(
-      '[ TAPPLET-BRIDGE ] start bridging to eth with amount:',
-      parsedAmount,
-    )
 
     const { paymentId } = await createTransaction.mutateAsync({
       to: ethAddress,
       from: tariAccount.address,
       tokenAmount: parsedAmount,
+    })
+
+    // set ongoing to immediately display wrap modal
+    setOngoingTransaction({
+      destinationAddress: ethAddress,
+      tokenAmount: parsedAmount,
+      amountAfterFee: parseWxtmTokenAmount(amountAfterFee),
+      status: UserTransactionDTO.status.PENDING,
+      createdAt: '',
+      paymentId: paymentId,
     })
     console.debug('[ TAPPLET-BRIDGE ] created tx with id: ', paymentId)
 
@@ -60,12 +69,14 @@ export const useBridgeToEthereum = () => {
       paymentId: paymentId,
     })
 
-    // await signer?.addPendingTappletTx({
-    //   amount: amount,
-    //   amountToReceive: amountAfterFee,
-    //   destinationAddress: ethAddress,
-    //   paymentId: paymentId,
-    // })
+    // add this line to store ongoing tx also in the TU to check on tapplet reload
+    // if any previous tx was finished with success/fail status to display it to a user
+    await signer?.setOngoingBridgeTx({
+      amount: amount,
+      amountToReceive: amountAfterFee,
+      destinationAddress: ethAddress,
+      paymentId: paymentId,
+    })
 
     if (!isSend) {
       console.error('[ TAPPLET-BRIDGE ] send one sided failed')
@@ -75,8 +86,6 @@ export const useBridgeToEthereum = () => {
     if (!success) {
       console.error('[ TAPPLET-BRIDGE ] confirm token sent failed')
     }
-
-    setIsBridging(false)
   }
 
   const getBridgeTxParams = async () => {
@@ -86,11 +95,6 @@ export const useBridgeToEthereum = () => {
 
       setTariColdWalletAddress(coldWalletAddress)
       setWrapTokenFeePercentageBps(wrapTokenFeePercentageBps)
-      console.warn(
-        '!!!!! [ TAPPLET-BRIDGE ][gettxparams] set bridge tx params',
-        coldWalletAddress,
-        wrapTokenFeePercentageBps,
-      )
     } catch (error) {
       console.error('[ TAPPLET-BRIDGE ] Failed to fetch token params:', error)
     }
@@ -98,7 +102,6 @@ export const useBridgeToEthereum = () => {
 
   return {
     bridgeToEthereum,
-    isBridging,
     getBridgeTxParams,
   }
 }
