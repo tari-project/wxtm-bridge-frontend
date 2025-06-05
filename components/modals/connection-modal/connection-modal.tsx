@@ -27,33 +27,35 @@ const ConnectionModal: React.FC<ConnectionModalProps> = ({ closeModal }) => {
         {/* Below to be changed to one connector only */}
         <div className="p-4">
           <div className="rounded-3xl bg-[#F8F8F9]/80 flex flex-col justify-center overflow-hidden">
-            {connectors.map((connector, index) => (
-              <div
-                key={connector.uid}
-                className={`w-full ${
-                  index < 2 ? 'border-b border-gray-200' : ''
-                }`}
-              >
-                <button
-                  onClick={() => connect({ connector })}
-                  className="hover:bg-gray-200/80 hover:cursor-pointer p-4 font-bold w-full text-left flex gap-2 items-center px-6"
+            {connectors
+              .filter((connector) => connector.name === 'WalletConnect')
+              .map((connector, index) => (
+                <div
+                  key={connector.uid}
+                  className={`w-full ${
+                    index < 2 ? 'border-b border-gray-200' : ''
+                  }`}
                 >
-                  {connector.name === 'WalletConnect' && (
-                    <div className="w-[42px] h-[42px] rounded-xl overflow-hidden relative">
-                      <Image
-                        src="/icons/walletconnect.png"
-                        fill
-                        sizes="42px"
-                        alt={`Wallet`}
-                        className="object-cover"
-                      />
-                    </div>
-                  )}
+                  <button
+                    onClick={() => connect({ connector })}
+                    className="hover:bg-gray-200/80 hover:cursor-pointer p-4 font-bold w-full text-left flex gap-2 items-center px-6"
+                  >
+                    {connector.name === 'WalletConnect' && (
+                      <div className="w-[42px] h-[42px] rounded-xl overflow-hidden relative">
+                        <Image
+                          src="/icons/walletconnect.png"
+                          fill
+                          sizes="42px"
+                          alt={`Wallet`}
+                          className="object-cover"
+                        />
+                      </div>
+                    )}
 
-                  {connector.name}
-                </button>
-              </div>
-            ))}
+                    {connector.name}
+                  </button>
+                </div>
+              ))}
           </div>
         </div>
       </div>
