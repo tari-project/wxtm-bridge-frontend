@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import Image from 'next/image'
-import useTariAccount from '@/store/account'
+import useTariAccountStore from '@/store/account'
 
 import { ethers } from 'ethers'
 import { useAccount, useBalance } from 'wagmi'
@@ -41,7 +41,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
 
   const { isConnected, chain, address } = useAccount()
   const { fromToken } = useBridgeInfo(fromNetwork)
-  const available_balance = useTariAccount((s) => s.available_balance)
+  const available_balance = useTariAccountStore((s) => s.available_balance)
 
   const chainId = (chain?.id ?? 1) as DeployedChains
   const deployments = getDeployments(chainId)

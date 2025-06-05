@@ -5,35 +5,35 @@ import { WagmiProvider, State, Config } from 'wagmi'
 import { getConfig } from '@/utils/config'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { cookieToInitialState } from 'wagmi'
-import useTariAccount from '@/store/account'
-import useTariSigner from '@/store/signer'
+import useTariAccountStore from '@/store/account'
+import useTariSignerStore from '@/store/signer'
 import { TariL1SignerParameters } from '@/types/tapplet'
 import TariL1Signer from '@/clients/tari-l1-signer'
 import { MessageType, useIframeMessage } from '@/utils/useIframeMessage'
+import useAppStore from '@/store/app'
 
 export const Providers = ({ children }: { children: ReactNode }) => {
-  const projectId = useTariAccount((s) => s.walletconnect_id)
   const [config, setConfig] = useState<Config | null>(null)
   const [queryClient] = useState(() => new QueryClient())
   const [initialState, setInitialState] = useState<State | undefined>(undefined)
-  const { setTariAccount } = useTariAccount()
-  const setLanguage = useTariAccount((s) => s.setLanguage)
-  const { signer, setSigner } = useTariSigner()
+  const setTariAccount = useTariAccountStore((s) => s.setTariAccount)
+  const setAppConfig = useAppStore((s) => s.setAppConfig)
+  const signer = useTariSignerStore((s) => s.signer)
+  const setSigner = useTariSignerStore((s) => s.setSigner)
+  const projectId = useAppStore((s) => s.walletConnectProjectId)
 
+  // Auto-connect if projectId is set
   useEffect(() => {
     if (projectId) {
-      setConfig(getConfig())
+      const cfg = getConfig(projectId)
+      setConfig(cfg)
+      const cookieHeader = document.cookie
+      const state = cookieToInitialState(cfg, cookieHeader)
+      setInitialState(state)
     }
   }, [projectId])
 
-  useEffect(() => {
-    if (projectId && config) {
-      const cookieHeader = document.cookie
-      const state = cookieToInitialState(config, cookieHeader)
-      setInitialState(state)
-    }
-  }, [config, projectId])
-
+  // Initialize signer and account on mount
   useEffect(() => {
     const initializeSignerAndAccount = async () => {
       try {
@@ -45,15 +45,21 @@ export const Providers = ({ children }: { children: ReactNode }) => {
           const newSigner = new TariL1Signer(signerParams)
           setSigner(newSigner)
         }
-
-        const id = await setTariAccount()
-        setConfig(getConfig(id))
+        const id = await setAppConfig()
+        // If projectId is not set yet, set config here as fallback
+        if (!projectId && id) {
+          const cfg = getConfig(id)
+          setConfig(cfg)
+          const cookieHeader = document.cookie
+          const state = cookieToInitialState(cfg, cookieHeader)
+          setInitialState(state)
+        }
       } catch (error) {
         console.error('[ TAPPLET-BRIDGE ] Failed to set Tari Account:', error)
       }
     }
-
     initializeSignerAndAccount()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setSigner, setTariAccount, signer])
 
   useIframeMessage((event) => {
@@ -71,17 +77,31 @@ export const Providers = ({ children }: { children: ReactNode }) => {
       case MessageType.SET_LANGUAGE:
         const language = event.data.payload.language
         console.info('[ TAPPLET-BRIDGE ] Received SET_LANGUAGE: ', language)
-        setLanguage(language)
+        // setLanguage(language)
         break
     }
   })
   if (!initialState)
     console.debug('[ TAPPLET-BRIDGE ] provider initial state undefined')
 
+  // if (process.env.NODE_ENV === 'development') {
+  //   console.debug('[ TAPPLET-BRIDGE ] provider config', config)
+  //   return (
+  //     <>
+  //       {config && (
+  //         <WagmiProvider config={config} initialState={initialState}>
+  //           <QueryClientProvider client={queryClient}>
+  //             {children}
+  //           </QueryClientProvider>
+  //         </WagmiProvider>
+  //       )}
+  //     </>
+  //   )
+  // }
   return (
     <>
-      {projectId.length ? (
-        <WagmiProvider config={getConfig()} initialState={initialState}>
+      {config ? (
+        <WagmiProvider config={config} initialState={initialState}>
           <QueryClientProvider client={queryClient}>
             {children}
           </QueryClientProvider>

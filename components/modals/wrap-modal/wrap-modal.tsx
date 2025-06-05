@@ -2,7 +2,7 @@ import React from 'react'
 import Image from 'next/image'
 import { WrapModalProps } from './wrap-modal.types'
 import { useBridgeInfo } from '@/hooks/use-bridge-info'
-import useTariAccount from '@/store/account'
+import useTariAccountStore from '@/store/account'
 import { getModalTitle } from '@/utils/transaction'
 import { openExternalLink } from '@/utils/universe'
 import { config } from '@/config'
@@ -16,7 +16,7 @@ export const WrapModal: React.FC<WrapModalProps> = ({
   feesData,
 }) => {
   const { i18n, t } = useTranslation('main', { useSuspense: false })
-  const ongoingBridgeTx = useTariAccount((s) => s.ongoingBridgeTx)
+  const ongoingBridgeTx = useTariAccountStore((s) => s.ongoingBridgeTx)
   const bridgeInfo = useBridgeInfo(
     fromNetwork,
     ethereumAddress!,

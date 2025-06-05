@@ -7,7 +7,8 @@ import {
 
 import { parseWxtmTokenAmount } from '@/utils/parse-wxtm-token-amount'
 import useTariSigner from '@/store/signer'
-import useTariAccount from '@/store/account'
+import useTariAccountStore from '@/store/account'
+import useBridgeStore from '@/store/bridge'
 
 export const useBridgeToEthereum = () => {
   const createTransaction = useMutation({
@@ -21,15 +22,17 @@ export const useBridgeToEthereum = () => {
   })
 
   const signer = useTariSigner((s) => s.signer)
-  const tariAccount = useTariAccount((s) => s.tariAccount)
-  const tariColdWalletAddress = useTariAccount((s) => s.tariColdWalletAddress)
-  const setWrapTokenFeePercentageBps = useTariAccount(
-    (s) => s.setWrapTokenFeePercentageBps,
-  )
-  const setTariColdWalletAddress = useTariAccount(
+  const tariAccount = useTariAccountStore((s) => s.tariAccount)
+  const tariColdWalletAddress = useBridgeStore((s) => s.tariColdWalletAddress)
+  const setTariColdWalletAddress = useBridgeStore(
     (s) => s.setTariColdWalletAddress,
   )
-  const setOngoingTransaction = useTariAccount((s) => s.setOngoingTransaction)
+  const setWrapTokenFeePercentageBps = useBridgeStore(
+    (s) => s.setWrapTokenFeePercentageBps,
+  )
+  const setOngoingTransaction = useTariAccountStore(
+    (s) => s.setOngoingTransaction,
+  )
 
   const bridgeToEthereum = async ({
     amount,
