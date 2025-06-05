@@ -7,11 +7,11 @@ export interface SignerStore<TSigner extends TariL1Signer> {
   setSigner(signer: TSigner): void
 }
 
-const useTariSigner = create<SignerStore<TariL1Signer>>()((set) => ({
+const useTariSignerStore = create<SignerStore<TariL1Signer>>()((set) => ({
   signer: null,
   setSigner(signer) {
     set({ signer })
   },
 }))
 
-export default useTariSigner
+export default useTariSignerStore

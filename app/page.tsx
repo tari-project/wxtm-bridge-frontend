@@ -10,7 +10,7 @@ import { MainComponent } from '@/components/main'
 import { useBridgeToEthereum } from '@/hooks/use-bridge-to-ethereum'
 import { BridgeFormValues } from '@/components/bridge-input'
 import { Network } from '@/components/network-box'
-import useTariAccount from '@/store/account'
+import useTariAccountStore from '@/store/account'
 import { useBridgeToEthereumFees } from '@/hooks/use-bridge-to-ethereum-fees'
 import { useBridgeTransaction } from '@/hooks/use-bridge-transaction'
 import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
@@ -30,8 +30,8 @@ export default function Home() {
 
   const { bridgeToEthereum, getBridgeTxParams } = useBridgeToEthereum()
   const { getUserTransactions } = useBridgeTransaction()
-  const tariAccount = useTariAccount((s) => s.tariAccount)
-  const ongoingBridgeTx = useTariAccount((s) => s.ongoingBridgeTx)
+  const tariAccount = useTariAccountStore((s) => s.tariAccount)
+  const ongoingBridgeTx = useTariAccountStore((s) => s.ongoingBridgeTx)
 
   const {
     watch,

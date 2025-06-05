@@ -5,7 +5,7 @@ import {
   UserTransactionDTO,
 } from '@tari-project/wxtm-bridge-backend-api'
 
-import useTariAccount from '@/store/account'
+import useTariAccountStore from '@/store/account'
 import { PendingUserTransaction } from '@/types/tapplet'
 
 export const useBridgeTransaction = () => {
@@ -13,9 +13,10 @@ export const useBridgeTransaction = () => {
     mutationFn: WrapTokenService.getUserTransactions,
   })
 
-  const setOngoingTransaction = useTariAccount.getState().setOngoingTransaction
+  const setOngoingTransaction =
+    useTariAccountStore.getState().setOngoingTransaction
   const removeOngoingTransaction =
-    useTariAccount.getState().removeOngoingTransaction
+    useTariAccountStore.getState().removeOngoingTransaction
 
   /**
    * Fetch user transactions and update the store's ongoing transaction state.
@@ -23,10 +24,10 @@ export const useBridgeTransaction = () => {
    */
   const getUserTransactions =
     async (): Promise<PendingUserTransaction | null> => {
-      const ongoingBridgeTx = useTariAccount.getState().ongoingBridgeTx
+      const ongoingBridgeTx = useTariAccountStore.getState().ongoingBridgeTx
       const lastOngoingPaymentIdFromTU =
-        useTariAccount.getState().lastOngoingPaymentIdFromTU
-      const tariAccount = useTariAccount.getState().tariAccount
+        useTariAccountStore.getState().lastOngoingPaymentIdFromTU
+      const tariAccount = useTariAccountStore.getState().tariAccount
 
       if (!tariAccount) return null
       const walletAddress = tariAccount.address

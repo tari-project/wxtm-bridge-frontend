@@ -3,13 +3,13 @@ import Image from 'next/image'
 import { FailedModalProps } from './failed-modal.types'
 import { ModalButton } from '@/components/modals/modal-button'
 
-import useTariAccount from '@/store/account'
+import useTariAccountStore from '@/store/account'
 import useTariSigner from '@/store/signer'
 
 export const FailedModal: React.FC<FailedModalProps> = ({ closeModal }) => {
   const signer = useTariSigner((s) => s.signer)
-  const ongoingBridgeTx = useTariAccount((s) => s.ongoingBridgeTx)
-  const removeOngoingTransaction = useTariAccount(
+  const ongoingBridgeTx = useTariAccountStore((s) => s.ongoingBridgeTx)
+  const removeOngoingTransaction = useTariAccountStore(
     (s) => s.removeOngoingTransaction,
   )
 
