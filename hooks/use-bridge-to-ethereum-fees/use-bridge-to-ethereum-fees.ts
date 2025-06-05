@@ -3,12 +3,12 @@ import { parseUnits, formatUnits } from 'ethers'
 
 import { config } from '@/config'
 import { BridgeToEthereumFees } from './use-bridge-to-ethereum-fees.types'
-import useTariAccountStore from '@/store/account'
+import useBridgeStore from '@/store/bridge'
 
 export const useBridgeToEthereumFees = (
   tokenAmount: string,
 ): BridgeToEthereumFees => {
-  const wrapTokenFeePercentageBps = useTariAccountStore(
+  const wrapTokenFeePercentageBps = useBridgeStore(
     (s) => s.wrapTokenFeePercentageBps,
   )
 
