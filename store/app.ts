@@ -32,9 +32,9 @@ export const useAppStore = create<AppStoreState>()((set) => ({
       }
       const language = await signer.getAppLanguage()
       const envs = await signer.getBridgeEnvs()
-      //TODO TMP hardcoded
-      const walletconnectId = envs?.[0] ?? '89085ba8291ae91cf7e35f57ad60033d'
-      const bridgeAPI = envs?.[1] ?? 'https://api.staging-bridge.tari.com'
+      const walletconnectId = envs?.[0] ?? ''
+      const bridgeAPI = envs?.[1] ?? ''
+
       set({
         language: language,
         walletConnectProjectId: walletconnectId,
