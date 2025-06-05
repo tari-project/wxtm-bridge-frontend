@@ -87,7 +87,7 @@ export const Providers = ({ children }: { children: ReactNode }) => {
           </QueryClientProvider>
         </WagmiProvider>
       ) : (
-        <>{children}</>
+        <div className="h-5 w-5 animate-spin rounded-full border-b-[3px] border-white"></div>
       )}
     </>
   )
