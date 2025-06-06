@@ -1,23 +1,26 @@
 import { create } from 'zustand'
 import useTariSigner from './signer'
 import { OpenAPI } from '@tari-project/wxtm-bridge-backend-api'
+import { Theme } from '@/types/app'
 
 interface State {
   language: string
   walletConnectProjectId: string
   bridgeAPI: string
+  theme: Theme
 }
 
 interface Actions {
   setAppConfig: () => Promise<string | undefined>
+  setTheme: (theme: Theme) => void
 }
-
 type AppStoreState = State & Actions
 
 const initialState: State = {
   language: 'en',
   walletConnectProjectId: '',
   bridgeAPI: '',
+  theme: 'light',
 }
 
 export const useAppStore = create<AppStoreState>()((set) => ({
@@ -51,6 +54,11 @@ export const useAppStore = create<AppStoreState>()((set) => ({
         error,
       )
     }
+  },
+  setTheme: (theme: Theme) => {
+    set({
+      theme: theme,
+    })
   },
 }))
 

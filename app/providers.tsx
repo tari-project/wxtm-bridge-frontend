@@ -17,9 +17,21 @@ export const Providers = ({ children }: { children: ReactNode }) => {
   const [initialState, setInitialState] = useState<State | undefined>(undefined)
   const setTariAccount = useTariAccountStore((s) => s.setTariAccount)
   const setAppConfig = useAppStore((s) => s.setAppConfig)
+  const setTheme = useAppStore((s) => s.setTheme)
   const signer = useTariSignerStore((s) => s.signer)
   const setSigner = useTariSignerStore((s) => s.setSigner)
   const projectId = useAppStore((s) => s.walletConnectProjectId)
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data?.type === 'SET_THEME') {
+        const theme = event.data.payload
+        setTheme(theme)
+      }
+    }
+    window.addEventListener('message', handleMessage)
+    return () => window.removeEventListener('message', handleMessage)
+  }, [setTheme])
 
   // Auto-connect if projectId is set
   useEffect(() => {
