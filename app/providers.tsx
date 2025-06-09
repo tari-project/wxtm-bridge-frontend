@@ -76,20 +76,6 @@ export const Providers = ({ children }: { children: ReactNode }) => {
   if (!initialState)
     console.debug('[ TAPPLET-BRIDGE ] provider initial state undefined')
 
-  // if (process.env.NODE_ENV === 'development') {
-  //   console.debug('[ TAPPLET-BRIDGE ] provider config', config)
-  //   return (
-  //     <>
-  //       {config && (
-  //         <WagmiProvider config={config} initialState={initialState}>
-  //           <QueryClientProvider client={queryClient}>
-  //             {children}
-  //           </QueryClientProvider>
-  //         </WagmiProvider>
-  //       )}
-  //     </>
-  //   )
-  // }
   return (
     <>
       {config ? (
