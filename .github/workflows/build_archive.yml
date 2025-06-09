@@ -86,11 +86,11 @@ jobs:
           echo "Archive ${{ env.TS_FILENAME }} too ${{ env.TS_FILENAME }}-v${TS_VERSION}.zip"
           7z a "${{ env.TS_FILENAME }}-v${TS_VERSION}.zip" *
           echo "Compute archive shasum"
-          shasum "${{ env.TS_FILENAME }}-v${TS_VERSION}.zip" >> "${{ env.TS_FILENAME }}-v${TS_VERSION}.zip.sha256"
+          shasum --algorithm 256 "${{ env.TS_FILENAME }}-v${TS_VERSION}.zip" >> "${{ env.TS_FILENAME }}-v${TS_VERSION}.zip.sha256"
           echo "Show the shasum"
           cat "${{ env.TS_FILENAME }}-v${TS_VERSION}.zip.sha256"
           echo "Checksum verification archive is "
-          shasum --check "${{ env.TS_FILENAME }}-v${TS_VERSION}.zip.sha256"
+          shasum --algorithm 256 --check "${{ env.TS_FILENAME }}-v${TS_VERSION}.zip.sha256"
 
       - name: Create release
         uses: ncipollo/release-action@v1
