@@ -10,6 +10,7 @@ import useTariSignerStore from '@/store/signer'
 import { TariL1SignerParameters } from '@/types/tapplet'
 import TariL1Signer from '@/clients/tari-l1-signer'
 import useAppStore from '@/store/app'
+import { MessageType, useIframeMessage } from '@/utils/useIframeMessage'
 
 export const Providers = ({ children }: { children: ReactNode }) => {
   const [config, setConfig] = useState<Config | null>(null)
@@ -21,6 +22,29 @@ export const Providers = ({ children }: { children: ReactNode }) => {
   const signer = useTariSignerStore((s) => s.signer)
   const setSigner = useTariSignerStore((s) => s.setSigner)
   const projectId = useAppStore((s) => s.walletConnectProjectId)
+
+  useIframeMessage((event) => {
+    switch (event.data.type) {
+      case MessageType.SIGNER_CALL: {
+        console.info(
+          '[ TAPPLET-BRIDGE ] Received SIGNER_CALL message from parent window',
+        )
+        break
+      }
+      case MessageType.RESIZE: {
+        console.info(
+          '[ TAPPLET-BRIDGE ] Received RESIZE message from parent window',
+        )
+        break
+      }
+      case MessageType.SET_THEME: {
+        console.info(
+          '[ TAPPLET-BRIDGE ] Received SET_THEME message from parent window',
+        )
+        break
+      }
+    }
+  })
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
