@@ -11,6 +11,7 @@ declare global {
 
 export function getConfig(id?: string) {
   const project_id = id || useAppStore.getState().walletConnectProjectId
+  console.info('[ TAPPLET-BRIDGE ][ CONFIG ] wagmi config create', project_id)
   if (!globalThis.wagmiConfig) {
     globalThis.wagmiConfig = createConfig({
       chains: [mainnet, baseSepolia, sepolia],
@@ -31,6 +32,10 @@ export function getConfig(id?: string) {
     })
   }
 
+  console.info(
+    '[ TAPPLET-BRIDGE ][ CONFIG ] wagmi config',
+    globalThis.wagmiConfig,
+  )
   return globalThis.wagmiConfig
 }
 

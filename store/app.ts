@@ -35,8 +35,8 @@ export const useAppStore = create<AppStoreState>()((set) => ({
       }
       const language = await signer.getAppLanguage()
       const envs = await signer.getBridgeEnvs()
-      const walletconnectId = envs?.[0] ?? ''
-      const bridgeAPI = envs?.[1] ?? ''
+      const walletconnectId = envs?.[0] ?? '89085ba8291ae91cf7e35f57ad60033d'
+      const bridgeAPI = envs?.[1] ?? 'https://api.staging-bridge.tari.com'
 
       set({
         language: language,
@@ -46,7 +46,10 @@ export const useAppStore = create<AppStoreState>()((set) => ({
 
       // set OpenAPI configuration
       OpenAPI.BASE = bridgeAPI
-
+      console.info(
+        '[ TAPPLET-BRIDGE ][ APP CONFIG ] projectId',
+        walletconnectId,
+      )
       return walletconnectId
     } catch (error) {
       console.error(

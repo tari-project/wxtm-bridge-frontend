@@ -1,5 +1,5 @@
 'use client'
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect, useCallback } from 'react'
 import { useAccount } from 'wagmi'
 import { useForm } from 'react-hook-form'
@@ -14,6 +14,7 @@ import useTariAccountStore from '@/store/account'
 import { useBridgeToEthereumFees } from '@/hooks/use-bridge-to-ethereum-fees'
 import { useBridgeTransaction } from '@/hooks/use-bridge-transaction'
 import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
+import { getConfig } from '@/utils/config'
 
 export default function Home() {
   const { isConnected, address: ethAddress } = useAccount()
@@ -33,6 +34,72 @@ export default function Home() {
   const tariAccount = useTariAccountStore((s) => s.tariAccount)
   const ongoingBridgeTx = useTariAccountStore((s) => s.ongoingBridgeTx)
 
+  useEffect(() => {
+    if (isConnected) {
+      ;(async () => {
+        let serializedState = ''
+        console.info(
+          '[ TAPPLET-BRIDGE ] session string try to read ',
+          isConnected,
+        )
+        try {
+          const cfg = getConfig('89085ba8291ae91cf7e35f57ad60033d')
+
+          if (cfg) {
+            // Only serialize the state property
+            const serializableState = cfg.state
+
+            // Custom replacer to handle Maps/Sets in state and avoid cyclic structures
+            const getCycleSafeReplacer = () => {
+              const seen = new WeakSet()
+              return (_key: string, value: any) => {
+                if (typeof value === 'function' || typeof value === 'symbol') {
+                  return undefined
+                }
+                if (typeof value === 'object' && value !== null) {
+                  if (seen.has(value)) {
+                    return undefined
+                  }
+                  seen.add(value)
+                }
+                if (value instanceof Map) {
+                  return Array.from(value.entries())
+                }
+                if (value instanceof Set) {
+                  return Array.from(value)
+                }
+                return value
+              }
+            }
+
+            try {
+              serializedState = JSON.stringify(
+                serializableState,
+                getCycleSafeReplacer(),
+              )
+            } catch (error) {
+              console.error(
+                '[Page serialize] Failed to serialize config state:',
+                error,
+              )
+            }
+          }
+        } catch (error) {
+          console.error('[Page serialize] Failed to serialize:', error)
+        }
+        if (serializedState) {
+          console.error('[ TAPPLET-BRIDGE ] SEND TO PARENT ', serializedState)
+          window.parent.postMessage(
+            {
+              type: 'REOWN_WALLETCONNECT_CONFIG',
+              payload: { config: serializedState },
+            },
+            '*',
+          )
+        }
+      })()
+    }
+  }, [isConnected])
   const {
     watch,
     control,
