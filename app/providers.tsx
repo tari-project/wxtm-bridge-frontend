@@ -42,77 +42,68 @@ export const Providers = ({ children }: { children: ReactNode }) => {
     const handleMessage = (event: MessageEvent) => {
       if (event.data?.type === 'WALLETCONNECT_CONFIG_DATA') {
         const parentConfig = event.data.payload.config
-        if (
-          !parentConfig ||
-          parentConfig === 'null' ||
-          parentConfig === 'undefined' ||
-          parentConfig === ''
-        ) {
-          // No config from parent, create new config
-          const cfg = getConfig(projectId)
-          setConfig(cfg)
-          setInitialState(undefined)
-          console.info(
-            '[ TAPPLET-BRIDGE ] No config from parent, created new config:',
-            cfg,
-          )
-        } else {
+        // if (
+        //   !config &&
+        //   !!!parentConfig
+        //   // (!parentConfig ||
+        //   //   parentConfig === 'null' ||
+        //   //   parentConfig === 'undefined' ||
+        //   //   parentConfig === '')
+        // ) {
+        //   // No config from parent, create new config
+        //   const cfg = getConfig(projectId)
+        //   setConfig(cfg)
+        //   setInitialState(undefined)
+        //   console.info(
+        //     '[ TAPPLET-BRIDGE ] No config from parent, created new config:',
+        //     cfg,
+        //   )
+        // } else {
+        if (!config && !initialState && parentConfig) {
           // Config exists from parent, parse and use it
+
+          console.info(
+            '[ TAPPLET-BRIDGE ] Using config from parent:',
+            typeof parentConfig === 'string',
+            parentConfig,
+          )
           try {
-            console.info(
-              '[ TAPPLET-BRIDGE ] Using config from parent:',
-              typeof parentConfig === 'string',
-              parentConfig,
-            )
-            try {
-              const parsedState: State =
-                typeof parentConfig === 'string'
-                  ? JSON.parse(parentConfig)
-                  : parentConfig
-              // Revive connections into a Map
-              if (
-                parsedState.connections &&
-                !(parsedState.connections instanceof Map)
-              ) {
-                parsedState.connections = new Map(parsedState.connections)
-              }
-              setInitialState(parsedState)
-              console.info('[ TAPPLET-BRIDGE ] parsed state:', parsedState)
-              // setConfig(parsedState)
-            } catch (error) {
-              console.error(
-                '[ TAPPLET-BRIDGE ] Failed to set init state:',
-                error,
-              )
+            const parsedState: State =
+              typeof parentConfig === 'string'
+                ? JSON.parse(parentConfig)
+                : parentConfig
+            // Revive connections into a Map
+            if (
+              parsedState.connections &&
+              !(parsedState.connections instanceof Map)
+            ) {
+              parsedState.connections = new Map(parsedState.connections)
             }
-            // If parent also sent session state, set it here
-            // if (event.data.session) {
-            //   setInitialState(event.data.session)
-            // }
-          } catch (error) {
-            console.error(
-              '[ TAPPLET-BRIDGE ] Failed to parse parent config:',
-              error,
-            )
-            // fallback: create new config
+            setInitialState(parsedState)
+            console.info('[ TAPPLET-BRIDGE ] parsed state:', parsedState)
             const cfg = getConfig(projectId)
             setConfig(cfg)
-            setInitialState(undefined)
+          } catch (error) {
+            console.error('[ TAPPLET-BRIDGE ] Failed to set init state:', error)
           }
+          // If parent also sent session state, set it here
+          // if (event.data.session) {
+          //   setInitialState(event.data.session)
+          // }
         }
         // If configData is present, set initial state
-        const configData: string = event.data.payload?.config || ''
-        if (projectId && configData) {
-          try {
-            const parsedState = JSON.parse(configData) as State
-            setInitialState(parsedState)
-          } catch (error) {
-            console.error(
-              '[ TAPPLET-BRIDGE ] Failed to parse configData:',
-              error,
-            )
-          }
-        }
+        // const configData: string = event.data.payload?.config || ''
+        // if (projectId && configData) {
+        //   try {
+        //     const parsedState = JSON.parse(configData) as State
+        //     setInitialState(parsedState)
+        //   } catch (error) {
+        //     console.error(
+        //       '[ TAPPLET-BRIDGE ] Failed to parse configData:',
+        //       error,
+        //     )
+        //   }
+        // }
       } else if (event.data?.type === 'SET_THEME') {
         setTheme(event.data.payload)
       }
@@ -120,28 +111,28 @@ export const Providers = ({ children }: { children: ReactNode }) => {
 
     window.addEventListener('message', handleMessage)
     return () => window.removeEventListener('message', handleMessage)
-  }, [projectId, setTheme, config])
+  }, [projectId, setTheme, config, initialState])
 
   // If no config event is sent after a short delay, create a new config
-  useEffect(() => {
-    let timeout: NodeJS.Timeout | null = null
-    if (!config && projectId) {
-      timeout = setTimeout(() => {
-        if (!config) {
-          const cfg = getConfig(projectId)
-          setConfig(cfg)
-          // setInitialState(undefined)
-          console.info(
-            '[ TAPPLET-BRIDGE ] No config event received, created new config:',
-            cfg,
-          )
-        }
-      }, 1000) // 1 second timeout, adjust as needed
-    }
-    return () => {
-      if (timeout) clearTimeout(timeout)
-    }
-  }, [config, projectId])
+  // useEffect(() => {
+  //   let timeout: NodeJS.Timeout | null = null
+  //   if (!config && projectId) {
+  //     timeout = setTimeout(() => {
+  //       if (!config) {
+  //         const cfg = getConfig(projectId)
+  //         setConfig(cfg)
+  //         // setInitialState(undefined)
+  //         console.info(
+  //           '[ TAPPLET-BRIDGE ] No config event received, created new config:',
+  //           cfg,
+  //         )
+  //       }
+  //     }, 5000) // 1 second timeout, adjust as needed
+  //   }
+  //   return () => {
+  //     if (timeout) clearTimeout(timeout)
+  //   }
+  // }, [config, initialState, projectId])
 
   // 3. When connected, send session data to parent for storage
   // const sendSessionToParent = useCallback((state: State | undefined) => {
