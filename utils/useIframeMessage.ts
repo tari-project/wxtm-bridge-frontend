@@ -5,6 +5,7 @@ export enum MessageType {
   SIGNER_CALL = 'signer-call',
   RESIZE = 'resize',
   SET_THEME = 'SET_THEME',
+  WALLETCONNECT_CONFIG_DATA = 'WALLETCONNECT_CONFIG_DATA',
 }
 
 interface SignerCallMessage {
@@ -27,7 +28,18 @@ interface SetThemeMEssage {
   payload: Theme
 }
 
-export type IframeMessage = SignerCallMessage | ResizeMessage | SetThemeMEssage
+interface SetWalletConnectConfigData {
+  type: MessageType.WALLETCONNECT_CONFIG_DATA
+  payload: {
+    config: string
+  }
+}
+
+export type IframeMessage =
+  | SignerCallMessage
+  | ResizeMessage
+  | SetThemeMEssage
+  | SetWalletConnectConfigData
 
 // Hook to listen for messages from the parent window
 export function useIframeMessage(
