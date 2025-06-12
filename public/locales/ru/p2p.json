@@ -1,0 +1,25 @@
+{
+  "connected-since": "Подключен с",
+  "connections": "подключения",
+  "established": "Установлено",
+  "listener-addresses": "Адрес слушателя",
+  "miners": "Майнеры",
+  "network-info": "Информация о сети",
+  "p2pool-chain-tip": "Вершина цепи P2Pool",
+  "p2pool-connected": "P2Pool подключен",
+  "p2pool-connection-info": "Подключение",
+  "p2pool-connection-info-more": "Детали подключения",
+  "p2pool-peers": "P2pool пиры",
+  "p2pool-stats": "Статистика P2pool",
+  "pending": "В ожидании",
+  "randomx-stats": "RandomX Статистика",
+  "sha3-stats": "SHA3 Статистика",
+  "stats": {
+    "earned": "You earned",
+    "tile-heading": "Награды в процессе",
+    "tile-loading": "Пул разогревается",
+    "tooltip-copy": "Награды находятся в «Процессе», пока вы не заработаете минимум <strong>{{amount}}</strong>. После достижения порога, награды в процессе будут автоматически отправлены в ваш кошелек Tari Universe. Это может занять еще 2 часа.",
+    "tooltip-tile-heading": "Порог наград"
+  },
+  "tribe": "Команда"
+}
