@@ -10,6 +10,7 @@ import { TariL1SignerParameters } from '@/types/tapplet'
 import TariL1Signer from '@/clients/tari-l1-signer'
 import useAppStore from '@/store/app'
 import { MessageType, useIframeMessage } from '@/utils/useIframeMessage'
+import { parseAndReviveState } from '@/utils/json-parser'
 
 export const Providers = ({ children }: { children: ReactNode }) => {
   const [config, setConfig] = useState<Config | null>(null)
@@ -24,74 +25,6 @@ export const Providers = ({ children }: { children: ReactNode }) => {
   const projectId = useAppStore((s) => s.walletConnectProjectId)
   const setTheme = useAppStore((s) => s.setTheme)
 
-  // 1. On mount, always post REQUEST_WALLETCONNECT_CONFIG to parent
-  // useEffect(() => {
-  //   window.parent.postMessage({ type: 'REQUEST_WALLETCONNECT_CONFIG' }, '*')
-  // }, [])
-
-  // 2. Listen for WALLETCONNECT_CONFIG_DATA from parent and set config/initialState ONCE
-  // useEffect(() => {
-  //   const handleMessage = (event: MessageEvent) => {
-  //     if (configSetRef.current) return
-
-  //     if (event.data?.type === MessageType.WALLETCONNECT_CONFIG_DATA) {
-  //       const parentConfig = event.data.payload.config
-
-  //       if (
-  //         !parentConfig ||
-  //         parentConfig === 'null' ||
-  //         parentConfig === 'undefined' ||
-  //         parentConfig === ''
-  //       ) {
-  //         // No config from parent, create new config ONCE
-  //         const cfg = getConfig(projectId)
-  //         setConfig(cfg)
-  //         configSetRef.current = true
-  //         setWaitingForParent(false)
-  //         console.info(
-  //           '[ TAPPLET-BRIDGE ] No config from parent, created new config:',
-  //           cfg,
-  //         )
-  //       } else {
-  //         // Config exists from parent, parse and use it as initial state, create config ONCE
-  //         try {
-  //           const parsedState: State =
-  //             typeof parentConfig === 'string'
-  //               ? JSON.parse(parentConfig)
-  //               : parentConfig
-  //           if (
-  //             parsedState.connections &&
-  //             !(parsedState.connections instanceof Map)
-  //           ) {
-  //             parsedState.connections = new Map(parsedState.connections)
-  //           }
-  //           setInitialState(parsedState)
-  //           const cfg = getConfig(projectId)
-  //           setConfig(cfg)
-  //           configSetRef.current = true
-  //           setWaitingForParent(false)
-  //           console.info(
-  //             '[ TAPPLET-BRIDGE ] Using config from parent, parsed state:',
-  //             parsedState,
-  //           )
-  //         } catch (error) {
-  //           console.error('[ TAPPLET-BRIDGE ] Failed to set init state:', error)
-  //           // fallback: create new config ONCE
-  //           // const cfg = getConfig(projectId)
-  //           // setConfig(cfg)
-  //           // setInitialState(undefined)
-  //           // configSetRef.current = true
-  //           // setWaitingForParent(false)
-  //         }
-  //       }
-  //     }
-  //   }
-
-  //   window.addEventListener('message', handleMessage)
-  //   return () => window.removeEventListener('message', handleMessage)
-  // }, [projectId])
-
-  // 3. Initialize signer and account on mount (unchanged)
   useEffect(() => {
     const initializeSignerAndAccount = async () => {
       try {
@@ -153,16 +86,7 @@ export const Providers = ({ children }: { children: ReactNode }) => {
         } else {
           // Config exists from parent, parse and use it as initial state, create config ONCE
           try {
-            const parsedState: State =
-              typeof parentConfig === 'string'
-                ? JSON.parse(parentConfig)
-                : parentConfig
-            if (
-              parsedState.connections &&
-              !(parsedState.connections instanceof Map)
-            ) {
-              parsedState.connections = new Map(parsedState.connections)
-            }
+            const parsedState = parseAndReviveState(parentConfig)
             setInitialState(parsedState)
             const cfg = getConfig(projectId)
             setConfig(cfg)

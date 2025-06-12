@@ -1,5 +1,5 @@
 'use client'
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import React, { useState, useEffect, useCallback } from 'react'
 import { useAccount, useConfig } from 'wagmi'
 import { useForm } from 'react-hook-form'
@@ -14,6 +14,7 @@ import useTariAccountStore from '@/store/account'
 import { useBridgeToEthereumFees } from '@/hooks/use-bridge-to-ethereum-fees'
 import { useBridgeTransaction } from '@/hooks/use-bridge-transaction'
 import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
+import { getCycleSafeReplacer } from '@/utils/json-parser'
 
 export default function Home() {
   const { isConnected, address: ethAddress } = useAccount()
@@ -45,40 +46,6 @@ export default function Home() {
         try {
           // Only serialize the state property
           const serializableState = state
-
-          // Custom replacer to handle Maps/Sets in state and avoid cyclic structures
-          const getCycleSafeReplacer = () => {
-            const seen = new WeakSet()
-
-            return (_key: string, value: any) => {
-              if (typeof value === 'function' || typeof value === 'symbol') {
-                return undefined
-              }
-
-              if (typeof value === 'object' && value !== null) {
-                if (seen.has(value)) {
-                  return undefined // Avoid cyclic reference
-                }
-                seen.add(value)
-
-                if (value instanceof Map) {
-                  return {
-                    __type: 'Map',
-                    value: Array.from(value.entries()),
-                  }
-                }
-
-                if (value instanceof Set) {
-                  return {
-                    __type: 'Set',
-                    value: Array.from(value),
-                  }
-                }
-              }
-
-              return value
-            }
-          }
 
           try {
             serializedState = JSON.stringify(
