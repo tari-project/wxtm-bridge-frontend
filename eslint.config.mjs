@@ -17,7 +17,23 @@ const eslintConfig = [
       i18next,
     },
     rules: {
-      'i18next/no-literal-string': ['warn', { markupOnly: true }],
+      'no-console': ['warn', { allow: ['info', 'warn', 'debug', 'error'] }],
+      'no-unused-vars': 'off', // base rule must be disabled
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
+      '@typescript-eslint/no-explicit-any': 'warn',
+      'react/prop-types': 'off',
+      'react/jsx-uses-react': 'off',
+      'react/react-in-jsx-scope': 'off',
+      // DISABLED UNITIL APP IS REFACTORED TO USE TRANSLATIONS STRINGS
+      // 'i18next/no-literal-string': ['error', { markupOnly: true }],
+      'i18next/no-literal-string': 'off',
     },
   },
 ]
