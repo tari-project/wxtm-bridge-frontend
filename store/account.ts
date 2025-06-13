@@ -56,9 +56,9 @@ export const useTariAccount = create<TariL1WalletStoreState>()((set) => ({
       const account = await signer.getAccount()
       const balance = await signer.getTariBalance()
       // TODO move this app config data to separate store and init fct
-      const appLanguage = await signer.getAppLanguage()
       const envs = await signer.getBridgeEnvs()
-      console.error('[ TAPPLET-BRIDGE ] language', appLanguage)
+      const appLanguage = await signer.getAppLanguage()
+      if (appLanguage) await useTariAccount.getState().setLanguage(appLanguage)
       const id = envs?.[0] ?? ''
       set({
         tariAccount: {
