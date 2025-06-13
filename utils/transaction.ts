@@ -9,9 +9,9 @@ export function getModalTitle(
   bridgeInfo: BridgeInfo,
   feeData: BridgeToEthereumFees,
   tx?: PendingUserTransaction,
-  language?: string, // <-- add language param
+  language?: string,
 ): { title: string; subtext: string } {
-  const t = i18n.getFixedT(language || null, 'main') // <-- use language if provided
+  const t = i18n.getFixedT(language || null, 'main')
 
   if (!tx)
     return {
@@ -22,22 +22,15 @@ export function getModalTitle(
   const amount = parseFloat(
     formatUnits(tx.tokenAmount, 6).toString(),
   ).toPrecision()
-  const amountToReceive = parseFloat(
-    formatUnits(tx.amountAfterFee, 6).toString(),
-  ).toPrecision()
+
   const bridgingTime = feeData.isOverHighBridgeThreshold ? '24-72h' : '12h'
-  const txDirection = bridgeInfo.isWrapping ? 'wrapping' : 'unwrapping'
-  const [fromNetwork, toNetwork] = bridgeInfo.isWrapping
-    ? ['Tari', 'Ethereum']
-    : ['Ethereum', 'Tari']
-  const isUnwrapping = txDirection === 'unwrapping'
   const fromToken = bridgeInfo.fromToken
 
   switch (tx.status) {
     case UserTransactionDTO.status.PENDING:
       return {
         title: t('pending_title', {
-          action: isUnwrapping ? t('unwrapping') : t('wrapping'),
+          action: bridgeInfo.isWrapping ? t('wrapping') : t('unwrapping'),
           amount,
           fromToken,
         }),
@@ -51,7 +44,7 @@ export function getModalTitle(
     case UserTransactionDTO.status.SUCCESS:
       return {
         title: t('success_title', {
-          action: isUnwrapping ? t('unwrapped') : t('wrapped'),
+          action: bridgeInfo.isWrapping ? t('wrapped') : t('unwrapped'),
           amount,
           fromToken,
         }),
