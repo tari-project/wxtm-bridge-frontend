@@ -14,7 +14,6 @@ import useTariAccount from '@/store/account'
 import { useBridgeToEthereumFees } from '@/hooks/use-bridge-to-ethereum-fees'
 import { useBridgeTransaction } from '@/hooks/use-bridge-transaction'
 import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
-import { useWalletUtils } from '@/hooks/use-wallet'
 
 export default function Home() {
   const { isConnected, address: ethAddress } = useAccount()
@@ -33,7 +32,6 @@ export default function Home() {
   const { getUserTransactions } = useBridgeTransaction()
   const tariAccount = useTariAccount((s) => s.tariAccount)
   const ongoingBridgeTx = useTariAccount((s) => s.ongoingBridgeTx)
-  const { addXtmToWallet } = useWalletUtils()
 
   const {
     watch,
@@ -140,23 +138,6 @@ export default function Home() {
   const handleBridgeToTari = () => {
     setModalStep(2)
   }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleAddWxtmToWallet = useCallback(() => {
-    console.info('[ TAPPLET-BRIDGE ] Adding WXTM token to the wallet initiated')
-    addXtmToWallet()
-      .then(() => {
-        console.info(
-          '[ TAPPLET-BRIDGE ] Adding WXTM token to the wallet successful',
-        )
-      })
-      .catch((error) => {
-        console.error(
-          '[ TAPPLET-BRIDGE ] Fail to add WXTM token to the wallet',
-          error,
-        )
-      })
-  }, [addXtmToWallet])
 
   return (
     <main className="relative min-h-screen w-full flex flex-col px-20 items-center justify-center">
