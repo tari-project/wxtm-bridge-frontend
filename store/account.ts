@@ -69,7 +69,6 @@ export const useTariAccount = create<TariL1WalletStoreState>()((set) => ({
         language: appLanguage,
         walletconnect_id: envs?.[0] ?? '',
         bridge_api: envs?.[1] ?? '',
-        lastOngoingPaymentIdFromTU: ongoingBridgeTx?.paymentId ?? '',
       })
       OpenAPI.BASE = envs?.[1] ?? ''
       return id ?? ''

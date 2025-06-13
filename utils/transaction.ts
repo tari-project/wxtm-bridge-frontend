@@ -30,7 +30,8 @@ export function getModalTitle(
   const [fromNetwork, toNetwork] = bridgeInfo.isWrapping
     ? ['Tari', 'Ethereum']
     : ['Ethereum', 'Tari']
-  const isUnwrapping = bridgeInfo.fromToken === 'wXTM'
+  const isUnwrapping = txDirection === 'unwrapping'
+  const fromToken = bridgeInfo.fromToken
 
   switch (tx.status) {
     case UserTransactionDTO.status.PENDING:
