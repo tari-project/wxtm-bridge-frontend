@@ -4,7 +4,7 @@
   "xtm_token": "XTM",
   "bridge_title_suffix_inline": "на любую цепочку",
   "bridge_title_suffix_break": "на \n любую цепочку",
-  "bridge_description_prefix": "Обертайте XTM, чтобы создать wXTM на Ethereum. wXTM — это не ваш обычный токен Ethereum. Это мощный ",
+  "bridge_description_prefix": "Обертайте XTM, чтобы создать wXTM на Ethereum. wXTM — это не ваш\nобычный токен Ethereum. Это мощный ",
   "layerzero_oft": "LayerZero \nOFT",
   "bridge_description_suffix": ", который в будущем может существовать на любой цепочке, которую вы пожелаете.",
   "amount_to_bridge": "Сумма для переноса",

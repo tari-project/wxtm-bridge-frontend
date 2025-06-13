@@ -4,7 +4,7 @@
   "xtm_token": "XTM",
   "bridge_title_suffix_inline": "zu jeder Kette",
   "bridge_title_suffix_break": "zu \n jeder Kette",
-  "bridge_description_prefix": "Wickeln Sie XTM ein, um wXTM auf Ethereum zu erstellen. wXTM ist nicht Ihr alltäglicher Ethereum-Token, Anonym. Es ist ein mächtiger ",
+  "bridge_description_prefix": "Wickeln Sie XTM ein, um wXTM auf Ethereum zu erstellen. wXTM ist nicht Ihr\nalltäglicher Ethereum-Token, Anonym. Es ist ein mächtiger ",
   "layerzero_oft": "LayerZero \nOFT",
   "bridge_description_suffix": " das in Zukunft auf fast jeder gewünschten Kette existieren kann.",
   "amount_to_bridge": "Betrag zum Überbrücken",

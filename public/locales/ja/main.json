@@ -4,7 +4,7 @@
   "xtm_token": "XTM",
   "bridge_title_suffix_inline": "任意のチェーンへ",
   "bridge_title_suffix_break": "任意のチェーンへ",
-  "bridge_description_prefix": "XTMをラップしてEthereum上でwXTMを作成します。wXTMは日常的なEthereumトークンではありません。それは強力な",
+  "bridge_description_prefix": "XTMをラップしてEthereum上でwXTMを作成します。wXTMは日常的な\nEthereumトークンではありません。それは強力な",
   "layerzero_oft": "LayerZero \nOFT",
   "bridge_description_suffix": "将来的には、ほぼすべてのチェーンで存在できる",
   "amount_to_bridge": "ブリッジする量",
