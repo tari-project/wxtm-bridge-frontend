@@ -9,6 +9,7 @@ import useTariAccount from '@/store/account'
 import useTariSigner from '@/store/signer'
 import { TariL1SignerParameters } from '@/types/tapplet'
 import TariL1Signer from '@/clients/tari-l1-signer'
+import { MessageType, useIframeMessage } from '@/utils/useIframeMessage'
 
 export const Providers = ({ children }: { children: ReactNode }) => {
   const projectId = useTariAccount((s) => s.walletconnect_id)
@@ -16,6 +17,7 @@ export const Providers = ({ children }: { children: ReactNode }) => {
   const [queryClient] = useState(() => new QueryClient())
   const [initialState, setInitialState] = useState<State | undefined>(undefined)
   const { setTariAccount } = useTariAccount()
+  const setLanguage = useTariAccount((s) => s.setLanguage)
   const { signer, setSigner } = useTariSigner()
 
   useEffect(() => {
@@ -54,6 +56,25 @@ export const Providers = ({ children }: { children: ReactNode }) => {
     initializeSignerAndAccount()
   }, [setSigner, setTariAccount, signer])
 
+  useIframeMessage((event) => {
+    switch (event.data.type) {
+      case MessageType.SIGNER_CALL:
+        console.info(
+          '[ TAPPLET-BRIDGE ] Received SIGNER_CALL message from parent window',
+        )
+        break
+      case MessageType.RESIZE:
+        console.info(
+          '[ TAPPLET-BRIDGE ] Received RESIZE message from parent window',
+        )
+        break
+      case MessageType.SET_LANGUAGE:
+        const language = event.data.payload.language
+        console.info('[ TAPPLET-BRIDGE ] Received SET_LANGUAGE: ', language)
+        setLanguage(language)
+        break
+    }
+  })
   if (!initialState)
     console.debug('[ TAPPLET-BRIDGE ] provider initial state undefined')
 
