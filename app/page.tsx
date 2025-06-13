@@ -29,8 +29,9 @@ export default function Home() {
   })
 
   const { bridgeToEthereum, getBridgeTxParams } = useBridgeToEthereum()
-  const { tariAccount, isOngoingBridgeTx, ongoingBridgeTx } = useTariAccount()
   const { getUserTransactions } = useBridgeTransaction()
+  const tariAccount = useTariAccount((s) => s.tariAccount)
+  const ongoingBridgeTx = useTariAccount((s) => s.ongoingBridgeTx)
 
   const {
     watch,
@@ -79,8 +80,8 @@ export default function Home() {
     }
 
     fetchUserTransactions()
-    // Poll every 1 min
-    const intervalId = setInterval(fetchUserTransactions, 60000)
+    // Poll every 30 sec
+    const intervalId = setInterval(fetchUserTransactions, 30000)
 
     return () => {
       clearInterval(intervalId)
@@ -92,11 +93,11 @@ export default function Home() {
     if (modalOpen && modalStep === 0 && isConnected) {
       setModalOpen(false)
       setModalStep(1)
-    } else if (isOngoingBridgeTx && ongoingBridgeTx) {
+    } else if (ongoingBridgeTx) {
       setModalStep(2)
       setModalOpen(true)
     }
-  }, [isConnected, modalOpen, modalStep, isOngoingBridgeTx, ongoingBridgeTx])
+  }, [isConnected, modalOpen, modalStep, ongoingBridgeTx])
 
   const handleConnectClick = () => {
     if (!isConnected) {
@@ -118,6 +119,7 @@ export default function Home() {
     bridgeToEthereum({
       amount,
       ethAddress: ethAddress,
+      amountAfterFee: feesData.amountAfterFee,
     })
       .then(() => {
         getUserTransactions()
@@ -125,7 +127,13 @@ export default function Home() {
       .catch((error) => {
         console.error('[ TAPPLET-BRIDGE ] Bridge operation failed:', error)
       })
-  }, [amount, ethAddress, bridgeToEthereum, getUserTransactions])
+  }, [
+    amount,
+    ethAddress,
+    bridgeToEthereum,
+    feesData.amountAfterFee,
+    getUserTransactions,
+  ])
 
   const handleBridgeToTari = () => {
     setModalStep(2)
@@ -145,7 +153,7 @@ export default function Home() {
         setFromNetwork={setFromNetwork}
         toNetwork={toNetwork}
         setToNetwork={setToNetwork}
-        isOngoingBridgeTx={isOngoingBridgeTx}
+        isOngoingBridgeTx={!!ongoingBridgeTx}
       />
       {modalOpen && (
         <MainModal
@@ -158,7 +166,7 @@ export default function Home() {
           setStep={setModalStep}
           handleBridgeToEthereum={handleBridgeToEthereum}
           handleBridgeToTari={handleBridgeToTari}
-          isBridging={isOngoingBridgeTx}
+          isBridging={!!ongoingBridgeTx}
           amount={amount}
           ethereumAddress={ethAddress}
           tariWalletAddress={tariAccount?.address}

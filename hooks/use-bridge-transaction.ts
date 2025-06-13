@@ -13,7 +13,9 @@ export const useBridgeTransaction = () => {
     mutationFn: WrapTokenService.getUserTransactions,
   })
 
-  const { setOngoingTransaction, removeOngoingTransaction } = useTariAccount()
+  const setOngoingTransaction = useTariAccount.getState().setOngoingTransaction
+  const removeOngoingTransaction =
+    useTariAccount.getState().removeOngoingTransaction
 
   /**
    * Fetch user transactions and update the store's ongoing transaction state.
@@ -22,6 +24,8 @@ export const useBridgeTransaction = () => {
   const getUserTransactions =
     async (): Promise<PendingUserTransaction | null> => {
       const ongoingBridgeTx = useTariAccount.getState().ongoingBridgeTx
+      const lastOngoingPaymentIdFromTU =
+        useTariAccount.getState().lastOngoingPaymentIdFromTU
       const tariAccount = useTariAccount.getState().tariAccount
 
       if (!tariAccount) return null
@@ -42,11 +46,19 @@ export const useBridgeTransaction = () => {
         }
 
         // If no pending tx found, but previously had one, check if it succeeded/failed
+        // check also with the paymentId from the TU to display modal after the bridge relaunch
+        const validPaymentIds = new Set([
+          ongoingBridgeTx?.paymentId,
+          lastOngoingPaymentIdFromTU,
+        ])
+        const validStatuses = new Set([
+          UserTransactionDTO.status.SUCCESS,
+          UserTransactionDTO.status.TIMEOUT,
+        ])
+
         const ongoingCompleted = transactions.find(
-          (tx) =>
-            (tx.status === UserTransactionDTO.status.SUCCESS ||
-              tx.status === UserTransactionDTO.status.TIMEOUT) &&
-            tx.paymentId === ongoingBridgeTx?.paymentId,
+          ({ paymentId, status }) =>
+            validPaymentIds.has(paymentId) && validStatuses.has(status),
         )
 
         if (ongoingCompleted) {

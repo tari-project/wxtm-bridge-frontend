@@ -3,8 +3,10 @@ import Image from 'next/image'
 import { WrapModalProps } from './wrap-modal.types'
 import { useBridgeInfo } from '@/hooks/use-bridge-info'
 import useTariAccount from '@/store/account'
-import { formatUnits } from 'ethers'
 import { getModalTitle } from '@/utils/transaction'
+import { openExternalLink } from '@/utils/universe'
+import { config } from '@/config'
+import { formatUnits } from 'ethers'
 import { useTranslation } from 'react-i18next'
 
 export const WrapModal: React.FC<WrapModalProps> = ({
@@ -14,22 +16,22 @@ export const WrapModal: React.FC<WrapModalProps> = ({
   feesData,
 }) => {
   const { i18n, t } = useTranslation('main', { useSuspense: false })
-  const { ongoingBridgeTx } = useTariAccount()
-  const { fromToken, toToken, destAddress } = useBridgeInfo(
+  const ongoingBridgeTx = useTariAccount((s) => s.ongoingBridgeTx)
+  const bridgeInfo = useBridgeInfo(
     fromNetwork,
     ethereumAddress!,
     tariWalletAddress!,
   )
-
   const amountAfterFeePending = ongoingBridgeTx?.amountAfterFee
-    ? formatUnits(ongoingBridgeTx.amountAfterFee, 6)
+    ? parseFloat(formatUnits(ongoingBridgeTx.amountAfterFee, 6)).toPrecision()
     : feesData.amountAfterFee
 
-  const destAddressPending = ongoingBridgeTx?.destinationAddress ?? destAddress
+  const destAddressPending =
+    ongoingBridgeTx?.destinationAddress ?? bridgeInfo.destAddress
 
   // Pass the current language to getModalTitle
   const { title, subtext } = getModalTitle(
-    fromToken,
+    bridgeInfo,
     feesData,
     ongoingBridgeTx,
     i18n.language,
@@ -62,7 +64,7 @@ export const WrapModal: React.FC<WrapModalProps> = ({
               {t('amount_to_receive')}
             </div>
             <div className="text-sm">
-              {parseFloat(amountAfterFeePending).toPrecision()} {toToken}
+              {amountAfterFeePending} {bridgeInfo.toToken}
             </div>
           </div>
 
@@ -104,10 +106,9 @@ export const WrapModal: React.FC<WrapModalProps> = ({
           <div className="mt-8 text-center text-xs text-gray-500">
             {t('having_trouble')}{' '}
             <a
-              href="https://tarilabs.notion.site/Tari-Universe-Bridge-x-User-Guide-FAQs-2014e6c995c38094b4e4e98a1a3e8ec1"
-              target="_blank"
+              onClick={(e) => openExternalLink(config.TARI_BRIDGE_FAQ_URL, e)}
               rel="noopener noreferrer"
-              className="underline"
+              className="underline cursor-pointer"
             >
               {t('view_faqs')}
             </a>

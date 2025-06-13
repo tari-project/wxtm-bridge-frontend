@@ -1,3 +1,4 @@
+import { BridgeInfo } from '@/hooks/use-bridge-info'
 import { BridgeToEthereumFees } from '@/hooks/use-bridge-to-ethereum-fees'
 import { PendingUserTransaction } from '@/types/tapplet'
 import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
@@ -5,7 +6,7 @@ import { formatUnits } from 'ethers'
 import i18n from 'i18next'
 
 export function getModalTitle(
-  fromToken: string,
+  bridgeInfo: BridgeInfo,
   feeData: BridgeToEthereumFees,
   tx?: PendingUserTransaction,
   language?: string, // <-- add language param
@@ -21,8 +22,15 @@ export function getModalTitle(
   const amount = parseFloat(
     formatUnits(tx.tokenAmount, 6).toString(),
   ).toPrecision()
-  const isUnwrapping = fromToken === 'wXTM'
+  const amountToReceive = parseFloat(
+    formatUnits(tx.amountAfterFee, 6).toString(),
+  ).toPrecision()
   const bridgingTime = feeData.isOverHighBridgeThreshold ? '24-72h' : '12h'
+  const txDirection = bridgeInfo.isWrapping ? 'wrapping' : 'unwrapping'
+  const [fromNetwork, toNetwork] = bridgeInfo.isWrapping
+    ? ['Tari', 'Ethereum']
+    : ['Ethereum', 'Tari']
+  const isUnwrapping = bridgeInfo.fromToken === 'wXTM'
 
   switch (tx.status) {
     case UserTransactionDTO.status.PENDING:
