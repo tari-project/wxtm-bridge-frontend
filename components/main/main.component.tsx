@@ -119,7 +119,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
             className="object-cover"
           />
         </div>
-        <div className="font-light text-4xl lg:text-[67.64px] text-small leading-[40px] lg:leading-[71.5px] tracking-[0px] lg:tracking-[-3.98px] max-w-[30rem] lg:max-w-[40rem]">
+        <div className="font-light text-4xl lg:text-[67.64px] text-small leading-[40px] lg:leading-[71.5px] tracking-[0px] lg:tracking-[-3.98px] max-w-[30rem] lg:max-w-[40rem] text-black font-poppins lg:font-normal lg:font-light lg:tracking-[-3.979px]">
           {t('bridge_title_prefix')}{' '}
           <span className="font-semibold">{t('xtm_token')}</span>{' '}
           <span className="hidden short:inline">
@@ -129,7 +129,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
             {t('bridge_title_suffix_break')}
           </span>
         </div>
-        <div className="font-normal text-lg lg:text-[24px] text-very-small leading-[30px] tracking-[0px] lg:tracking-[-1px] max-w-[25rem] lg:max-w-[35rem] whitespace-pre">
+        <div className="font-normal text-lg lg:text-[24px] text-very-small leading-[30px] tracking-[0px] lg:tracking-[-1px] max-w-[25rem] lg:max-w-[35rem] whitespace-pre text-black font-poppins lg:text-[27px] lg:leading-[30px] lg:font-normal lg:tracking-[-1px]">
           {t('bridge_description_prefix')}
           <span className="font-semibold">{t('layerzero_oft')}</span>{' '}
           {t('bridge_description_suffix')}
@@ -137,7 +137,18 @@ export const MainComponent: React.FC<MainComponentProps> = ({
       </div>
 
       <div className="mt-[4rem] mt-small">
-        <div className="mb-4 font-medium text-xl leading-[30px] tracking-[-1px]">
+        <div
+          className="mb-4"
+          style={{
+            color: '#000',
+            fontFamily: 'Poppins, sans-serif',
+            fontSize: '20px',
+            fontStyle: 'normal',
+            fontWeight: 500,
+            lineHeight: '30px',
+            letterSpacing: '-1px',
+          }}
+        >
           {t('start_bridging')}
         </div>
         <div className="bg-white/50 backdrop-blur-sm shadow-xl rounded-2xl p-4 mx-auto">
@@ -263,7 +274,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
           </div>
         </div>
       </div>
-      <div className="fixed bottom-0 mb-4 left-0 w-full text-center text-xs text-gray-500 items-center justify-center">
+      <div className="fixed bottom-0 mb-4 left-0 w-full text-center text-xs text-gray-500 items-center justify-center whitespace-pre-line">
         {t('bridge_one_way_notice')}{' '}
         <a
           href="https://tarilabs.notion.site/Tari-Universe-Bridge-x-User-Guide-FAQs-2014e6c995c38094b4e4e98a1a3e8ec1"
