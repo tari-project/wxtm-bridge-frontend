@@ -111,7 +111,7 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
         <div style={{ height: 20 }} />
         <OfficialContractAddressConainer>
           <OfficialContractAddressWrapper>
-            <span className="label">{'Official wXTM Token Address'}</span>
+            <span className="label">{t('official_wxtm_token_address')}</span>
             <span className="address">{config.WXTM_CONTRACT_ADDRESS}</span>
           </OfficialContractAddressWrapper>
           <CopyIconWrapper onClick={handleCopyAddress}>
@@ -122,26 +122,24 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
               >
-                {'Copied!'}
+                {t('copied')}
               </CopyText>
             )}
           </CopyIconWrapper>
         </OfficialContractAddressConainer>
         <div style={{ height: 10 }} />
         <HelperText>
-          <div className="strong">{'How to view wXTM in your wallet?'}</div>
+          <div className="strong">{t('how_to_view_wxtm_in_wallet')}</div>
           <div>
-            {'To see your balance, add wXTM to your wallet by importing the '}
-            <span className="strong">{'token address'}</span>
-            {' on the '}
-            <span className="strong">{'Ethereum mainnet'}</span>
-            {' network. Alternatively, '}
-            <span className="btn" onClick={(e) => handleAddWxtmToWallet(e)}>
-              {'click here'}
+            {t('how_to_view_wxtm_step1_prefix')}
+            <span className="strong">{t('token_address')}</span>
+            {t('how_to_view_wxtm_step1_middle')}
+            <span className="strong">{t('ethereum_mainnet')}</span>
+            {t('how_to_view_wxtm_step1_network')}
+            <span className="btn" onClick={handleAddWxtmToWallet}>
+              {t('click_here')}
             </span>
-            {
-              " to send the request directly to your mobile wallet app—you'll need to approve it on your phone."
-            }
+            {t('how_to_view_wxtm_step2')}
           </div>
         </HelperText>
         {/* Section 1 */}

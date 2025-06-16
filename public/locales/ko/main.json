@@ -53,5 +53,15 @@
   "wrap_failed_message": "랩핑 요청을 제시간에 완료할 수 없었습니다.\n귀하의 XTM은 Tari 지갑에 안전하게 보관되어 있으며, 차감되거나 이동되지 않았습니다.",
   "wrapped": "랩핑됨",
   "wrapping": "랩핑",
-  "xtm_token": "XTM"
+  "xtm_token": "XTM",
+  "official_wxtm_token_address": "Official wXTM Token Address",
+  "copied": "Copied!",
+  "how_to_view_wxtm_in_wallet": "How to view wXTM in your wallet?",
+  "how_to_view_wxtm_step1_prefix": "To see your balance, add wXTM to your wallet by importing the ",
+  "token_address": "token address",
+  "how_to_view_wxtm_step1_middle": " on the ",
+  "ethereum_mainnet": "Ethereum mainnet",
+  "how_to_view_wxtm_step1_network": " network. Alternatively, ",
+  "click_here": "click here",
+  "how_to_view_wxtm_step2": " to send the request directly to your mobile wallet app — you'll need to approve it on your phone."
 }

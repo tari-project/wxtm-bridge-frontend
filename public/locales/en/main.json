@@ -53,5 +53,15 @@
   "wrap_failed_message": "We couldn't complete your wrapping request in time.\nYour XTM remains safe in your Tari wallet — it hasn't been deducted or moved.",
   "wrapped": "wrapped",
   "wrapping": "wrapping",
-  "xtm_token": "XTM"
+  "xtm_token": "XTM",
+  "official_wxtm_token_address": "Official wXTM Token Address",
+  "copied": "Copied!",
+  "how_to_view_wxtm_in_wallet": "How to view wXTM in your wallet?",
+  "how_to_view_wxtm_step1_prefix": "To see your balance, add wXTM to your wallet by importing the ",
+  "token_address": "token address",
+  "how_to_view_wxtm_step1_middle": " on the ",
+  "ethereum_mainnet": "Ethereum mainnet",
+  "how_to_view_wxtm_step1_network": " network. Alternatively, ",
+  "click_here": "click here",
+  "how_to_view_wxtm_step2": " to send the request directly to your mobile wallet app — you'll need to approve it on your phone."
 }
