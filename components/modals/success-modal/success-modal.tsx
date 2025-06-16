@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import Image from 'next/image'
 // import { HiArrowRightOnRectangle } from 'react-icons/hi2'
 import { SuccessModalProps } from './success-modal.types'
@@ -7,6 +7,17 @@ import { useBridgeInfo } from '@/hooks/use-bridge-info'
 import useTariAccount from '@/store/account'
 import { formatUnits } from 'ethers'
 import useTariSigner from '@/store/signer'
+import {
+  CopyIconWrapper,
+  CopyText,
+  HelperText,
+  OfficialContractAddressConainer,
+  OfficialContractAddressWrapper,
+} from './success-modal.styles'
+import { useWalletUtils } from '@/hooks/use-wallet'
+import { config } from '@/config'
+import { CopyIcon } from '@/styles/copyIcon'
+import { sendErrorMessage } from '@/utils/universe'
 import { useTranslation } from 'react-i18next'
 
 export const SuccessModal: React.FC<SuccessModalProps> = ({
@@ -21,13 +32,44 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
   const removeOngoingTransaction = useTariAccount(
     (s) => s.removeOngoingTransaction,
   )
-
   const { fromToken, toToken } = useBridgeInfo(
     fromNetwork,
     ethereumAddress!,
     tariWalletAddress!,
   )
+  const { addXtmToWallet } = useWalletUtils()
+  const [copied, setCopied] = useState(false)
 
+  const handleCopyAddress = useCallback(() => {
+    navigator.clipboard.writeText(config.WXTM_CONTRACT_ADDRESS)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1500)
+  }, [])
+
+  const handleAddWxtmToWallet = useCallback(
+    (e: React.MouseEvent) => {
+      console.info(
+        '[ TAPPLET-BRIDGE ] Adding WXTM token to the wallet initiated',
+      )
+      addXtmToWallet()
+        .then(() => {
+          console.info(
+            '[ TAPPLET-BRIDGE ] Adding WXTM token to the wallet successful',
+          )
+        })
+        .catch((error) => {
+          sendErrorMessage(
+            `Request failed. Feature not supported by your wallet app.`,
+            e,
+          )
+          console.error(
+            '[ TAPPLET-BRIDGE ] Fail to add WXTM token to the wallet: ',
+            error,
+          )
+        })
+    },
+    [addXtmToWallet],
+  )
   const handleOnClick = useCallback(async () => {
     closeModal()
     removeOngoingTransaction()
@@ -66,7 +108,42 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
             {t('conversion_complete', { toToken })}
           </div>
         </div>
-
+        <div style={{ height: 20 }} />
+        <OfficialContractAddressConainer>
+          <OfficialContractAddressWrapper>
+            <span className="label">{'Official wXTM Token Address'}</span>
+            <span className="address">{config.WXTM_CONTRACT_ADDRESS}</span>
+          </OfficialContractAddressWrapper>
+          <CopyIconWrapper onClick={handleCopyAddress}>
+            <CopyIcon size={16} />
+            {copied && (
+              <CopyText
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+              >
+                {'Copied!'}
+              </CopyText>
+            )}
+          </CopyIconWrapper>
+        </OfficialContractAddressConainer>
+        <div style={{ height: 10 }} />
+        <HelperText>
+          <div className="strong">{'How to view wXTM in your wallet?'}</div>
+          <div>
+            {'To see your balance, add wXTM to your wallet by importing the '}
+            <span className="strong">{'token address'}</span>
+            {' on the '}
+            <span className="strong">{'Ethereum mainnet'}</span>
+            {' network. Alternatively, '}
+            <span className="btn" onClick={(e) => handleAddWxtmToWallet(e)}>
+              {'click here'}
+            </span>
+            {
+              " to send the request directly to your mobile wallet app—you'll need to approve it on your phone."
+            }
+          </div>
+        </HelperText>
         {/* Section 1 */}
         <div className="flex flex-col my-4">
           <div className="font-medium">

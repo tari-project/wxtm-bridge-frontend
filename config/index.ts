@@ -10,4 +10,6 @@ export const config = {
     'https://tarilabs.notion.site/Tari-Universe-Bridge-x-User-Guide-FAQs-2014e6c995c38094b4e4e98a1a3e8ec1',
   TARI_SC_AUDIT_URL:
     'https://www.coinspect.com/doc/Coinspect%20-%20Smart%20Contract%20Audit%20-%20Tari%20-%20wXTM%20Bridge%20-%20Fix%20Review%20-%20v250528.pdf',
+  MAINNET_EXPLORER_URL: 'https://etherscan.io',
+  WXTM_CONTRACT_ADDRESS: '0xfD36fA88bb3feA8D1264fc89d70723b6a2B56958',
 }

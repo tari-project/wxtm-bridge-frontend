@@ -12,4 +12,5 @@ export type MainComponentProps = {
   toNetwork: Network
   setToNetwork: React.Dispatch<React.SetStateAction<Network>>
   isOngoingBridgeTx: boolean
+  addWxtmToWallet?: () => void
 } & Pick<BridgeInputProps, 'control' | 'errors'>
