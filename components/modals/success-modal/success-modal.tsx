@@ -17,6 +17,7 @@ import {
 import { useWalletUtils } from '@/hooks/use-wallet'
 import { config } from '@/config'
 import { CopyIcon } from '@/styles/copyIcon'
+import { sendErrorMessage } from '@/utils/universe'
 
 export const SuccessModal: React.FC<SuccessModalProps> = ({
   closeModal,
@@ -43,21 +44,30 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
     setTimeout(() => setCopied(false), 1500)
   }, [])
 
-  const handleAddWxtmToWallet = useCallback(() => {
-    console.info('[ TAPPLET-BRIDGE ] Adding WXTM token to the wallet initiated')
-    addXtmToWallet()
-      .then(() => {
-        console.info(
-          '[ TAPPLET-BRIDGE ] Adding WXTM token to the wallet successful',
-        )
-      })
-      .catch((error) => {
-        console.error(
-          '[ TAPPLET-BRIDGE ] Fail to add WXTM token to the wallet',
-          error,
-        )
-      })
-  }, [addXtmToWallet])
+  const handleAddWxtmToWallet = useCallback(
+    (e: React.MouseEvent) => {
+      console.info(
+        '[ TAPPLET-BRIDGE ] Adding WXTM token to the wallet initiated',
+      )
+      addXtmToWallet()
+        .then(() => {
+          console.info(
+            '[ TAPPLET-BRIDGE ] Adding WXTM token to the wallet successful',
+          )
+        })
+        .catch((error) => {
+          sendErrorMessage(
+            `Request failed. Feature not supported by your wallet app.`,
+            e,
+          )
+          console.error(
+            '[ TAPPLET-BRIDGE ] Fail to add WXTM token to the wallet: ',
+            error,
+          )
+        })
+    },
+    [addXtmToWallet],
+  )
   const handleOnClick = useCallback(async () => {
     closeModal()
     removeOngoingTransaction()
@@ -95,6 +105,7 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
             deposited into the address specified.
           </div>
         </div>
+        <div style={{ height: 20 }} />
         <OfficialContractAddressConainer>
           <OfficialContractAddressWrapper>
             <span className="label">{'Official wXTM Token Address'}</span>
@@ -113,7 +124,7 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
             )}
           </CopyIconWrapper>
         </OfficialContractAddressConainer>
-        <div style={{ height: 8 }} />
+        <div style={{ height: 10 }} />
         <HelperText>
           <div className="strong">{'How to view wXTM in your wallet?'}</div>
           <div>
@@ -122,7 +133,7 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
             {' on the '}
             <span className="strong">{'Ethereum mainnet'}</span>
             {' network. Alternatively, '}
-            <span className="btn" onClick={handleAddWxtmToWallet}>
+            <span className="btn" onClick={(e) => handleAddWxtmToWallet(e)}>
               {'click here'}
             </span>
             {
