@@ -1,7 +1,7 @@
 import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 import HttpBackend from 'i18next-http-backend'
-import useTariAccount from '@/store/account'
+import useAppStore from '@/store/app'
 
 export enum Language {
   EN = 'en',
@@ -104,7 +104,7 @@ export const LanguageList: Record<Language, string> = {
   [Language.DE]: 'Deutsch', // German
 }
 
-const appLanguage = resolveI18nLanguage(useTariAccount.getState().language) // parse to Language enum
+const appLanguage = resolveI18nLanguage(useAppStore.getState().language) // parse to Language enum
 
 // Initialize i18n with new supported languages
 i18n

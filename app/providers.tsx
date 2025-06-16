@@ -21,6 +21,8 @@ export const Providers = ({ children }: { children: ReactNode }) => {
   const signer = useTariSignerStore((s) => s.signer)
   const setSigner = useTariSignerStore((s) => s.setSigner)
   const projectId = useAppStore((s) => s.walletConnectProjectId)
+  const setLanguage = useAppStore((s) => s.setLanguage)
+  const setTheme = useAppStore((s) => s.setTheme)
 
   // Auto-connect if projectId is set
   useEffect(() => {
@@ -64,51 +66,29 @@ export const Providers = ({ children }: { children: ReactNode }) => {
 
   useIframeMessage((event) => {
     switch (event.data.type) {
-      case MessageType.SIGNER_CALL:
-        console.info(
-          '[ TAPPLET-BRIDGE ] Received SIGNER_CALL message from parent window',
-        )
-        break
-      case MessageType.RESIZE:
-        console.info(
-          '[ TAPPLET-BRIDGE ] Received RESIZE message from parent window',
-        )
-        break
       case MessageType.SET_LANGUAGE:
         const language = event.data.payload.language
-        console.info('[ TAPPLET-BRIDGE ] Received SET_LANGUAGE: ', language)
-        // setLanguage(language)
+        setLanguage(language)
+        break
+      case MessageType.SET_THEME:
+        const theme = event.data.payload.theme
+        setTheme(theme)
         break
     }
   })
   if (!initialState)
     console.debug('[ TAPPLET-BRIDGE ] provider initial state undefined')
 
-  // if (process.env.NODE_ENV === 'development') {
-  //   console.debug('[ TAPPLET-BRIDGE ] provider config', config)
-  //   return (
-  //     <>
-  //       {config && (
-  //         <WagmiProvider config={config} initialState={initialState}>
-  //           <QueryClientProvider client={queryClient}>
-  //             {children}
-  //           </QueryClientProvider>
-  //         </WagmiProvider>
-  //       )}
-  //     </>
-  //   )
-  // }
+  if (!config) {
+    console.debug('[ TAPPLET-BRIDGE ] provider config undefined')
+    return (
+      <div className="h-5 w-5 animate-spin rounded-full border-b-[3px] border-white"></div>
+    )
+  }
+
   return (
-    <>
-      {config ? (
-        <WagmiProvider config={config} initialState={initialState}>
-          <QueryClientProvider client={queryClient}>
-            {children}
-          </QueryClientProvider>
-        </WagmiProvider>
-      ) : (
-        <h1>...</h1>
-      )}
-    </>
+    <WagmiProvider config={config} initialState={initialState}>
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    </WagmiProvider>
   )
 }

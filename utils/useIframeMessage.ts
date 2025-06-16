@@ -4,6 +4,7 @@ export enum MessageType {
   SIGNER_CALL = 'signer-call',
   RESIZE = 'resize',
   SET_LANGUAGE = 'SET_LANGUAGE',
+  SET_THEME = 'SET_THEME',
 }
 
 interface SignerCallMessage {
@@ -28,10 +29,18 @@ interface SetLanguageMessage {
   }
 }
 
+interface SetThemeMessage {
+  type: MessageType.SET_THEME
+  payload: {
+    theme: string
+  }
+}
+
 export type IframeMessage =
   | SignerCallMessage
   | ResizeMessage
   | SetLanguageMessage
+  | SetThemeMessage
 
 // Hook to listen for messages from the parent window
 export function useIframeMessage(
