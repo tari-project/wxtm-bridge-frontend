@@ -18,6 +18,7 @@ import { useWalletUtils } from '@/hooks/use-wallet'
 import { config } from '@/config'
 import { CopyIcon } from '@/styles/copyIcon'
 import { sendErrorMessage } from '@/utils/universe'
+import { useTranslation } from 'react-i18next'
 
 export const SuccessModal: React.FC<SuccessModalProps> = ({
   closeModal,
@@ -25,6 +26,7 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
   ethereumAddress,
   fromNetwork,
 }) => {
+  const { t } = useTranslation('main', { useSuspense: false })
   const signer = useTariSigner((s) => s.signer)
   const ongoingBridgeTx = useTariAccount((s) => s.ongoingBridgeTx)
   const removeOngoingTransaction = useTariAccount(
@@ -97,18 +99,19 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
             />
           </div>
           <div className="font-semibold text-lg mt-2">
-            We&apos;ve {fromToken === 'wXTM' ? 'unwrapped' : 'wrapped'} your{' '}
-            {amount} {fromToken}!
+            {t(fromToken === 'wXTM' ? 'success_unwrapped' : 'success_wrapped', {
+              amount,
+              fromToken,
+            })}
           </div>
           <div className="font-normal text-xs mt-2 text-center px-3">
-            Your {toToken} conversion has been complete and your funds have been
-            deposited into the address specified.
+            {t('conversion_complete', { toToken })}
           </div>
         </div>
         <div style={{ height: 20 }} />
         <OfficialContractAddressConainer>
           <OfficialContractAddressWrapper>
-            <span className="label">{'Official wXTM Token Address'}</span>
+            <span className="label">{t('official_wxtm_token_address')}</span>
             <span className="address">{config.WXTM_CONTRACT_ADDRESS}</span>
           </OfficialContractAddressWrapper>
           <CopyIconWrapper onClick={handleCopyAddress}>
@@ -119,32 +122,32 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
               >
-                {'Copied!'}
+                {t('copied')}
               </CopyText>
             )}
           </CopyIconWrapper>
         </OfficialContractAddressConainer>
         <div style={{ height: 10 }} />
         <HelperText>
-          <div className="strong">{'How to view wXTM in your wallet?'}</div>
+          <div className="strong">{t('how_to_view_wxtm_in_wallet')}</div>
           <div>
-            {'To see your balance, add wXTM to your wallet by importing the '}
-            <span className="strong">{'token address'}</span>
-            {' on the '}
-            <span className="strong">{'Ethereum mainnet'}</span>
-            {' network. Alternatively, '}
-            <span className="btn" onClick={(e) => handleAddWxtmToWallet(e)}>
-              {'click here'}
+            {t('how_to_view_wxtm_step1_prefix')}
+            <span className="strong">{t('token_address')}</span>
+            {t('how_to_view_wxtm_step1_middle')}
+            <span className="strong">{t('ethereum_mainnet')}</span>
+            {t('how_to_view_wxtm_step1_network')}
+            <span className="btn" onClick={handleAddWxtmToWallet}>
+              {t('click_here')}
             </span>
-            {
-              " to send the request directly to your mobile wallet app—you'll need to approve it on your phone."
-            }
+            {t('how_to_view_wxtm_step2')}
           </div>
         </HelperText>
         {/* Section 1 */}
         <div className="flex flex-col my-4">
           <div className="font-medium">
-            <div className="text-xs text-gray-500">Amount to receive</div>
+            <div className="text-xs text-gray-500">
+              {t('amount_to_receive')}
+            </div>
             <div className="text-sm">
               {amountToReceive} {toToken}
             </div>
@@ -153,14 +156,16 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
 
           <div className="font-medium">
-            <div className="text-xs text-gray-500">Destination address</div>
+            <div className="text-xs text-gray-500">
+              {t('destination_address')}
+            </div>
             <div className="text-sm">{ongoingBridgeTx?.destinationAddress}</div>
           </div>
 
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
 
           {/* <div className="font-medium">
-            <div className="text-xs text-gray-500">Transaction Details</div>
+            <div className="text-xs text-gray-500">{t('transaction_details')}</div>
             <a
               href="https://sepolia.etherscan.io/tx/0x0bec7941a37c07ec7cd408b3478c66ac7a26c4e48c2fd22577bb2c9c44cb4ae8"
               target="_blank"
@@ -175,7 +180,7 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div> */}
 
           {/* <div className="font-medium">
-            <div className="text-xs text-gray-500">Transaction ID</div>
+            <div className="text-xs text-gray-500">{t('transaction_id')}</div>
             <div className="text-sm">GH7SLK9087</div>
           </div>
 

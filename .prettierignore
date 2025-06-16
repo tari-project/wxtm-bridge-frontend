@@ -1,0 +1,18 @@
+# Ignore artifacts:
+build
+coverage
+dist
+dist-isolation
+
+# Ignore all JSON files in locales:
+**/locales/**/*.json
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+

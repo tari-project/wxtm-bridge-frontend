@@ -3,59 +3,66 @@ import { BridgeToEthereumFees } from '@/hooks/use-bridge-to-ethereum-fees'
 import { PendingUserTransaction } from '@/types/tapplet'
 import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
 import { formatUnits } from 'ethers'
+import i18n from 'i18next'
 
 export function getModalTitle(
   bridgeInfo: BridgeInfo,
   feeData: BridgeToEthereumFees,
   tx?: PendingUserTransaction,
+  language?: string,
 ): { title: string; subtext: string } {
+  const t = i18n.getFixedT(language || null, 'main')
+
   if (!tx)
     return {
-      title: 'Unknown transaction status.',
+      title: t('unknown_transaction_status'),
       subtext: ``,
     }
 
   const amount = parseFloat(
     formatUnits(tx.tokenAmount, 6).toString(),
   ).toPrecision()
-  const amountToReceive = parseFloat(
-    formatUnits(tx.amountAfterFee, 6).toString(),
-  ).toPrecision()
+
   const bridgingTime = feeData.isOverHighBridgeThreshold ? '24-72h' : '12h'
-  const txDirection = bridgeInfo.isWrapping ? 'wrapping' : 'unwrapping'
-  const [fromNetwork, toNetwork] = bridgeInfo.isWrapping
-    ? ['Tari', 'Ethereum']
-    : ['Ethereum', 'Tari']
+  const fromToken = bridgeInfo.fromToken
 
   switch (tx.status) {
     case UserTransactionDTO.status.PENDING:
       return {
-        title: `We're ${txDirection} your ${amount} ${bridgeInfo.fromToken}`,
-        subtext: `You'll receive ${amountToReceive} ${bridgeInfo.toToken} in no more than ${bridgingTime}. Funds are automatically transferred from your linked ${fromNetwork} wallet. You don't need to do anything else.`,
+        title: t('pending_title', {
+          action: bridgeInfo.isWrapping ? t('wrapping') : t('unwrapping'),
+          amount,
+          fromToken,
+        }),
+        subtext: t('pending_subtext', { amount, fromToken, bridgingTime }),
       }
     case UserTransactionDTO.status.PROCESSING:
       return {
-        title: 'Waiting for confirmation...',
-        subtext: `We've received your request. Your funds will be wrapped as soon as the process begins. No action is needed.`,
+        title: t('processing_title'),
+        subtext: t('processing_subtext'),
       }
     case UserTransactionDTO.status.SUCCESS:
       return {
-        title: `We've ${txDirection} your ${amount} ${bridgeInfo.fromToken}!`,
-        subtext: `Your ${bridgeInfo.toToken} conversion has been complete and your funds have been deposited into the address specified.`,
+        title: t('success_title', {
+          action: bridgeInfo.isWrapping ? t('wrapped') : t('unwrapped'),
+          amount,
+          fromToken,
+        }),
+        subtext: t('success_subtext'),
       }
     case UserTransactionDTO.status.TIMEOUT:
       return {
-        title: `Oops! Your transaction has timed out!`,
-        subtext: `We couldn't complete your ${txDirection} request in time. Your ${bridgeInfo.fromToken} remains safe in your ${fromNetwork} wallet — it hasn't been deducted or moved.`,
+        title: t('timeout_title'),
+        subtext: t('timeout_subtext'),
       }
     case UserTransactionDTO.status.TOKENS_RECEIVED:
       return {
-        title: `${amount} ${bridgeInfo.fromToken} received - ${txDirection} soon`,
-        subtext: `We've received your ${bridgeInfo.fromToken}: ${txDirection} is queued and will begin shortly. You'll get ${bridgeInfo.toToken} at your  ${toNetwork} address once complete.`,
+        title: t('tokens_received_title', { fromToken }),
+        subtext: t('tokens_received_subtext', { fromToken }),
       }
     default:
       return {
-        title: 'Unknown transaction status.',
+        title: t('unknown_transaction_status'),
         subtext: ``,
       }
   }
