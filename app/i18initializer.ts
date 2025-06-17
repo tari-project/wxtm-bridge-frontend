@@ -114,7 +114,9 @@ i18n
     lng: appLanguage,
     compatibilityJSON: 'v4',
     fallbackLng: Language.EN,
-    fallbackNS: 'common',
+    ns: ['main'],
+    fallbackNS: 'main',
+    defaultNS: 'main',
     backend: {
       loadPath: '/locales/{{lng}}/{{ns}}.json',
     },
