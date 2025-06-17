@@ -46,30 +46,24 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
     setTimeout(() => setCopied(false), 1500)
   }, [])
 
-  const handleAddWxtmToWallet = useCallback(
-    (e: React.MouseEvent) => {
-      console.info(
-        '[ TAPPLET-BRIDGE ] Adding WXTM token to the wallet initiated',
-      )
-      addXtmToWallet()
-        .then(() => {
-          console.info(
-            '[ TAPPLET-BRIDGE ] Adding WXTM token to the wallet successful',
-          )
-        })
-        .catch((error) => {
-          sendErrorMessage(
-            `Request failed. Feature not supported by your wallet app.`,
-            e,
-          )
-          console.error(
-            '[ TAPPLET-BRIDGE ] Fail to add WXTM token to the wallet: ',
-            error,
-          )
-        })
-    },
-    [addXtmToWallet],
-  )
+  const handleAddWxtmToWallet = useCallback(() => {
+    console.info('[ TAPPLET-BRIDGE ] Adding WXTM token to the wallet initiated')
+    addXtmToWallet()
+      .then(() => {
+        console.info(
+          '[ TAPPLET-BRIDGE ] Adding WXTM token to the wallet successful',
+        )
+      })
+      .catch((error) => {
+        sendErrorMessage(
+          `Request failed. Feature not supported by your wallet app.`,
+        )
+        console.error(
+          '[ TAPPLET-BRIDGE ] Fail to add WXTM token to the wallet: ',
+          error,
+        )
+      })
+  }, [addXtmToWallet])
   const handleOnClick = useCallback(async () => {
     closeModal()
     removeOngoingTransaction()
