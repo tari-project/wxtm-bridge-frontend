@@ -10,7 +10,7 @@ declare global {
 }
 
 export function getConfig(id?: string) {
-  const project_id = id || useAppStore.getState().walletConnectProjectId
+  const projectId = id || useAppStore.getState().walletConnectProjectId
   if (!globalThis.wagmiConfig) {
     globalThis.wagmiConfig = createConfig({
       chains: [mainnet, baseSepolia, sepolia],
@@ -21,7 +21,7 @@ export function getConfig(id?: string) {
       },
       connectors: [
         walletConnect({
-          projectId: project_id ?? '',
+          projectId: projectId,
         }),
       ],
       storage: createStorage({
