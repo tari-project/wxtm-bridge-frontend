@@ -10,7 +10,7 @@ interface State {
 }
 
 interface Actions {
-  setTariAccount: () => Promise<string | undefined>
+  setTariAccount: () => Promise<void>
   setOngoingTransaction: (tx: PendingUserTransaction) => void
   removeOngoingTransaction: () => void
 }
@@ -31,7 +31,7 @@ export const useTariAccountStore = create<TariL1WalletStoreState>()((set) => ({
   ...initialState,
   setTariAccount: async () => {
     const signer = useTariSigner.getState().signer
-
+    if (process.env.NODE_ENV === 'development') return
     try {
       if (!signer) {
         console.error('[ TAPPLET-BRIDGE ] signer undefined')
@@ -48,7 +48,8 @@ export const useTariAccountStore = create<TariL1WalletStoreState>()((set) => ({
         availableBalance: balance.available_balance,
         lastOngoingPaymentIdFromTU: ongoingBridgeTx?.paymentId ?? '',
       })
-      return account.address ?? ''
+
+      return
     } catch (error) {
       console.error(
         '[ TAPPLET-BRIDGE ] error setting the Tari account: ',

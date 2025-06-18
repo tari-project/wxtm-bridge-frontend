@@ -37,7 +37,14 @@ export const useAppStore = create<AppStoreState>()((set) => ({
         return
       }
 
-      const envs = await signer.getBridgeEnvs()
+      const envs =
+        process.env.NODE_ENV === 'development'
+          ? [
+              process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
+              process.env.NEXT_PUBLIC_BACKEND_API_URL,
+            ]
+          : await signer.getBridgeEnvs()
+
       const walletconnectId = envs?.[0] ?? ''
       const bridgeAPI = envs?.[1] ?? ''
       set({
