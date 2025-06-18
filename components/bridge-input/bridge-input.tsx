@@ -14,7 +14,7 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
 }) => {
   const [valueLength, setValueLength] = useState(5)
   const { fromToken } = useBridgeInfo(fromNetwork)
-  const available_balance = useTariAccountStore((s) => s.available_balance)
+  const availableBalance = useTariAccountStore((s) => s.availableBalance)
 
   // Helper to block invalid keys
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -98,7 +98,7 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
           if (amount > config.MAX_BRIDGE_AMOUNT) {
             return `Max amount is ${config.MAX_BRIDGE_AMOUNT} ${fromToken}`
           }
-          if (amount > available_balance) {
+          if (amount > availableBalance) {
             return `Not enough ${fromToken}`
           }
           return true

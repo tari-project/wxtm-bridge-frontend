@@ -3,7 +3,6 @@ import { create } from 'zustand'
 
 export interface SignerStore<TSigner extends TariL1Signer> {
   signer: TSigner | null
-
   setSigner(signer: TSigner): void
 }
 

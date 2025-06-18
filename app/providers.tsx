@@ -71,7 +71,6 @@ export const Providers = ({ children }: { children: ReactNode }) => {
       case MessageType.SET_THEME:
         const theme = event.data.payload.theme
         setTheme(theme)
-        console.info('set theme', theme)
         break
       case MessageType.SET_LANGUAGE:
         const language = event.data.payload.language

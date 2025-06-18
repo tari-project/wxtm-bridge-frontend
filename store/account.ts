@@ -4,7 +4,7 @@ import useTariSigner from './signer'
 
 interface State {
   tariAccount?: AccountData
-  available_balance: number
+  availableBalance: number
   ongoingBridgeTx?: PendingUserTransaction
   lastOngoingPaymentIdFromTU: string
 }
@@ -22,7 +22,7 @@ const initialState: State = {
     account_id: 0,
     address: '',
   },
-  available_balance: 0,
+  availableBalance: 0,
   ongoingBridgeTx: undefined,
   lastOngoingPaymentIdFromTU: '',
 }
@@ -45,7 +45,7 @@ export const useTariAccountStore = create<TariL1WalletStoreState>()((set) => ({
           account_id: account.account_id,
           address: account.address,
         },
-        available_balance: balance?.available_balance ?? 0,
+        availableBalance: balance.available_balance,
         lastOngoingPaymentIdFromTU: ongoingBridgeTx?.paymentId ?? '',
       })
       return account.address ?? ''

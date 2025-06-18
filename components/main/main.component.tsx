@@ -41,7 +41,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
 
   const { isConnected, chain, address } = useAccount()
   const { fromToken } = useBridgeInfo(fromNetwork)
-  const available_balance = useTariAccountStore((s) => s.available_balance)
+  const availableBalance = useTariAccountStore((s) => s.availableBalance)
 
   const chainId = (chain?.id ?? 1) as DeployedChains
   const deployments = getDeployments(chainId)
@@ -104,8 +104,8 @@ export const MainComponent: React.FC<MainComponentProps> = ({
   const getBalance = (formatted = false) => {
     return fromNetwork.name === 'Tari'
       ? formatted
-        ? formatNumber(available_balance || 0, FormatPreset.XTM_COMPACT)
-        : (available_balance / 1_000_000).toString()
+        ? formatNumber(availableBalance || 0, FormatPreset.XTM_COMPACT)
+        : (availableBalance / 1_000_000).toString()
       : evm_balance
   }
 
