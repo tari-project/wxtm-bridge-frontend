@@ -8,12 +8,14 @@ import { openExternalLink } from '@/utils/universe'
 import { config } from '@/config'
 import { formatUnits } from 'ethers'
 import { useTranslation } from 'react-i18next'
+import { IoCloseOutline } from 'react-icons/io5'
 
 export const WrapModal: React.FC<WrapModalProps> = ({
   tariWalletAddress,
   ethereumAddress,
   fromNetwork,
   feesData,
+  closeModal,
 }) => {
   const { i18n, t } = useTranslation('main', { useSuspense: false })
   const ongoingBridgeTx = useTariAccountStore((s) => s.ongoingBridgeTx)
@@ -41,6 +43,15 @@ export const WrapModal: React.FC<WrapModalProps> = ({
     <div className="w-full flex flex-col p-6">
       <div className="mt-2">
         {/* Top Section */}
+        <div className="w-full flex justify-end">
+          <button
+            className="text-black font-bold hover:cursor-pointer
+                     cursor-pointer flex text-xl rounded-full p-1 bg-black/10 hover:bg-black/20"
+            onClick={closeModal}
+          >
+            <IoCloseOutline />
+          </button>
+        </div>
         <div className="flex flex-col items-center justify-center">
           <div className="w-[63px] h-[63px] rounded-full overflow-hidden mr-1 relative">
             <Image
