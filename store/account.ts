@@ -26,13 +26,13 @@ type TariL1WalletStoreState = State & Actions
 //TODO REMOVE
 const exampleItem: BackendBridgeTransaction = {
   amountAfterFee: '1234',
-  createdAt: 'sda',
+  createdAt: 'Jun 20, 13:31',
   destinationAddress: 'ss',
   feeAmount: '5',
   paymentId: 'paymentId',
   status: UserTransactionDTO.status.PENDING,
   sourceAddress: 'sourceAddress',
-  tokenAmount: '1420',
+  tokenAmount: '1420000000',
 }
 
 const initialState: State = {

@@ -30,19 +30,21 @@ export const Header: React.FC<HeaderProps> = ({ onConnectClick }) => {
 
   return (
     <>
-      <header className="absolute top-8 right-8 z-50">
+      <header className="absolute top-8 right-8 z-50 flex items-center space-x-4">
         {exampleItem && (
-          <BridgeHistoryListItem
-            key={exampleItem.createdAt}
-            item={exampleItem}
-            index={0}
-            itemIsNew={true}
-            setDetailsItem={setDetailsItem}
-          />
+          <div className="w-[308px] h-[48px]">
+            <BridgeHistoryListItem
+              key={exampleItem.createdAt}
+              item={exampleItem}
+              index={0}
+              itemIsNew={true}
+              setDetailsItem={setDetailsItem}
+            />
+          </div>
         )}
         {!isConnected ? (
           <button
-            className="px-8.5 py-4 bg-[#090719] text-white font-semibold text-[12px] rounded-full hover:bg-gray-800 hover:cursor-pointer transition"
+            className="w-[154.27px] min-w-[154.27px] max-w-[154.27px] h-[51px] rounded-[100px] bg-[#090719] text-white font-semibold text-[12px] hover:bg-gray-800 hover:cursor-pointer transition"
             onClick={onConnectClick}
           >
             Connect Wallet
