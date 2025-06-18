@@ -235,11 +235,14 @@ export const MainComponent: React.FC<MainComponentProps> = ({
                             </div>
                           </div>
                           <div className="flex justify-end mt-2 gap-1 items-center">
-                            <div className="font-semibold text-[9px] 2xl:text-xs text-gray-500">
-                              {getBalance(true)} {fromToken}
+                            <div
+                              className="font-poppins font-medium text-[12px] leading-[100%] tracking-[-0.03em] text-gray-500 whitespace-nowrap flex items-center gap-1"
+                              style={{ fontFeatureSettings: '"cpsp"' }}
+                            >
+                              {getBalance(true)}&nbsp;{fromToken}
                             </div>
                             <button
-                              className="border border-gray-500/50 rounded-3xl text-xs font-medium px-1.5 hover:cursor-pointer"
+                              className="w-[31px] h-[13px] flex items-center justify-center gap-[7px] border border-gray-500/50 rounded-3xl px-1.5 hover:cursor-pointer font-poppins font-medium text-[8px] leading-[100%] tracking-[0em]"
                               onClick={handleMaxAmount}
                             >
                               {t('max')}
