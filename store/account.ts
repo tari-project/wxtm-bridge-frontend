@@ -1,4 +1,8 @@
-import { AccountData, PendingUserTransaction } from '@/types/tapplet'
+import {
+  AccountData,
+  BackendBridgeTransaction,
+  PendingUserTransaction,
+} from '@/types/tapplet'
 import { create } from 'zustand'
 import useTariSigner from './signer'
 
@@ -7,6 +11,7 @@ interface State {
   availableBalance: number
   ongoingBridgeTx?: PendingUserTransaction
   lastOngoingPaymentIdFromTU: string
+  backendBridgeTxs: BackendBridgeTransaction[]
 }
 
 interface Actions {
@@ -25,6 +30,7 @@ const initialState: State = {
   availableBalance: 0,
   ongoingBridgeTx: undefined,
   lastOngoingPaymentIdFromTU: '',
+  backendBridgeTxs: [],
 }
 
 export const useTariAccountStore = create<TariL1WalletStoreState>()((set) => ({
@@ -40,6 +46,7 @@ export const useTariAccountStore = create<TariL1WalletStoreState>()((set) => ({
       const account = await signer.getAccount()
       const balance = await signer.getTariBalance()
       const ongoingBridgeTx = await signer.getOngoingBridgeTx()
+      const backendBridgeTxs = await signer.getBackendBridgeTxs()
       set({
         tariAccount: {
           account_id: account.account_id,
@@ -47,6 +54,7 @@ export const useTariAccountStore = create<TariL1WalletStoreState>()((set) => ({
         },
         availableBalance: balance.available_balance,
         lastOngoingPaymentIdFromTU: ongoingBridgeTx?.paymentId ?? '',
+        backendBridgeTxs: backendBridgeTxs,
       })
 
       return
@@ -68,6 +76,24 @@ export const useTariAccountStore = create<TariL1WalletStoreState>()((set) => ({
       ongoingBridgeTx: undefined,
       lastOngoingPaymentIdFromTU: '',
     })
+  },
+  getBackendBridgeTxs: async () => {
+    const signer = useTariSigner.getState().signer
+    try {
+      if (!signer) {
+        console.error('[ TAPPLET-BRIDGE ] signer undefined')
+        return
+      }
+      const backendBridgeTxs = await signer.getBackendBridgeTxs()
+      set({
+        backendBridgeTxs: backendBridgeTxs,
+      })
+    } catch (error) {
+      console.error(
+        '[ TAPPLET-BRIDGE ] error getting bridge transactions:',
+        error,
+      )
+    }
   },
 }))
 
