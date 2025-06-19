@@ -17,3 +17,8 @@ export interface PendingBridgeTx {
 }
 
 export type PendingUserTransaction = Omit<UserTransactionDTO, 'feeAmount'>
+
+export interface BackendBridgeTransaction extends UserTransactionDTO {
+  sourceAddress?: string
+  mined_in_block_height?: number
+}
