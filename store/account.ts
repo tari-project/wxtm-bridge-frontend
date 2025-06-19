@@ -18,6 +18,7 @@ interface Actions {
   setTariAccount: () => Promise<void>
   setOngoingTransaction: (tx: OngoingUserTransaction) => void
   removeOngoingTransaction: () => void
+  getBackendBridgeTxsFromTU: () => Promise<BackendBridgeTransaction[]>
 }
 
 type TariL1WalletStoreState = State & Actions
@@ -77,22 +78,28 @@ export const useTariAccountStore = create<TariL1WalletStoreState>()((set) => ({
       lastOngoingPaymentIdFromTU: '',
     })
   },
-  getBackendBridgeTxs: async () => {
+  getBackendBridgeTxsFromTU: async () => {
     const signer = useTariSigner.getState().signer
     try {
       if (!signer) {
         console.error('[ TAPPLET-BRIDGE ] signer undefined')
-        return
+        return []
       }
       const backendBridgeTxs = await signer.getBackendBridgeTxs()
+      console.warn(
+        '🚀🚀🚀 [ TAPPLET-BRIDGE ] fetched bridge TX from TU',
+        backendBridgeTxs,
+      )
       set({
         backendBridgeTxs: backendBridgeTxs,
       })
+      return backendBridgeTxs
     } catch (error) {
       console.error(
         '[ TAPPLET-BRIDGE ] error getting bridge transactions:',
         error,
       )
+      return []
     }
   },
 }))

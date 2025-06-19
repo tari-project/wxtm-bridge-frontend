@@ -6,7 +6,10 @@ import {
 } from '@tari-project/wxtm-bridge-backend-api'
 
 import useTariAccountStore from '@/store/account'
-import { OngoingUserTransaction } from '@/types/tapplet'
+import {
+  BackendBridgeTransaction,
+  OngoingUserTransaction,
+} from '@/types/tapplet'
 
 export const useBridgeTransaction = () => {
   const getUserTxs = useMutation({
@@ -19,62 +22,80 @@ export const useBridgeTransaction = () => {
     useTariAccountStore.getState().removeOngoingTransaction
 
   /**
-   * Fetch user transactions and update the store's ongoing transaction state.
+   * Fetch user bridge transactions and update the store's ongoing transaction state.
    * Returns the updated ongoing transaction or null if none.
    */
-  const getUserTransactions =
-    async (): Promise<OngoingUserTransaction | null> => {
-      const ongoingBridgeTx = useTariAccountStore.getState().ongoingBridgeTx
-      const lastOngoingPaymentIdFromTU =
-        useTariAccountStore.getState().lastOngoingPaymentIdFromTU
-      const tariAccount = useTariAccountStore.getState().tariAccount
+  const getUserBackendBridgeTxs = async (
+    getFromTU = false,
+  ): Promise<OngoingUserTransaction | null> => {
+    const ongoingBridgeTx = useTariAccountStore.getState().ongoingBridgeTx
+    const lastOngoingPaymentIdFromTU =
+      useTariAccountStore.getState().lastOngoingPaymentIdFromTU
+    const tariAccount = useTariAccountStore.getState().tariAccount
+    const getBackendBridgeTxsFromTU =
+      useTariAccountStore.getState().getBackendBridgeTxsFromTU
 
-      if (!tariAccount) return null
-      const walletAddress = tariAccount.address
-      const { transactions } = await getUserTxs.mutateAsync(walletAddress)
+    if (!tariAccount) return null
+    const walletAddress = tariAccount.address
 
-      if (Array.isArray(transactions) && transactions.length > 0) {
-        // Find a pending transaction
-        const ongoing = transactions.find(
-          (tx) =>
-            tx.status === UserTransactionDTO.status.PENDING ||
-            tx.status === UserTransactionDTO.status.PROCESSING ||
-            tx.status === UserTransactionDTO.status.TOKENS_RECEIVED,
-        )
-        if (ongoing) {
-          setOngoingTransaction(ongoing)
-          return ongoing
-        }
-
-        // If no pending tx found, but previously had one, check if it succeeded/failed
-        // check also with the paymentId from the TU to display modal after the bridge relaunch
-        const validPaymentIds = new Set([
-          ongoingBridgeTx?.paymentId,
-          lastOngoingPaymentIdFromTU,
-        ])
-        const validStatuses = new Set([
-          UserTransactionDTO.status.SUCCESS,
-          UserTransactionDTO.status.TIMEOUT,
-        ])
-
-        const ongoingCompleted = transactions.find(
-          ({ paymentId, status }) =>
-            validPaymentIds.has(paymentId) && validStatuses.has(status),
-        )
-
-        if (ongoingCompleted) {
-          setOngoingTransaction(ongoingCompleted)
-          return ongoingCompleted
-        }
-      } else {
-        // No transactions found, clear any pending transaction
-        removeOngoingTransaction()
-      }
-
-      return null
+    console.warn('🚀 [ TAPPLET-BRIDGE ] getu user txs', getFromTU)
+    let transactions: BackendBridgeTransaction[]
+    if (getFromTU) {
+      console.warn('🚀 [ TAPPLET-BRIDGE ] fetch from TU')
+      transactions = await getBackendBridgeTxsFromTU()
+    } else {
+      console.warn('🚀 [ TAPPLET-BRIDGE ] fetch from backend')
+      const result = await getUserTxs.mutateAsync(walletAddress)
+      transactions = result.transactions
     }
 
+    if (Array.isArray(transactions) && transactions.length > 0) {
+      // Find a pending transaction
+      const ongoing = transactions.find(
+        (tx) =>
+          tx.status === UserTransactionDTO.status.PENDING ||
+          tx.status === UserTransactionDTO.status.PROCESSING ||
+          tx.status === UserTransactionDTO.status.TOKENS_RECEIVED,
+      )
+      if (ongoing) {
+        // update only if tx has changed
+        if (
+          ongoing.paymentId !== ongoingBridgeTx?.paymentId ||
+          ongoing.status !== ongoingBridgeTx?.status
+        )
+          setOngoingTransaction(ongoing)
+        return ongoing
+      }
+
+      // If no pending tx found, but previously had one, check if it succeeded/failed
+      // check also with the paymentId from the TU to display modal after the bridge relaunch
+      const validPaymentIds = new Set([
+        ongoingBridgeTx?.paymentId,
+        lastOngoingPaymentIdFromTU,
+      ])
+      const validStatuses = new Set([
+        UserTransactionDTO.status.SUCCESS,
+        UserTransactionDTO.status.TIMEOUT,
+      ])
+
+      const ongoingCompleted = transactions.find(
+        ({ paymentId, status }) =>
+          validPaymentIds.has(paymentId) && validStatuses.has(status),
+      )
+
+      if (ongoingCompleted) {
+        setOngoingTransaction(ongoingCompleted)
+        return ongoingCompleted
+      }
+    } else {
+      // No transactions found, clear any pending transaction
+      removeOngoingTransaction()
+    }
+
+    return null
+  }
+
   return {
-    getUserTransactions,
+    getUserBackendBridgeTxs,
   }
 }
