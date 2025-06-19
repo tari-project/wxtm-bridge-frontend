@@ -29,9 +29,10 @@ export default function Home() {
   })
 
   const { bridgeToEthereum, getBridgeTxParams } = useBridgeToEthereum()
-  const { getUserTransactions } = useBridgeTransaction()
+  const { getUserBackendBridgeTxs } = useBridgeTransaction()
   const tariAccount = useTariAccountStore((s) => s.tariAccount)
   const ongoingBridgeTx = useTariAccountStore((s) => s.ongoingBridgeTx)
+  const setOngoingBridgeTx = useTariAccountStore((s) => s.setOngoingTransaction)
 
   const {
     watch,
@@ -45,6 +46,8 @@ export default function Home() {
 
   const amount = watch('amount')
   const feesData = useBridgeToEthereumFees(amount)
+  const isBridgingShowModal =
+    !!ongoingBridgeTx && !ongoingBridgeTx.modalClosedByUser
 
   // Fetch bridge transaction parameters once on mount or when tariAccount changes
   useEffect(() => {
@@ -70,7 +73,8 @@ export default function Home() {
 
     const fetchUserTransactions = async () => {
       try {
-        await getUserTransactions()
+        // await getUserTransactions()
+        await getUserBackendBridgeTxs()
       } catch (error) {
         console.error(
           '[ TAPPLET-BRIDGE ] Failed to get user transactions:',
@@ -93,7 +97,7 @@ export default function Home() {
     if (modalOpen && modalStep === 0 && isConnected) {
       setModalOpen(false)
       setModalStep(1)
-    } else if (ongoingBridgeTx) {
+    } else if (ongoingBridgeTx && !ongoingBridgeTx.modalClosedByUser) {
       setModalStep(2)
       setModalOpen(true)
     }
@@ -110,6 +114,11 @@ export default function Home() {
     setModalStep(1)
     setModalOpen(true)
   }
+  const handleSetOngoingModalOpen = (open: boolean) => {
+    setModalOpen(open)
+    if (ongoingBridgeTx)
+      setOngoingBridgeTx({ ...ongoingBridgeTx, modalClosedByUser: true })
+  }
 
   const handleBridgeToEthereum = useCallback(() => {
     if (!amount || !ethAddress) {
@@ -122,7 +131,7 @@ export default function Home() {
       amountAfterFee: feesData.amountAfterFee,
     })
       .then(() => {
-        getUserTransactions()
+        getUserBackendBridgeTxs()
       })
       .catch((error) => {
         console.error('[ TAPPLET-BRIDGE ] Bridge operation failed:', error)
@@ -132,7 +141,7 @@ export default function Home() {
     ethAddress,
     bridgeToEthereum,
     feesData.amountAfterFee,
-    getUserTransactions,
+    getUserBackendBridgeTxs,
   ])
 
   const handleBridgeToTari = () => {
@@ -153,11 +162,11 @@ export default function Home() {
         setFromNetwork={setFromNetwork}
         toNetwork={toNetwork}
         setToNetwork={setToNetwork}
-        isOngoingBridgeTx={!!ongoingBridgeTx}
+        isOngoingBridgeTx={isBridgingShowModal}
       />
       {modalOpen && (
         <MainModal
-          setModalOpen={setModalOpen}
+          setModalOpen={handleSetOngoingModalOpen}
           success={
             ongoingBridgeTx?.status === UserTransactionDTO.status.SUCCESS
           }
@@ -166,7 +175,7 @@ export default function Home() {
           setStep={setModalStep}
           handleBridgeToEthereum={handleBridgeToEthereum}
           handleBridgeToTari={handleBridgeToTari}
-          isBridging={!!ongoingBridgeTx}
+          isBridging={isBridgingShowModal}
           amount={amount}
           ethereumAddress={ethAddress}
           tariWalletAddress={tariAccount?.address}
