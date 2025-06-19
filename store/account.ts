@@ -1,7 +1,7 @@
 import {
   AccountData,
   BackendBridgeTransaction,
-  PendingUserTransaction,
+  OngoingUserTransaction,
 } from '@/types/tapplet'
 import { create } from 'zustand'
 import useTariSigner from './signer'
@@ -9,14 +9,14 @@ import useTariSigner from './signer'
 interface State {
   tariAccount?: AccountData
   availableBalance: number
-  ongoingBridgeTx?: PendingUserTransaction
+  ongoingBridgeTx?: OngoingUserTransaction
   lastOngoingPaymentIdFromTU: string
   backendBridgeTxs: BackendBridgeTransaction[]
 }
 
 interface Actions {
   setTariAccount: () => Promise<void>
-  setOngoingTransaction: (tx: PendingUserTransaction) => void
+  setOngoingTransaction: (tx: OngoingUserTransaction) => void
   removeOngoingTransaction: () => void
 }
 
@@ -66,7 +66,7 @@ export const useTariAccountStore = create<TariL1WalletStoreState>()((set) => ({
     }
   },
 
-  setOngoingTransaction: (tx: PendingUserTransaction) => {
+  setOngoingTransaction: (tx: OngoingUserTransaction) => {
     set({
       ongoingBridgeTx: tx,
     })

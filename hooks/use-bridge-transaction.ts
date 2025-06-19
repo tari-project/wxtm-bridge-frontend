@@ -6,7 +6,7 @@ import {
 } from '@tari-project/wxtm-bridge-backend-api'
 
 import useTariAccountStore from '@/store/account'
-import { PendingUserTransaction } from '@/types/tapplet'
+import { OngoingUserTransaction } from '@/types/tapplet'
 
 export const useBridgeTransaction = () => {
   const getUserTxs = useMutation({
@@ -23,7 +23,7 @@ export const useBridgeTransaction = () => {
    * Returns the updated ongoing transaction or null if none.
    */
   const getUserTransactions =
-    async (): Promise<PendingUserTransaction | null> => {
+    async (): Promise<OngoingUserTransaction | null> => {
       const ongoingBridgeTx = useTariAccountStore.getState().ongoingBridgeTx
       const lastOngoingPaymentIdFromTU =
         useTariAccountStore.getState().lastOngoingPaymentIdFromTU

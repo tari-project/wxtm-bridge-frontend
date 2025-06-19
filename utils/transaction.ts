@@ -1,6 +1,6 @@
 import { BridgeInfo } from '@/hooks/use-bridge-info'
 import { BridgeToEthereumFees } from '@/hooks/use-bridge-to-ethereum-fees'
-import { PendingUserTransaction } from '@/types/tapplet'
+import { OngoingUserTransaction } from '@/types/tapplet'
 import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
 import { formatUnits } from 'ethers'
 import i18n from 'i18next'
@@ -8,7 +8,7 @@ import i18n from 'i18next'
 export function getModalTitle(
   bridgeInfo: BridgeInfo,
   feeData: BridgeToEthereumFees,
-  tx?: PendingUserTransaction,
+  tx?: OngoingUserTransaction,
   language?: string,
 ): { title: string; subtext: string } {
   const t = i18n.getFixedT(language || null, 'main')
