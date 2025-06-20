@@ -61,8 +61,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
   const fromNetworks = networks.filter(
     (n) => n.name === 'Ethereum' || n.name === 'Tari',
   )
-
-  const showHistory = true
+  const [showHistory, setShowHistory] = useState(false)
 
   const handleNetworkSelect = (network: Network, type: 'from' | 'to') => {
     if (type === 'from') {
@@ -144,7 +143,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
 
       <div className="mt-[4rem] mt-small">
         <div
-          className="mb-4"
+          className="mb-4 flex gap-2"
           style={{
             color: '#000',
             fontFamily: 'Poppins, sans-serif',
@@ -155,8 +154,27 @@ export const MainComponent: React.FC<MainComponentProps> = ({
             letterSpacing: '-1px',
           }}
         >
-          {t('start_bridging')} | {t('History')}
+          <button
+            className={`px-4 py-2 rounded ${
+              !showHistory ? 'bg-black text-white' : 'bg-gray-200 text-black'
+            }`}
+            onClick={() => setShowHistory(false)}
+            type="button"
+          >
+            {t('start_bridging')}
+          </button>
+          <button
+            className={`px-4 py-2 rounded ${
+              showHistory ? 'bg-black text-white' : 'bg-gray-200 text-black'
+            }`}
+            onClick={() => setShowHistory(true)}
+            type="button"
+          >
+            {t('History')}
+          </button>
         </div>
+
+        
         {showHistory ? (
           <TransactionHistory />
         ) : (
