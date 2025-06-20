@@ -9,6 +9,7 @@ interface State {
   walletConnectProjectId: string
   bridgeAPI: string
   theme: Theme
+  hideWalletBalance: boolean
 }
 
 interface Actions {
@@ -24,6 +25,7 @@ const initialState: State = {
   walletConnectProjectId: '',
   bridgeAPI: '',
   theme: 'light',
+  hideWalletBalance: false,
 }
 
 export const useAppStore = create<AppStoreState>()((set) => ({
@@ -86,6 +88,11 @@ export const useAppStore = create<AppStoreState>()((set) => ({
     console.info(`Changing theme to ${parsedTheme}`)
     set({
       theme: parsedTheme,
+    })
+  },
+  setHideWalletBalance: (hideBalance: boolean) => {
+    set({
+      hideWalletBalance: hideBalance,
     })
   },
 }))

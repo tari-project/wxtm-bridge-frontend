@@ -22,6 +22,7 @@ import { formatTimeStamp, getTimestampFromTransaction } from './helpers'
 import { Button } from '@mui/material'
 import BridgeItemHover from './BridgeHoveredItem'
 import { truncateMiddle } from '@/utils/truncateString'
+import useAppStore from '@/store/app'
 
 const BaseItem = memo(function BaseItem({
   title,
@@ -71,7 +72,7 @@ const BridgeHistoryListItem = memo(function ListItem({
   setDetailsItem,
 }: BridgeHistoryListItemProps) {
   const { t } = useTranslation('wallet')
-  const hideWalletBalance = false // TODO add store useUIStore((s) => s.hideWalletBalance)
+  const hideWalletBalance = useAppStore((s) => s.hideWalletBalance)
 
   const ref = useRef<HTMLDivElement>(null)
 
