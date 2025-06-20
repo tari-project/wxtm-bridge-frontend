@@ -29,6 +29,7 @@ const BaseItem = memo(function BaseItem({
   value,
   chip,
   onClick,
+  status,
 }: BridgeBaseItemProps) {
   // note re. isPositiveValue:
   // amounts in the tx response are always positive numbers but
@@ -44,6 +45,7 @@ const BaseItem = memo(function BaseItem({
         </BlockInfoWrapper>
       </Content>
       <Content>
+        {status}
         {chip ? (
           <Chip>
             <span>{chip}</span>
