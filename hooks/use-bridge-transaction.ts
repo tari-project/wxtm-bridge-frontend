@@ -6,10 +6,8 @@ import {
 } from '@tari-project/wxtm-bridge-backend-api'
 
 import useTariAccountStore from '@/store/account'
-import {
-  BackendBridgeTransaction,
-  OngoingUserTransaction,
-} from '@/types/tapplet'
+import { OngoingUserTransaction } from '@/types/tapplet'
+import { BackendBridgeTransaction } from '@/types/transactions'
 
 export const useBridgeTransaction = () => {
   const getUserTxs = useMutation({

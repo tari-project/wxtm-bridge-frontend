@@ -1,3 +1,4 @@
+import { BackendBridgeTransaction } from '@/types/transactions'
 import {
   TariL1SignerParameters,
   SignerMethodNames,
@@ -6,7 +7,6 @@ import {
   SignerReturnType,
   AccountData,
   WalletBalance,
-  BackendBridgeTransaction,
 } from '../types/tapplet'
 
 export interface SendOneSidedRequest {

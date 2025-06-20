@@ -73,7 +73,6 @@ export default function Home() {
 
     const fetchUserTransactions = async () => {
       try {
-        // await getUserTransactions()
         await getUserBackendBridgeTxs()
       } catch (error) {
         console.error(

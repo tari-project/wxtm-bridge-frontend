@@ -7,11 +7,16 @@ import { truncateAddress } from '@/utils/truncate'
 import { NetworkSwitchModal } from '@/components/modals/network-switch-modal'
 import { supportedChains, chainsMap } from '@/utils/networksConfig'
 import { HeaderProps } from './header.types'
+import { BridgeHistoryListItem } from '../transactions/BridgeListItem'
+import useTariAccountStore from '@/store/account'
 
 export const Header: React.FC<HeaderProps> = ({ onConnectClick }) => {
   const chainId = useChainId()
   const { address, isConnected, chain } = useAccount()
   const [showNetworkModal, setShowNetworkModal] = useState(false)
+  const bridgeTxs = useTariAccountStore((s) => s.backendBridgeTxs)
+  const setDetailsItem = useTariAccountStore((s) => s.setDetailsItem)
+  const exampleItem = bridgeTxs.find((tx) => tx.paymentId !== '')
 
   const isNetworkSupported = chain !== undefined
 
@@ -26,6 +31,15 @@ export const Header: React.FC<HeaderProps> = ({ onConnectClick }) => {
   return (
     <>
       <header className="absolute top-8 right-8 z-50">
+        {exampleItem && (
+          <BridgeHistoryListItem
+            key={exampleItem.createdAt}
+            item={exampleItem}
+            index={0}
+            itemIsNew={true}
+            setDetailsItem={setDetailsItem}
+          />
+        )}
         {!isConnected ? (
           <button
             className="px-8.5 py-4 bg-[#090719] text-white font-semibold text-[12px] rounded-full hover:bg-gray-800 hover:cursor-pointer transition"

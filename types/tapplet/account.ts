@@ -20,7 +20,3 @@ export type OngoingUserTransaction = Omit<UserTransactionDTO, 'feeAmount'> & {
   modalClosedByUser?: boolean
 }
 
-export interface BackendBridgeTransaction extends UserTransactionDTO {
-  sourceAddress?: string
-  mined_in_block_height?: number
-}
