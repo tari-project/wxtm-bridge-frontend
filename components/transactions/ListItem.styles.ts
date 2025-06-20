@@ -202,3 +202,61 @@ export const ListItemWrapper = styled.div`
   gap: 4px;
   padding: 6px 0 0;
 `
+
+export const ListWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  position: relative;
+
+  width: 100%;
+  height: 100%;
+
+  h6 {
+    text-align: center;
+  }
+`
+
+export const HistoryListWrapper = styled(m.div)`
+  display: flex;
+  width: 100%;
+  height: 240px;
+  flex-grow: 1;
+  overflow: hidden;
+  overflow-y: auto;
+  align-items: flex-end;
+  justify-content: flex-end;
+  position: relative;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent -10px,
+    black 10px,
+    black calc(100% - 40px),
+    transparent 100%
+  );
+  mask-position: bottom;
+  mask-size: 50% 100%;
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+
+  * {
+    box-sizing: border-box;
+
+    ::-webkit-scrollbar {
+      display: none;
+    }
+
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  @media (max-height: 815px) {
+    height: 140px;
+  }
+  @media (max-height: 690px) {
+    height: 100px;
+  }
+`

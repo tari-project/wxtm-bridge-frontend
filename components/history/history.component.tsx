@@ -1,15 +1,29 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import useTariAccountStore from '@/store/account'
 
 import { BridgeHistoryListItem } from '../transactions/BridgeListItem'
-import { ListItemWrapper } from '../transactions/ListItem.styles'
+import {
+  HistoryListWrapper,
+  ListItemWrapper,
+  ListWrapper,
+} from '../transactions/ListItem.styles'
 
 export const TransactionHistory: React.FC = ({}) => {
   const bridgeTxs = useTariAccountStore((s) => s.backendBridgeTxs)
   const setDetailsItem = useTariAccountStore((s) => s.setDetailsItem)
+  const targetRef = useRef<HTMLDivElement>(null)
+  const [isScrolled, setIsScrolled] = useState(false)
+
+  useEffect(() => {
+    const el = targetRef.current
+    if (!el) return
+    const onScroll = () => setIsScrolled(el.scrollTop > 1)
+    el.addEventListener('scroll', onScroll)
+    return () => el.removeEventListener('scroll', onScroll)
+  }, [])
 
   const listMarkup = (
     <ListItemWrapper>
@@ -23,17 +37,7 @@ export const TransactionHistory: React.FC = ({}) => {
             setDetailsItem={setDetailsItem}
           />
         )
-
-        // If we reach here, it means the transaction is neither a TransactionInfo nor a UserTransactionDTO
-        console.warn('Unexpected transaction type:', tx)
-        return null // or handle accordingly
       })}
-
-      {/* fill the list with placeholders if there are less than 4 entries */}
-      {/* {Array.from({ length: placeholdersNeeded }).map((_, index) => (
-        <PlaceholderItem key={`placeholder-${index}`} />
-      ))}
-      {isFetchingNextPage || isFetching ? <LoadingDots /> : null} */}
     </ListItemWrapper>
   )
   return (
@@ -42,7 +46,9 @@ export const TransactionHistory: React.FC = ({}) => {
         <div className="w-full flex flex-col p-1">
           <div className="relative">
             <div className="flex items-center justify-center"></div>
-            {listMarkup}
+            <HistoryListWrapper ref={targetRef}>
+              <ListWrapper>{listMarkup}</ListWrapper>
+            </HistoryListWrapper>
           </div>
         </div>
       </div>
