@@ -9,16 +9,13 @@ import { supportedChains, chainsMap } from '@/utils/networksConfig'
 import { HeaderProps } from './header.types'
 import { BridgeHistoryListItem } from '../transactions/BridgeListItem'
 import useTariAccountStore from '@/store/account'
-import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
 
 export const Header: React.FC<HeaderProps> = ({ onConnectClick }) => {
   const chainId = useChainId()
   const { address, isConnected, chain } = useAccount()
   const [showNetworkModal, setShowNetworkModal] = useState(false)
   const bridgeTxs = useTariAccountStore((s) => s.backendBridgeTxs)
-  const exampleItem = bridgeTxs.find(
-    (tx) => tx.status === UserTransactionDTO.status.PENDING,
-  )
+  const exampleItem = bridgeTxs.find((tx) => tx.paymentId !== '')
   const setDetailedTx = useTariAccountStore((s) => s.setDetailedTx)
 
   const isNetworkSupported = chain !== undefined
