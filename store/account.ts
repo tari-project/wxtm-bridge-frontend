@@ -43,7 +43,14 @@ const initialState: State = {
   availableBalance: 0,
   ongoingBridgeTx: undefined,
   lastOngoingPaymentIdFromTU: '',
-  backendBridgeTxs: [exampleItem],
+  backendBridgeTxs: [
+    exampleItem,
+    exampleItem,
+    exampleItem,
+    exampleItem,
+    exampleItem,
+    exampleItem,
+  ],
 }
 
 export const useTariAccountStore = create<TariL1WalletStoreState>()((set) => ({
