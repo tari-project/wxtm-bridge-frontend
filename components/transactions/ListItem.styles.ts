@@ -193,3 +193,12 @@ export const PlaceholderItem = styled.div<{ $isLast?: boolean }>`
   flex-shrink: 0;
   opacity: ${({ $isLast }) => ($isLast ? 0 : 0.75)};
 `
+
+export const ListItemWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  gap: 4px;
+  padding: 6px 0 0;
+`
