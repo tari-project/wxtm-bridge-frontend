@@ -21,7 +21,7 @@ export const HoverWrapper = styled(m.div)`
   inset: 0;
   z-index: 4;
   transition: background-color 1s ease;
-  background-color: rgba(0, 0, 0, 0.5);
+  backgroundcolor: rgba(0, 0, 0, 0.5);
   height: 100%;
   backdrop-filter: blur(1.5px);
 `
@@ -50,7 +50,7 @@ export const BlockInfoWrapper = styled.div`
 `
 export const TitleWrapper = styled(Typography)`
   display: flex;
-  color: #00bc62;
+  color: #000;
 
   font-size: 12px;
   font-weight: 500;
@@ -61,7 +61,7 @@ export const TimeWrapper = styled(Typography)`
   display: flex;
 
   font-size: 11px;
-  background-color: #019e53;
+  background-color: rgba(0, 0, 0, 0.5);
 `
 export const ValueWrapper = styled.div`
   display: flex;
@@ -100,13 +100,13 @@ export const CurrencyText = styled(Typography).attrs({ variant: 'p' })`
   display: flex;
   font-size: 11px;
   font-weight: 500;
-  color: #00bc62;
+  color: #000;
 `
 
 export const ValueChangeWrapper = styled.div<{ $isPositiveValue?: boolean }>`
   display: flex;
   line-height: 11px;
-  color: #00bc62;
+  color: #000;
 `
 
 export const ReplayButton = styled.button`
@@ -116,8 +116,8 @@ export const ReplayButton = styled.button`
   width: 31px;
   height: 31px;
   justify-content: center;
-  background-color: #019e53;
-  color: #00bc62;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #000;
   box-sizing: border-box;
   transition: opacity 0.2s ease;
 
@@ -155,7 +155,7 @@ export const FlexButton = styled.button`
     linear-gradient(180deg, #ff84a4 0%, #d92958 100%);
 
   position: relative;
-  color: #00bc62;
+  color: #fff;
   font-size: 12px;
   font-weight: 600;
   line-height: 1;
@@ -173,7 +173,7 @@ export const GemPill = styled.div`
   gap: 4px;
 
   span {
-    color: #00bc62;
+    color: #fff;
     display: flex;
     font-size: 10px;
     font-weight: 600;
