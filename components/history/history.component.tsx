@@ -13,7 +13,7 @@ import {
 
 export const TransactionHistory: React.FC = ({}) => {
   const bridgeTxs = useTariAccountStore((s) => s.backendBridgeTxs)
-  const setDetailsItem = useTariAccountStore((s) => s.setDetailsItem)
+  const setDetailedTx = useTariAccountStore((s) => s.setDetailedTx)
   const targetRef = useRef<HTMLDivElement>(null)
   const [isScrolled, setIsScrolled] = useState(false)
 
@@ -34,7 +34,7 @@ export const TransactionHistory: React.FC = ({}) => {
             item={tx}
             index={i}
             itemIsNew={i === 0}
-            setDetailsItem={setDetailsItem}
+            setDetailedTx={setDetailedTx}
           />
         )
       })}

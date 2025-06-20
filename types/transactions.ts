@@ -63,7 +63,7 @@ export interface BridgeHistoryListItemProps {
   item: BackendBridgeTransaction
   index: number
   itemIsNew?: boolean
-  setDetailsItem?: (item: BackendBridgeTransaction | null) => void
+  setDetailedTx?: (item: BackendBridgeTransaction | null) => void
 }
 
 export interface BackendBridgeTransaction extends UserTransactionDTO {

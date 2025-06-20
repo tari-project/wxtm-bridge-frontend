@@ -31,6 +31,8 @@ export default function Home() {
   const { bridgeToEthereum, getBridgeTxParams } = useBridgeToEthereum()
   const { getUserBackendBridgeTxs } = useBridgeTransaction()
   const tariAccount = useTariAccountStore((s) => s.tariAccount)
+  const detailedTx = useTariAccountStore((s) => s.detailedTx) // USE THIS TO DISPLAY MODAL WITH TX DETAILS
+  const setDetailedTx = useTariAccountStore((s) => s.setDetailedTx) // USE THIS TO CLOSE MODAL: setDetailedTx(null)
   const ongoingBridgeTx = useTariAccountStore((s) => s.ongoingBridgeTx)
   const setOngoingBridgeTx = useTariAccountStore((s) => s.setOngoingTransaction)
 

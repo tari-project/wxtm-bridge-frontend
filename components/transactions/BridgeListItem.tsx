@@ -69,7 +69,7 @@ const BridgeHistoryListItem = memo(function ListItem({
   item,
   index,
   itemIsNew = false,
-  setDetailsItem,
+  setDetailedTx,
 }: BridgeHistoryListItemProps) {
   const { t } = useTranslation('wallet')
   const hideWalletBalance = useAppStore((s) => s.hideWalletBalance)
@@ -101,7 +101,7 @@ const BridgeHistoryListItem = memo(function ListItem({
       variant="outlined"
       onClick={(e) => {
         e.stopPropagation()
-        setDetailsItem?.({ ...item, createdAt: time })
+        setDetailedTx?.({ ...item, createdAt: time })
       }}
     >
       {t(`history.view-details`)}

@@ -10,7 +10,7 @@ interface State {
   ongoingBridgeTx?: OngoingUserTransaction
   lastOngoingPaymentIdFromTU: string
   backendBridgeTxs: BackendBridgeTransaction[]
-  detailsItem?: BackendBridgeTransaction | null
+  detailedTx?: BackendBridgeTransaction | null
 }
 
 interface Actions {
@@ -18,7 +18,7 @@ interface Actions {
   setOngoingTransaction: (tx: OngoingUserTransaction) => void
   removeOngoingTransaction: () => void
   getBackendBridgeTxsFromTU: () => Promise<BackendBridgeTransaction[]>
-  setDetailsItem: (detailsItem: BackendBridgeTransaction | null) => void
+  setDetailedTx: (detailedTx: BackendBridgeTransaction | null) => void
 }
 
 type TariL1WalletStoreState = State & Actions
@@ -43,6 +43,7 @@ const initialState: State = {
   availableBalance: 0,
   ongoingBridgeTx: undefined,
   lastOngoingPaymentIdFromTU: '',
+  // TODO backendBridgeTxs: []
   backendBridgeTxs: [
     exampleItem,
     exampleItem,
@@ -105,10 +106,7 @@ export const useTariAccountStore = create<TariL1WalletStoreState>()((set) => ({
         return []
       }
       const backendBridgeTxs = await signer.getBackendBridgeTxs()
-      console.warn(
-        '🚀🚀🚀 [ TAPPLET-BRIDGE ] fetched bridge TX from TU',
-        backendBridgeTxs,
-      )
+
       set({
         backendBridgeTxs: backendBridgeTxs,
       })
@@ -121,9 +119,9 @@ export const useTariAccountStore = create<TariL1WalletStoreState>()((set) => ({
       return []
     }
   },
-  setDetailsItem: (detailsItem: BackendBridgeTransaction | null) =>
+  setDetailedTx: (detailedTx: BackendBridgeTransaction | null) =>
     set({
-      detailsItem: detailsItem,
+      detailedTx: detailedTx,
     }),
 }))
 
