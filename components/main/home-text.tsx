@@ -16,7 +16,7 @@ export const HomeText: React.FC = ({}) => {
           className="object-cover"
         />
       </div>
-      <div className="font-light text-4xl lg:text-[67.64px] text-small leading-[40px] lg:leading-[71.5px] tracking-[0px] lg:tracking-[-3.98px] max-w-[30rem] lg:max-w-[40rem] text-black font-poppins lg:font-normal lg:font-light lg:tracking-[-3.979px]">
+      <div className="font-light text-4xl lg:text-[67.64px] text-small leading-[40px] lg:leading-[71.5px] tracking-[0px] max-w-[30rem] lg:max-w-[40rem] text-black font-poppins lg:font-light lg:tracking-[-3.979px]">
         {t('bridge_title_prefix')}{' '}
         <span className="font-semibold">{t('xtm_token')}</span>{' '}
         <span className="hidden short:inline">
@@ -26,7 +26,7 @@ export const HomeText: React.FC = ({}) => {
           {t('bridge_title_suffix_break')}
         </span>
       </div>
-      <div className="font-normal text-lg lg:text-[24px] text-very-small leading-[30px] tracking-[0px] lg:tracking-[-1px] max-w-[25rem] lg:max-w-[35rem] whitespace-pre text-black font-poppins lg:text-[27px] lg:leading-[30px] lg:font-normal lg:tracking-[-1px]">
+      <div className="font-normal text-lg text-very-small leading-[30px] tracking-[0px] max-w-[25rem] lg:max-w-[35rem] whitespace-pre text-black font-poppins lg:text-[27px] lg:leading-[30px] lg:font-normal lg:tracking-[-1px]">
         {t('bridge_description_prefix')}
         <span className="font-semibold">{t('layerzero_oft')}</span>{' '}
         {t('bridge_description_suffix')}
