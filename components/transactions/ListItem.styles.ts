@@ -12,8 +12,10 @@ export const ItemWrapper = styled(m.div)`
   flex-direction: column;
   overflow: hidden;
   position: relative;
-  box-shadow: 28px 28px 77px 0 rgba(0, 0, 0, 0.1);
-  background-color: rgba(0, 0, 0, 0.5);
+  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.1);
+  background-color: #f3f3f3;
+  border: 1px;
+  border-color: #e5e7eb;
 `
 
 export const HoverWrapper = styled(m.div)`
@@ -61,7 +63,7 @@ export const TimeWrapper = styled(Typography)`
   display: flex;
 
   font-size: 11px;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: #f3f3f3;
 `
 export const ValueWrapper = styled.div`
   display: flex;
@@ -78,7 +80,7 @@ export const Chip = styled.div`
 
   text-transform: uppercase;
   border-radius: 50px;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: #126537;
 
   height: 14px;
   padding: 0 7px;
@@ -92,7 +94,9 @@ export const Chip = styled.div`
   line-height: normal;
 
   span {
-    height: 10px;
+    display: flex;
+    align-items: center;
+    line-height: 1;
   }
 `
 
@@ -188,7 +192,7 @@ export const GemImage = styled.img`
 export const PlaceholderItem = styled.div<{ $isLast?: boolean }>`
   width: 100%;
   height: ${({ $isLast }) => ($isLast ? '35px' : '48px')};
-  background: '#F3F3F3';
+  background: #f3f3f3;
   border-radius: 10px;
   flex-shrink: 0;
   opacity: ${({ $isLast }) => ($isLast ? 0 : 0.75)};
