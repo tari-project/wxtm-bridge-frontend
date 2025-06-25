@@ -40,23 +40,26 @@ export const MainComponent: React.FC<MainComponentProps> = ({
             fontFamily: 'Poppins, sans-serif',
             fontSize: '20px',
             fontStyle: 'normal',
-            fontWeight: 500,
+            fontWeight: 510,
             lineHeight: '30px',
             letterSpacing: '-1px',
           }}
         >
           <button
-            className={`px-4 py-2 rounded ${
-              !showHistory ? 'bg-black text-white' : 'bg-gray-200 text-black'
+            className={`${
+              !showHistory
+                ? 'text-black'
+                : 'text-[#797979] hover:cursor-pointer'
             }`}
             onClick={() => setShowHistory(false)}
             type="button"
           >
             {t('start_bridging')}
           </button>
+          <span className="text-black"> | </span>
           <button
-            className={`px-4 py-2 rounded ${
-              showHistory ? 'bg-black text-white' : 'bg-gray-200 text-black'
+            className={`${
+              showHistory ? 'text-black' : 'text-[#797979] hover:cursor-pointer'
             }`}
             onClick={() => setShowHistory(true)}
             type="button"
