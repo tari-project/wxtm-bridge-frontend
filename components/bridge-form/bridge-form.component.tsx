@@ -108,7 +108,7 @@ export const BridgeForm: React.FC<MainComponentProps> = ({
   }
 
   return (
-    <div className="bg-white/50 backdrop-blur-sm shadow-xl rounded-2xl p-4 mx-auto">
+    <div className="bg-white/50 backdrop-blur-sm shadow-xl rounded-2xl p-4 mx-auto min-h-[130px] fixed-box mb-5">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="w-full flex flex-col p-1">
           <div className="relative">
