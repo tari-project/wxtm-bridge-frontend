@@ -56,6 +56,7 @@ export interface BridgeBaseItemProps {
   value: string
   chip?: string
   status?: UserTransactionDTO.status
+  address?: string
   onClick?: () => void
 }
 

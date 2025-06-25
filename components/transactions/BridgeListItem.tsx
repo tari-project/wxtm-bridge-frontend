@@ -23,6 +23,7 @@ import { Button } from '@mui/material'
 import BridgeItemHover from './BridgeHoveredItem'
 import { truncateMiddle } from '@/utils/truncateString'
 import useAppStore from '@/store/app'
+import { BsQuestionCircleFill } from 'react-icons/bs'
 
 const BaseItem = memo(function BaseItem({
   title,
@@ -65,12 +66,91 @@ const BaseItem = memo(function BaseItem({
   )
 })
 
+const HistoryBaseItem = memo(function HistoryBaseItem({
+  title,
+  time,
+  value,
+  onClick,
+  status,
+  address,
+}: BridgeBaseItemProps) {
+  const displayTitle = title.length > 26 ? truncateMiddle(title, 8) : title
+  const displayAddress = address ? truncateMiddle(address, 6) : ''
+
+  const getStatusInfo = (status: any) => {
+    if (
+      status === 'PENDING' ||
+      status === 'PROCESSING' ||
+      status === 'TOKENS_RECEIVED'
+    ) {
+      return {
+        color: 'text-[#FE7701]',
+        text: (
+          <div className="flex items-center gap-1">
+            <span>Pending</span>
+            <BsQuestionCircleFill size={12} />
+          </div>
+        ),
+      }
+    }
+    if (status === 'SUCCESS') {
+      return { color: 'text-[#06C983]', text: 'Completed' }
+    }
+    if (status === 'TIMEOUT') {
+      return { color: 'text-gray-500', text: 'Timeout' }
+    }
+    return { color: 'text-gray-500', text: status }
+  }
+
+  return (
+    <div
+      onClick={onClick}
+      className="w-full px-3 flex flex-row items-center h-full text-xs font-medium"
+    >
+      <div className="flex-1 flex items-center">
+        <TitleWrapper title={title}>{displayTitle}</TitleWrapper>
+      </div>
+
+      <div className="flex-1 flex items-center justify-center">
+        <TimeWrapper variant="p">{time}</TimeWrapper>
+      </div>
+
+      <div className="flex-1 flex items-center justify-center">
+        <ValueWrapper>
+          <ValueChangeWrapper
+            $isPositiveValue={false}
+          >{`-`}</ValueChangeWrapper>
+          {value}
+          <CurrencyText>{`XTM`}</CurrencyText>
+        </ValueWrapper>
+      </div>
+
+      <div className="flex-1 flex items-center justify-center">
+        {displayAddress}
+      </div>
+
+      <div className="flex-1 flex items-center justify-center">
+        <span className={`${getStatusInfo(status).color}`}>
+          {getStatusInfo(status).text}
+        </span>
+      </div>
+
+      <div className="flex-1 flex items-center justify-center">
+        <button className="hover:text-blue-800 underline">
+          View on block explorer
+        </button>
+      </div>
+    </div>
+  )
+})
+
 const BridgeHistoryListItem = memo(function ListItem({
   item,
   index,
   itemIsNew = false,
   setDetailedTx,
-}: BridgeHistoryListItemProps) {
+  isHistoryList = false,
+}: BridgeHistoryListItemProps & { isHistoryList?: boolean }) {
   const { t } = useTranslation('wallet')
   const hideWalletBalance = useAppStore((s) => s.hideWalletBalance)
 
@@ -86,7 +166,15 @@ const BridgeHistoryListItem = memo(function ListItem({
       ).toLowerCase()
   const time = formatTimeStamp(getTimestampFromTransaction(item))
 
-  const baseItem = (
+  const baseItem = isHistoryList ? (
+    <HistoryBaseItem
+      title={'Bridge XTM to WXTM'}
+      time={time}
+      value={earningsFormatted}
+      status={item?.status}
+      address={item?.sourceAddress || item?.destinationAddress}
+    />
+  ) : (
     <BaseItem
       title={'Bridge XTM to WXTM'}
       time={time}

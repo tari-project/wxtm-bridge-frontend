@@ -204,7 +204,7 @@ export const ListItemWrapper = styled.div`
   align-items: center;
   position: relative;
   gap: 4px;
-  padding: 6px 0 0;
+  padding: 4px;
 `
 
 export const ListWrapper = styled.div`
