@@ -63,6 +63,27 @@ function isTransactionInfo(
   return 'tx_id' in transaction && typeof transaction.tx_id === 'string'
 }
 
+const getStatusInfo = (status: any) => {
+  if (
+    status === 'PENDING' ||
+    status === 'PROCESSING' ||
+    status === 'TOKENS_RECEIVED'
+  ) {
+    return {
+      statusType: 'pending' as const,
+      text: 'Pending',
+      showIcon: true,
+    }
+  }
+  if (status === 'SUCCESS') {
+    return { statusType: 'completed' as const, text: 'Completed', showIcon: false }
+  }
+  if (status === 'TIMEOUT') {
+    return { statusType: 'timeout' as const, text: 'Timeout', showIcon: false }
+  }
+  return { statusType: 'default' as const, text: status, showIcon: false }
+}
+
 export {
   formatTimeStamp,
   findFirstNonBridgeTransaction,
@@ -70,4 +91,5 @@ export {
   isBridgeTransaction,
   isTransactionInfo,
   getTimestampFromTransaction,
+  getStatusInfo,
 }
