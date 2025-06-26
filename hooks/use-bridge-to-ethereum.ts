@@ -44,10 +44,12 @@ export const useBridgeToEthereum = () => {
 
     const parsedAmount = parseWxtmTokenAmount(amount)
 
+    const baseNodeStatusBefore = await signer?.getBaseNodeStatus()
     const { paymentId } = await createTransaction.mutateAsync({
       to: ethAddress,
       from: tariAccount.address,
       tokenAmount: parsedAmount,
+      debug: { ...baseNodeStatusBefore },
     })
 
     // set ongoing to immediately display wrap modal
@@ -82,7 +84,10 @@ export const useBridgeToEthereum = () => {
       console.error('[ TAPPLET-BRIDGE ] send one sided failed')
     }
 
-    const { success } = await confirmTokenSent.mutateAsync(paymentId)
+    const baseNodeStatusAfter = await signer?.getBaseNodeStatus()
+    const { success } = await confirmTokenSent.mutateAsync(paymentId, {
+      debug: { ...baseNodeStatusAfter },
+    })
     if (!success) {
       console.error('[ TAPPLET-BRIDGE ] confirm token sent failed')
     }
