@@ -11,6 +11,8 @@ import {
   ContentWrapper,
   CurrencyText,
   ItemWrapper,
+  StatusContent,
+  StatusWrapper,
   TimeWrapper,
   TitleWrapper,
   ValueChangeWrapper,
@@ -18,7 +20,11 @@ import {
 } from './ListItem.styles'
 import { useTranslation } from 'react-i18next'
 import { formatNumber, FormatPreset } from '@/utils/formatters'
-import { formatTimeStamp, getTimestampFromTransaction } from './helpers'
+import {
+  formatTimeStamp,
+  getTimestampFromTransaction,
+  getStatusInfo,
+} from './helpers'
 import { Button } from '@mui/material'
 import BridgeItemHover from './BridgeHoveredItem'
 import { truncateMiddle } from '@/utils/truncateString'
@@ -46,22 +52,31 @@ const BaseItem = memo(function BaseItem({
           <TimeWrapper variant="p">{time}</TimeWrapper>
         </BlockInfoWrapper>
       </Content>
-      <Content>
-        {status}
-        {chip ? (
-          <Chip>
-            <span>{chip}</span>
-          </Chip>
-        ) : null}
 
-        <ValueWrapper>
-          <ValueChangeWrapper
-            $isPositiveValue={false}
-          >{`-`}</ValueChangeWrapper>
-          {value}
-          <CurrencyText>{`XTM`}</CurrencyText>
-        </ValueWrapper>
-      </Content>
+      <BlockInfoWrapper>
+        <Content>
+          <div className="mr-1">
+            {chip ? (
+              <Chip>
+                <span>{chip}</span>
+              </Chip>
+            ) : null}
+          </div>
+
+          <ValueWrapper>
+            <ValueChangeWrapper
+              $isPositiveValue={false}
+            >{`-`}</ValueChangeWrapper>
+            {value}
+            <CurrencyText>{`XTM`}</CurrencyText>
+          </ValueWrapper>
+        </Content>
+        <div className="flex justify-end">
+          <StatusWrapper $status={getStatusInfo(status).statusType}>
+            <StatusContent>{getStatusInfo(status).text}</StatusContent>
+          </StatusWrapper>
+        </div>
+      </BlockInfoWrapper>
     </ContentWrapper>
   )
 })
@@ -77,35 +92,10 @@ const HistoryBaseItem = memo(function HistoryBaseItem({
   const displayTitle = title.length > 26 ? truncateMiddle(title, 8) : title
   const displayAddress = address ? truncateMiddle(address, 6) : ''
 
-  const getStatusInfo = (status: any) => {
-    if (
-      status === 'PENDING' ||
-      status === 'PROCESSING' ||
-      status === 'TOKENS_RECEIVED'
-    ) {
-      return {
-        color: 'text-[#FE7701]',
-        text: (
-          <div className="flex items-center gap-1">
-            <span>Pending</span>
-            <BsQuestionCircleFill size={12} />
-          </div>
-        ),
-      }
-    }
-    if (status === 'SUCCESS') {
-      return { color: 'text-[#06C983]', text: 'Completed' }
-    }
-    if (status === 'TIMEOUT') {
-      return { color: 'text-gray-500', text: 'Timeout' }
-    }
-    return { color: 'text-gray-500', text: status }
-  }
-
   return (
     <div
       onClick={onClick}
-      className="w-full px-3 flex flex-row items-center h-full text-xs font-medium"
+      className="w-full px-3 flex flex-row items-center h-full text-xs font-[510]"
     >
       <div className="flex-1 flex items-center">
         <TitleWrapper title={title}>{displayTitle}</TitleWrapper>
@@ -130,9 +120,16 @@ const HistoryBaseItem = memo(function HistoryBaseItem({
       </div>
 
       <div className="flex-1 flex items-center justify-center">
-        <span className={`${getStatusInfo(status).color}`}>
-          {getStatusInfo(status).text}
-        </span>
+        <StatusWrapper $status={getStatusInfo(status).statusType}>
+          {getStatusInfo(status).showIcon ? (
+            <StatusContent>
+              <span>{getStatusInfo(status).text}</span>
+              <BsQuestionCircleFill size={12} />
+            </StatusContent>
+          ) : (
+            getStatusInfo(status).text
+          )}
+        </StatusWrapper>
       </div>
 
       <div className="flex-1 flex items-center justify-center">
