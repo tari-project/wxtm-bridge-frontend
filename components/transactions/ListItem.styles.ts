@@ -223,7 +223,7 @@ export const ListWrapper = styled.div`
 export const HistoryListWrapper = styled(m.div)`
   display: flex;
   width: 100%;
-  height: 240px;
+  height: 230px;
   flex-grow: 1;
   overflow: hidden;
   overflow-y: auto;
@@ -263,4 +263,32 @@ export const HistoryListWrapper = styled(m.div)`
   @media (max-height: 690px) {
     height: 100px;
   }
+`
+
+export const StatusWrapper = styled.span<{
+  $status: 'pending' | 'completed' | 'timeout' | 'default'
+}>`
+  color: ${({ $status }) => {
+    switch ($status) {
+      case 'pending':
+        return '#FE7701'
+      case 'completed':
+        return '#06C983'
+      case 'timeout':
+        return '#6B7280'
+      default:
+        return '#6B7280'
+    }
+  }};
+`
+
+export const StatusContent = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -2%;
 `
