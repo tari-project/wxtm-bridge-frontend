@@ -22,6 +22,9 @@ import { useTranslation } from 'react-i18next'
 
 export const SuccessModal: React.FC<SuccessModalProps> = ({
   closeModal,
+  amount: amountProp,
+  amountAfterFee: amountAfterFeeProp,
+  destinationAddress: destAddressProp,
   tariWalletAddress,
   ethereumAddress,
   fromNetwork,
@@ -70,13 +73,19 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
     if (signer) await signer.removeOngoingBridgeTx()
   }, [closeModal, removeOngoingTransaction, signer])
 
-  const amount = ongoingBridgeTx?.tokenAmount
-    ? parseFloat(formatUnits(ongoingBridgeTx?.tokenAmount, 6)).toPrecision()
-    : '0'
+  const amount =
+    amountProp ||
+    (ongoingBridgeTx?.tokenAmount
+      ? parseFloat(formatUnits(ongoingBridgeTx?.tokenAmount, 6)).toPrecision()
+      : '0')
 
-  const amountToReceive = ongoingBridgeTx?.amountAfterFee
-    ? parseFloat(formatUnits(ongoingBridgeTx?.amountAfterFee, 6)).toPrecision()
-    : '0'
+  const amountToReceive =
+    amountAfterFeeProp ||
+    (ongoingBridgeTx?.amountAfterFee
+      ? parseFloat(
+          formatUnits(ongoingBridgeTx?.amountAfterFee, 6),
+        ).toPrecision()
+      : '0')
 
   return (
     <div className="w-full flex flex-col p-6">
@@ -153,7 +162,9 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
             <div className="text-xs text-gray-500">
               {t('destination_address')}
             </div>
-            <div className="text-sm">{ongoingBridgeTx?.destinationAddress}</div>
+            <div className="text-sm">
+              {destAddressProp || ongoingBridgeTx?.destinationAddress}
+            </div>
           </div>
 
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
