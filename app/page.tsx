@@ -5,7 +5,6 @@ import { useAccount } from 'wagmi'
 import { useForm } from 'react-hook-form'
 
 import { MainModal } from '@/components/modals/main-modal'
-/** @TODO CONSIDER USING THIS MODAL HERE INSTEAD OF DIRECTLY IN HEADER/TX HISTORY */
 import { TransactionDetailsModal } from '@/components/modals/transaction-details-modal'
 import { Header } from '@/components/header'
 import { MainComponent } from '@/components/main'
@@ -110,6 +109,8 @@ export default function Home() {
     ) {
       setModalStep(2)
       setModalOpen(true)
+    } else if (isTransactionDetailsOpen && modalOpen) {
+      setModalOpen(false)
     }
   }, [
     isConnected,
