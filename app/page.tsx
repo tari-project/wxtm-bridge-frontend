@@ -38,6 +38,9 @@ export default function Home() {
   const ongoingBridgeTx = useTariAccountStore((s) => s.ongoingBridgeTx)
   const setOngoingBridgeTx = useTariAccountStore((s) => s.setOngoingTransaction)
 
+  // Prevent main modal from showing when transaction details modal is active
+  const isTransactionDetailsOpen = !!detailedTx
+
   const {
     watch,
     control,
@@ -100,11 +103,21 @@ export default function Home() {
     if (modalOpen && modalStep === 0 && isConnected) {
       setModalOpen(false)
       setModalStep(1)
-    } else if (ongoingBridgeTx && !ongoingBridgeTx.modalClosedByUser) {
+    } else if (
+      ongoingBridgeTx &&
+      !ongoingBridgeTx.modalClosedByUser &&
+      !isTransactionDetailsOpen
+    ) {
       setModalStep(2)
       setModalOpen(true)
     }
-  }, [isConnected, modalOpen, modalStep, ongoingBridgeTx])
+  }, [
+    isConnected,
+    modalOpen,
+    modalStep,
+    ongoingBridgeTx,
+    isTransactionDetailsOpen,
+  ])
 
   const handleConnectClick = () => {
     if (!isConnected) {
@@ -167,7 +180,15 @@ export default function Home() {
         setToNetwork={setToNetwork}
         isOngoingBridgeTx={isBridgingShowModal}
       />
-      {modalOpen && (
+
+      {detailedTx && (
+        <TransactionDetailsModal
+          transaction={detailedTx}
+          closeModal={() => setDetailedTx(null)}
+        />
+      )}
+
+      {modalOpen && !isTransactionDetailsOpen && (
         <MainModal
           setModalOpen={handleSetOngoingModalOpen}
           success={

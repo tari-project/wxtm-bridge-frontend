@@ -8,24 +8,21 @@ import { NetworkSwitchModal } from '@/components/modals/network-switch-modal'
 import { supportedChains, chainsMap } from '@/utils/networksConfig'
 import { HeaderProps } from './header.types'
 import { BridgeHistoryListItem } from '../transactions/BridgeListItem'
-import { TransactionDetailsModal } from '../modals/transaction-details-modal'
 import useTariAccountStore from '@/store/account'
 
 export const Header: React.FC<HeaderProps> = ({ onConnectClick }) => {
   const chainId = useChainId()
   const { address, isConnected, chain } = useAccount()
   const [showNetworkModal, setShowNetworkModal] = useState(false)
-  const [showTransactionModal, setShowTransactionModal] = useState(false)
   const bridgeTxs = useTariAccountStore((s) => s.backendBridgeTxs)
   const exampleItem = bridgeTxs.find((tx) => tx.paymentId !== '')
   const setDetailedTx = useTariAccountStore((s) => s.setDetailedTx)
 
   const isNetworkSupported = chain !== undefined
 
-  /** @TODO FIX INTERFERENCE WITH MAIN MODAL */
   const handleDisplayTransaction = () => {
     if (exampleItem) {
-      setShowTransactionModal(true)
+      setDetailedTx(exampleItem)
     }
   }
 
@@ -51,7 +48,6 @@ export const Header: React.FC<HeaderProps> = ({ onConnectClick }) => {
                 item={exampleItem}
                 index={0}
                 itemIsNew={true}
-                // setDetailedTx={() => {}}
                 setDetailedTx={setDetailedTx}
               />
             </div>
@@ -107,14 +103,6 @@ export const Header: React.FC<HeaderProps> = ({ onConnectClick }) => {
         <NetworkSwitchModal
           closeModal={() => setShowNetworkModal(false)}
           supportedChains={supportedChains}
-        />
-      )}
-
-      {/* Transaction Details Modal */}
-      {showTransactionModal && exampleItem && (
-        <TransactionDetailsModal
-          transaction={exampleItem}
-          closeModal={() => setShowTransactionModal(false)}
         />
       )}
     </>
