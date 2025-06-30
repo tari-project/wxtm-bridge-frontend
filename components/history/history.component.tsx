@@ -16,7 +16,7 @@ export const TransactionHistory: React.FC = ({}) => {
   const bridgeTxs = useTariAccountStore((s) => s.backendBridgeTxs)
   const setDetailedTx = useTariAccountStore((s) => s.setDetailedTx)
   const targetRef = useRef<HTMLDivElement>(null)
-  const [isScrolled, setIsScrolled] = useState(false)
+  const [, setIsScrolled] = useState(false)
   const { t } = useTranslation('main', { useSuspense: false })
 
   useEffect(() => {
