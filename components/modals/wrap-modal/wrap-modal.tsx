@@ -18,6 +18,7 @@ export const WrapModal: React.FC<WrapModalProps> = ({
   closeModal,
   amountAfterFee: amountAfterFeeProp,
   destinationAddress: destAddressProp,
+  transactionStatus,
 }) => {
   const { i18n, t } = useTranslation('main', { useSuspense: false })
   const ongoingBridgeTx = useTariAccountStore((s) => s.ongoingBridgeTx)
@@ -41,7 +42,7 @@ export const WrapModal: React.FC<WrapModalProps> = ({
   const { title, subtext } = getModalTitle(
     bridgeInfo,
     feesData,
-    ongoingBridgeTx,
+    transactionStatus || ongoingBridgeTx,
     i18n.language,
   )
 

@@ -38,6 +38,7 @@ const TransactionDetailsModal = memo(function TransactionDetailsModal({
             fromNetwork={tariNetwork}
             amountAfterFee={transaction.amountAfterFee}
             destinationAddress={transaction.destinationAddress}
+            transactionStatus={transaction}
           />
         )
 
