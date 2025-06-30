@@ -73,19 +73,17 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
     if (signer) await signer.removeOngoingBridgeTx()
   }, [closeModal, removeOngoingTransaction, signer])
 
-  const amount =
-    amountProp ||
-    (ongoingBridgeTx?.tokenAmount
-      ? parseFloat(formatUnits(ongoingBridgeTx?.tokenAmount, 6)).toPrecision()
-      : '0')
+  const amount = amountProp
+    ? parseFloat(formatUnits(amountProp, 6)).toPrecision()
+    : ongoingBridgeTx?.tokenAmount
+    ? parseFloat(formatUnits(ongoingBridgeTx?.tokenAmount, 6)).toPrecision()
+    : '0'
 
-  const amountToReceive =
-    amountAfterFeeProp ||
-    (ongoingBridgeTx?.amountAfterFee
-      ? parseFloat(
-          formatUnits(ongoingBridgeTx?.amountAfterFee, 6),
-        ).toPrecision()
-      : '0')
+  const amountToReceive = amountAfterFeeProp
+    ? parseFloat(formatUnits(amountAfterFeeProp, 6)).toPrecision()
+    : ongoingBridgeTx?.amountAfterFee
+    ? parseFloat(formatUnits(ongoingBridgeTx?.amountAfterFee, 6)).toPrecision()
+    : '0'
 
   return (
     <div className="w-full flex flex-col p-6">

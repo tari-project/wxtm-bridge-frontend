@@ -16,6 +16,8 @@ export const WrapModal: React.FC<WrapModalProps> = ({
   fromNetwork,
   feesData,
   closeModal,
+  amountAfterFee: amountAfterFeeProp,
+  destinationAddress: destAddressProp,
 }) => {
   const { i18n, t } = useTranslation('main', { useSuspense: false })
   const ongoingBridgeTx = useTariAccountStore((s) => s.ongoingBridgeTx)
@@ -24,12 +26,16 @@ export const WrapModal: React.FC<WrapModalProps> = ({
     ethereumAddress!,
     tariWalletAddress!,
   )
-  const amountAfterFeePending = ongoingBridgeTx?.amountAfterFee
+  const amountAfterFeePending = amountAfterFeeProp
+    ? parseFloat(formatUnits(amountAfterFeeProp, 6)).toPrecision()
+    : ongoingBridgeTx?.amountAfterFee
     ? parseFloat(formatUnits(ongoingBridgeTx.amountAfterFee, 6)).toPrecision()
     : feesData.amountAfterFee
 
   const destAddressPending =
-    ongoingBridgeTx?.destinationAddress ?? bridgeInfo.destAddress
+    destAddressProp ||
+    ongoingBridgeTx?.destinationAddress ||
+    bridgeInfo.destAddress
 
   // Pass the current language to getModalTitle
   const { title, subtext } = getModalTitle(
