@@ -97,7 +97,7 @@ const HistoryBaseItem = memo(function HistoryBaseItem({
 
   const handleViewOnExplorer = (e: React.MouseEvent) => {
     e.stopPropagation()
-    console.log('View on block explorer clicked!')
+    console.debug('View on block explorer clicked!')
   }
 
   return (
