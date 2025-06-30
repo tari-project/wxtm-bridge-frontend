@@ -1,5 +1,5 @@
-import { memo, useRef, useState } from 'react'
-import { AnimatePresence } from 'motion/react'
+import { memo, useRef } from 'react'
+// import { AnimatePresence } from 'motion/react'
 import {
   BridgeBaseItemProps,
   BridgeHistoryListItemProps,
@@ -25,11 +25,12 @@ import {
   getTimestampFromTransaction,
   getStatusInfo,
 } from './helpers'
-import { Button } from '@mui/material'
-import BridgeItemHover from './BridgeHoveredItem'
+// import { Button } from '@mui/material'
+// import BridgeItemHover from './BridgeHoveredItem'
 import { truncateMiddle } from '@/utils/truncateString'
 import useAppStore from '@/store/app'
 import { BsQuestionCircleFill } from 'react-icons/bs'
+import { openExternalLink } from '@/utils/universe'
 
 const BaseItem = memo(function BaseItem({
   title,
@@ -91,52 +92,68 @@ const HistoryBaseItem = memo(function HistoryBaseItem({
 }: BridgeBaseItemProps) {
   const displayTitle = title.length > 26 ? truncateMiddle(title, 8) : title
   const displayAddress = address ? truncateMiddle(address, 6) : ''
+  const etherscanLink =
+    'https://etherscan.io/address/0xfD36fA88bb3feA8D1264fc89d70723b6a2B56958'
+
+  const handleViewOnExplorer = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    console.log('View on block explorer clicked!')
+  }
 
   return (
-    <div
-      onClick={onClick}
-      className="w-full px-3 flex flex-row items-center h-full text-xs font-[510]"
-    >
-      <div className="flex-1 flex items-center">
-        <TitleWrapper title={title}>{displayTitle}</TitleWrapper>
-      </div>
+    <div className="w-full px-3 flex flex-row items-center h-full text-xs font-[510]">
+      <button
+        className="flex flex-[3] p-3 hover:cursor-pointer"
+        onClick={onClick}
+      >
+        <div className="flex-1 flex items-center">
+          <TitleWrapper title={title}>{displayTitle}</TitleWrapper>
+        </div>
 
-      <div className="flex-1 flex items-center justify-center">
-        <TimeWrapper variant="p">{time}</TimeWrapper>
-      </div>
+        <div className="flex-1 flex items-center justify-center">
+          <TimeWrapper variant="p">{time}</TimeWrapper>
+        </div>
 
-      <div className="flex-1 flex items-center justify-center">
-        <ValueWrapper>
-          <ValueChangeWrapper
-            $isPositiveValue={false}
-          >{`-`}</ValueChangeWrapper>
-          {value}
-          <CurrencyText>{`XTM`}</CurrencyText>
-        </ValueWrapper>
-      </div>
+        <div className="flex-1 flex items-center justify-center">
+          <ValueWrapper>
+            <ValueChangeWrapper
+              $isPositiveValue={false}
+            >{`-`}</ValueChangeWrapper>
+            {value}
+            <CurrencyText>{`XTM`}</CurrencyText>
+          </ValueWrapper>
+        </div>
 
-      <div className="flex-1 flex items-center justify-center">
-        {displayAddress}
-      </div>
+        <div className="flex-1 flex items-center justify-center">
+          {displayAddress}
+        </div>
 
-      <div className="flex-1 flex items-center justify-center">
-        <StatusWrapper $status={getStatusInfo(status).statusType}>
-          {getStatusInfo(status).showIcon ? (
-            <StatusContent>
-              <span>{getStatusInfo(status).text}</span>
-              <BsQuestionCircleFill size={12} />
-            </StatusContent>
-          ) : (
-            getStatusInfo(status).text
-          )}
-        </StatusWrapper>
-      </div>
+        <div className="flex-1 flex items-center justify-center">
+          <StatusWrapper $status={getStatusInfo(status).statusType}>
+            {getStatusInfo(status).showIcon ? (
+              <StatusContent>
+                <span>{getStatusInfo(status).text}</span>
+                <BsQuestionCircleFill size={12} />
+              </StatusContent>
+            ) : (
+              getStatusInfo(status).text
+            )}
+          </StatusWrapper>
+        </div>
+      </button>
 
-      <div className="flex-1 flex items-center justify-center">
-        <button className="hover:text-blue-800 underline">
+      <button
+        className="flex flex-[1] p-3 hover:cursor-pointer"
+        onClick={handleViewOnExplorer}
+      >
+        <a
+          onClick={(e) => openExternalLink(etherscanLink, e)}
+          rel="noopener noreferrer"
+          className="flex-1 flex items-center justify-center underline"
+        >
           View on block explorer
-        </button>
-      </div>
+        </a>
+      </button>
     </div>
   )
 })
@@ -152,8 +169,7 @@ const BridgeHistoryListItem = memo(function ListItem({
   const hideWalletBalance = useAppStore((s) => s.hideWalletBalance)
 
   const ref = useRef<HTMLDivElement>(null)
-
-  const [hovering, setHovering] = useState(false)
+  // const [hovering, setHovering] = useState(false)
 
   const earningsFormatted = hideWalletBalance
     ? `***`
@@ -163,47 +179,53 @@ const BridgeHistoryListItem = memo(function ListItem({
       ).toLowerCase()
   const time = formatTimeStamp(getTimestampFromTransaction(item))
 
+  const handleItemClick = () => {
+    setDetailedTx?.({ ...item, createdAt: time })
+  }
+
   const baseItem = isHistoryList ? (
     <HistoryBaseItem
-      title={'Bridge XTM to WXTM'}
+      title={'Bridge XTM to wXTM'}
       time={time}
       value={earningsFormatted}
       status={item?.status}
       address={item?.sourceAddress || item?.destinationAddress}
+      onClick={handleItemClick}
     />
   ) : (
     <BaseItem
-      title={'Bridge XTM to WXTM'}
+      title={'Bridge XTM to wXTM'}
       time={time}
       value={earningsFormatted}
       status={item?.status}
       chip={itemIsNew ? t('new') : ''}
+      onClick={handleItemClick}
     />
   )
 
-  const detailsButton = (
-    <Button
-      variant="outlined"
-      onClick={(e) => {
-        e.stopPropagation()
-        setDetailedTx?.({ ...item, createdAt: time })
-      }}
-    >
-      {t(`history.view-details`)}
-    </Button>
-  )
+  // const detailsButton = (
+  //   <Button
+  //     variant="outlined"
+  //     onClick={(e) => {
+  //       e.stopPropagation()
+  //       setDetailedTx?.({ ...item, createdAt: time })
+  //     }}
+  //   >
+  //     {t(`history.view-details`)}
+  //   </Button>
+  // )
 
   return (
     <ItemWrapper
       ref={ref}
       data-index={index}
       style={{ height: 48 }}
-      onMouseEnter={() => setHovering(true)}
-      onMouseLeave={() => setHovering(false)}
+      // onMouseEnter={() => !isHistoryList && setHovering(true)}
+      // onMouseLeave={() => !isHistoryList && setHovering(false)}
     >
-      <AnimatePresence>
+      {/* <AnimatePresence>
         {hovering && <BridgeItemHover button={detailsButton} />}
-      </AnimatePresence>
+      </AnimatePresence> */}
       {baseItem}
     </ItemWrapper>
   )
