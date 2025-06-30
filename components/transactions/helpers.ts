@@ -1,5 +1,6 @@
 import useAppStore from '@/store/app'
 import { BackendBridgeTransaction, TransactionInfo } from '@/types/transactions'
+import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
 
 function formatTimeStamp(timestamp: number): string {
   const appLanguage = useAppStore.getState().language
@@ -63,11 +64,11 @@ function isTransactionInfo(
   return 'tx_id' in transaction && typeof transaction.tx_id === 'string'
 }
 
-const getStatusInfo = (status: any) => {
+const getStatusInfo = (status: UserTransactionDTO.status | undefined) => {
   if (
-    status === 'PENDING' ||
-    status === 'PROCESSING' ||
-    status === 'TOKENS_RECEIVED'
+    status === UserTransactionDTO.status.PENDING ||
+    status === UserTransactionDTO.status.PROCESSING ||
+    status === UserTransactionDTO.status.TOKENS_RECEIVED
   ) {
     return {
       statusType: 'pending' as const,
@@ -75,10 +76,14 @@ const getStatusInfo = (status: any) => {
       showIcon: true,
     }
   }
-  if (status === 'SUCCESS') {
-    return { statusType: 'completed' as const, text: 'Completed', showIcon: false }
+  if (status === UserTransactionDTO.status.SUCCESS) {
+    return {
+      statusType: 'completed' as const,
+      text: 'Completed',
+      showIcon: false,
+    }
   }
-  if (status === 'TIMEOUT') {
+  if (status === UserTransactionDTO.status.TIMEOUT) {
     return { statusType: 'timeout' as const, text: 'Timeout', showIcon: false }
   }
   return { statusType: 'default' as const, text: status, showIcon: false }
