@@ -1,4 +1,4 @@
-import { memo, useRef } from 'react'
+import { memo, useRef, useState, useEffect } from 'react'
 // import { AnimatePresence } from 'motion/react'
 import {
   BridgeBaseItemProps,
@@ -31,6 +31,7 @@ import { truncateMiddle } from '@/utils/truncateString'
 import useAppStore from '@/store/app'
 import { BsQuestionCircleFill } from 'react-icons/bs'
 import { openExternalLink } from '@/utils/universe'
+import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
 
 const BaseItem = memo(function BaseItem({
   title,
@@ -82,6 +83,19 @@ const BaseItem = memo(function BaseItem({
   )
 })
 
+const AnimatedDots = memo(function AnimatedDots() {
+  const [dotCount, setDotCount] = useState(1)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDotCount((prev) => (prev >= 3 ? 1 : prev + 1))
+    }, 700)
+    return () => clearInterval(interval)
+  }, [])
+
+  return <span>{'.'.repeat(dotCount)}</span>
+})
+
 const HistoryBaseItem = memo(function HistoryBaseItem({
   title,
   time,
@@ -98,6 +112,45 @@ const HistoryBaseItem = memo(function HistoryBaseItem({
   const handleViewOnExplorer = (e: React.MouseEvent) => {
     e.stopPropagation()
     console.debug('View on block explorer clicked!')
+  }
+
+  const renderExplorerSection = () => {
+    if (status === UserTransactionDTO.status.SUCCESS) {
+      return (
+        <button
+          className="flex flex-[1] p-3 hover:cursor-pointer"
+          onClick={handleViewOnExplorer}
+        >
+          <a
+            onClick={(e) => openExternalLink(etherscanLink, e)}
+            rel="noopener noreferrer"
+            className="flex-1 flex items-center justify-center underline"
+          >
+            View on block explorer
+          </a>
+        </button>
+      )
+    }
+
+    if (
+      status === UserTransactionDTO.status.PENDING ||
+      status === UserTransactionDTO.status.PROCESSING ||
+      status === UserTransactionDTO.status.TOKENS_RECEIVED
+    ) {
+      return (
+        <div className="flex flex-[1] p-3">
+          <div className="flex-1 flex items-center justify-center">
+            <AnimatedDots />
+          </div>
+        </div>
+      )
+    }
+
+    return (
+      <div className="flex flex-[1] p-3">
+        <div className="flex-1 flex items-center justify-center"></div>
+      </div>
+    )
   }
 
   return (
@@ -142,18 +195,7 @@ const HistoryBaseItem = memo(function HistoryBaseItem({
         </div>
       </button>
 
-      <button
-        className="flex flex-[1] p-3 hover:cursor-pointer"
-        onClick={handleViewOnExplorer}
-      >
-        <a
-          onClick={(e) => openExternalLink(etherscanLink, e)}
-          rel="noopener noreferrer"
-          className="flex-1 flex items-center justify-center underline"
-        >
-          View on block explorer
-        </a>
-      </button>
+      {renderExplorerSection()}
     </div>
   )
 })
