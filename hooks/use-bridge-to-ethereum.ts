@@ -1,21 +1,28 @@
 import { useMutation } from '@tanstack/react-query'
 
 import {
+  UpdateToTokensSentReqDTO,
   UserTransactionDTO,
   WrapTokenService,
 } from '@tari-project/wxtm-bridge-backend-api'
 
 import { parseWxtmTokenAmount } from '@/utils/parse-wxtm-token-amount'
 import useTariSigner from '@/store/signer'
-import useTariAccountStore from '@/store/account'
-import useBridgeStore from '@/store/bridge'
+import useTariAccount from '@/store/account'
+import { stringifyProperties } from '@/utils/stringifyProperties'
 
 export const useBridgeToEthereum = () => {
   const createTransaction = useMutation({
     mutationFn: WrapTokenService.createWrapTokenTransaction,
   })
   const confirmTokenSent = useMutation({
-    mutationFn: WrapTokenService.updateToTokensSent,
+    mutationFn: async ({
+      paymentId,
+      requestBody,
+    }: {
+      paymentId: string
+      requestBody?: UpdateToTokensSentReqDTO
+    }) => WrapTokenService.updateToTokensSent(paymentId, requestBody),
   })
   const getWrapTokenParams = useMutation({
     mutationFn: WrapTokenService.getWrapTokenParams,
@@ -47,10 +54,12 @@ export const useBridgeToEthereum = () => {
 
     const parsedAmount = parseWxtmTokenAmount(amount)
 
+    const baseNodeStatusBefore = await signer?.getBaseNodeStatus()
     const { paymentId } = await createTransaction.mutateAsync({
       to: ethAddress,
       from: tariAccount.address,
       tokenAmount: parsedAmount,
+      debug: stringifyProperties(baseNodeStatusBefore),
     })
 
     // set ongoing to immediately display wrap modal
@@ -85,7 +94,13 @@ export const useBridgeToEthereum = () => {
       console.error('[ TAPPLET-BRIDGE ] send one sided failed')
     }
 
-    const { success } = await confirmTokenSent.mutateAsync(paymentId)
+    const baseNodeStatusAfter = await signer?.getBaseNodeStatus()
+    const { success } = await confirmTokenSent.mutateAsync({
+      paymentId,
+      requestBody: {
+        debug: stringifyProperties(baseNodeStatusAfter),
+      },
+    })
     if (!success) {
       console.error('[ TAPPLET-BRIDGE ] confirm token sent failed')
     }

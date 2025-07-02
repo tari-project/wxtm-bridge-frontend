@@ -15,6 +15,18 @@ export interface SendOneSidedRequest {
   paymentId?: string
 }
 
+export interface BaseNodeStatus {
+  sha_network_hashrate: number
+  monero_randomx_network_hashrate: number
+  tari_randomx_network_hashrate: number
+  block_reward: number
+  block_height: number
+  block_time: number
+  is_synced: boolean
+  num_connections: number
+  readiness_status: string
+}
+
 export interface BridgeTxDetails {
   amount: string
   amountToReceive: string
@@ -96,6 +108,17 @@ export class TariL1Signer {
     return this.sendRequest({
       methodName: 'sendOneSided',
       args: [{ amount, address, paymentId }],
+    })
+  }
+
+  /**
+   * @description get Base Node status
+   * @returns BaseNodeStatus
+   */
+  public async getBaseNodeStatus(): Promise<BaseNodeStatus> {
+    return this.sendRequest({
+      methodName: 'getBaseNodeStatus',
+      args: [],
     })
   }
 
