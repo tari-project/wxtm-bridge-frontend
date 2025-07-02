@@ -22,7 +22,7 @@ export const FailedModal: React.FC<FailedModalProps> = ({
     closeModal()
     removeOngoingTransaction()
     if (signer) await signer.removeOngoingBridgeTx()
-  }, [closeModal])
+  }, [closeModal, removeOngoingTransaction, signer])
 
   return (
     <div className="w-full flex flex-col p-6">
