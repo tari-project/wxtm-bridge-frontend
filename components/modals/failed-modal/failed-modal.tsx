@@ -7,7 +7,10 @@ import useTariAccountStore from '@/store/account'
 import useTariSigner from '@/store/signer'
 import { useTranslation } from 'react-i18next'
 
-export const FailedModal: React.FC<FailedModalProps> = ({ closeModal }) => {
+export const FailedModal: React.FC<FailedModalProps> = ({
+  closeModal,
+  paymentId: paymentIdProp,
+}) => {
   const signer = useTariSigner((s) => s.signer)
   const ongoingBridgeTx = useTariAccountStore((s) => s.ongoingBridgeTx)
   const removeOngoingTransaction = useTariAccountStore(
@@ -19,7 +22,7 @@ export const FailedModal: React.FC<FailedModalProps> = ({ closeModal }) => {
     closeModal()
     removeOngoingTransaction()
     if (signer) await signer.removeOngoingBridgeTx()
-  }, [closeModal, removeOngoingTransaction, signer])
+  }, [closeModal])
 
   return (
     <div className="w-full flex flex-col p-6">
@@ -47,7 +50,9 @@ export const FailedModal: React.FC<FailedModalProps> = ({ closeModal }) => {
         <div className="flex flex-col my-4">
           <div className="font-medium">
             <div className="text-xs text-gray-500">{t('transaction_id')}</div>
-            <div className="text-sm">{ongoingBridgeTx?.paymentId}</div>
+            <div className="text-sm">
+              {paymentIdProp || ongoingBridgeTx?.paymentId}
+            </div>
           </div>
 
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
