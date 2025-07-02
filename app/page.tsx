@@ -20,6 +20,7 @@ export default function Home() {
   const { isConnected, address: ethAddress } = useAccount()
   const [modalOpen, setModalOpen] = useState(false)
   const [modalStep, setModalStep] = useState<number>(1)
+  const [lastShownTxId, setLastShownTxId] = useState<string | null>(null)
   const [fromNetwork, setFromNetwork] = useState<Network>({
     name: 'Tari',
     icon: '/icons/tari.png',
@@ -52,8 +53,9 @@ export default function Home() {
 
   const amount = watch('amount')
   const feesData = useBridgeToEthereumFees(amount)
-  const isBridgingShowModal =
-    !!ongoingBridgeTx && !ongoingBridgeTx.modalClosedByUser
+  const isBridgingShowModal = false
+  /** @dev Disabled as now user is allowed to process multiple transactions */
+  // !!ongoingBridgeTx && !ongoingBridgeTx.modalClosedByUser
 
   // Fetch bridge transaction parameters once on mount or when tariAccount changes
   useEffect(() => {
@@ -102,25 +104,25 @@ export default function Home() {
     if (modalOpen && modalStep === 0 && isConnected) {
       setModalOpen(false)
       setModalStep(1)
+    } else if (
+      ongoingBridgeTx &&
+      !ongoingBridgeTx.modalClosedByUser &&
+      !isTransactionDetailsOpen &&
+      ongoingBridgeTx.paymentId !== lastShownTxId
+    ) {
+      setModalStep(2)
+      setModalOpen(true)
+      setLastShownTxId(ongoingBridgeTx.paymentId)
     } else if (isTransactionDetailsOpen && modalOpen) {
       setModalOpen(false)
     }
-
-    /** @dev Below is for auto modal popup - to use it back, put it before 'else if (isTransactionDetailsOpen && modalOpen)' */
-    // else if (
-    //   ongoingBridgeTx &&
-    //   !ongoingBridgeTx.modalClosedByUser &&
-    //   !isTransactionDetailsOpen
-    // ) {
-    //   setModalStep(2)
-    //   setModalOpen(true)
-    // }
   }, [
     isConnected,
     modalOpen,
     modalStep,
     ongoingBridgeTx,
     isTransactionDetailsOpen,
+    lastShownTxId,
   ])
 
   const handleConnectClick = () => {

@@ -32,7 +32,6 @@ export const BridgeForm: React.FC<MainComponentProps> = ({
   setFromNetwork,
   toNetwork,
   setToNetwork,
-  isOngoingBridgeTx,
 }) => {
   const { t } = useTranslation('main', { useSuspense: false })
   const [openDropdown, setOpenDropdown] = useState<'from' | 'to' | null>(null)
@@ -52,7 +51,7 @@ export const BridgeForm: React.FC<MainComponentProps> = ({
   const evm_balance = data?.value
     ? parseFloat(ethers.formatEther(data?.value)).toPrecision(4)
     : '0'
-  const isDisabled = chain === undefined || isOngoingBridgeTx
+  const isDisabled = chain === undefined
 
   const fromNetworks = networks.filter(
     (n) => n.name === 'Ethereum' || n.name === 'Tari',
