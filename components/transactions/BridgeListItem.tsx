@@ -31,7 +31,9 @@ import { truncateMiddle } from '@/utils/truncateString'
 import useAppStore from '@/store/app'
 import { BsQuestionCircleFill } from 'react-icons/bs'
 import { openExternalLink } from '@/utils/universe'
+import { HiArrowRightOnRectangle } from 'react-icons/hi2'
 import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
+import { buildEtherscanLink } from '@/utils/tariNetwork'
 
 const BaseItem = memo(function BaseItem({
   title,
@@ -107,28 +109,19 @@ const HistoryBaseItem = memo(function HistoryBaseItem({
 }: BridgeBaseItemProps) {
   const displayTitle = title.length > 26 ? truncateMiddle(title, 8) : title
   const displayAddress = address ? truncateMiddle(address, 6) : ''
-  const etherscanLink = transactionHash
-    ? `https://etherscan.io/tx/${transactionHash}`
-    : 'https://etherscan.io/address/0xfD36fA88bb3feA8D1264fc89d70723b6a2B56958'
-
-  const handleViewOnExplorer = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    console.debug('View on block explorer clicked!')
-  }
+  const etherscanLink = buildEtherscanLink(transactionHash)
 
   const renderExplorerSection = () => {
     if (status === UserTransactionDTO.status.SUCCESS) {
       return (
-        <button
-          className="flex flex-[1] p-3 hover:cursor-pointer"
-          onClick={handleViewOnExplorer}
-        >
+        <button className="flex flex-[1] p-3 hover:cursor-pointer">
           <a
             onClick={(e) => openExternalLink(etherscanLink, e)}
             rel="noopener noreferrer"
             className="flex-1 flex items-center justify-center underline"
           >
             View on block explorer
+            <HiArrowRightOnRectangle className="ml-2 text-sm" />
           </a>
         </button>
       )
@@ -156,7 +149,7 @@ const HistoryBaseItem = memo(function HistoryBaseItem({
   }
 
   return (
-    <div className="w-full px-3 flex flex-row items-center h-full text-xs font-[510]">
+    <div className="w-full px-3 flex flex-row items-center h-full text-xs font-[520]">
       <button
         className="flex flex-[3] p-3 hover:cursor-pointer"
         onClick={onClick}
