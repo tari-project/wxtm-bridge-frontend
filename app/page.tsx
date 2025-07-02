@@ -102,16 +102,19 @@ export default function Home() {
     if (modalOpen && modalStep === 0 && isConnected) {
       setModalOpen(false)
       setModalStep(1)
-    } else if (
-      ongoingBridgeTx &&
-      !ongoingBridgeTx.modalClosedByUser &&
-      !isTransactionDetailsOpen
-    ) {
-      setModalStep(2)
-      setModalOpen(true)
     } else if (isTransactionDetailsOpen && modalOpen) {
       setModalOpen(false)
     }
+
+    /** @dev Below is for auto modal popup - to use it back, put it before 'else if (isTransactionDetailsOpen && modalOpen)' */
+    // else if (
+    //   ongoingBridgeTx &&
+    //   !ongoingBridgeTx.modalClosedByUser &&
+    //   !isTransactionDetailsOpen
+    // ) {
+    //   setModalStep(2)
+    //   setModalOpen(true)
+    // }
   }, [
     isConnected,
     modalOpen,

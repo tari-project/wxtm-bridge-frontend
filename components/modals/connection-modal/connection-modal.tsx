@@ -27,7 +27,6 @@ const ConnectionModal: React.FC<ConnectionModalProps> = ({ closeModal }) => {
           </span>
         </div>
 
-        {/* Below to be changed to one connector only */}
         <div className="p-4">
           <div className="rounded-3xl bg-[#F8F8F9]/80 flex flex-col justify-center overflow-hidden">
             {connectors.slice(0, 1).map((connector) => (
