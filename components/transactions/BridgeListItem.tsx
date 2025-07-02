@@ -103,11 +103,13 @@ const HistoryBaseItem = memo(function HistoryBaseItem({
   onClick,
   status,
   address,
+  transactionHash,
 }: BridgeBaseItemProps) {
   const displayTitle = title.length > 26 ? truncateMiddle(title, 8) : title
   const displayAddress = address ? truncateMiddle(address, 6) : ''
-  const etherscanLink =
-    'https://etherscan.io/address/0xfD36fA88bb3feA8D1264fc89d70723b6a2B56958'
+  const etherscanLink = transactionHash
+    ? `https://etherscan.io/tx/${transactionHash}`
+    : 'https://etherscan.io/address/0xfD36fA88bb3feA8D1264fc89d70723b6a2B56958'
 
   const handleViewOnExplorer = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -232,6 +234,7 @@ const BridgeHistoryListItem = memo(function ListItem({
       value={earningsFormatted}
       status={item?.status}
       address={item?.sourceAddress || item?.destinationAddress}
+      transactionHash={item?.transactionHash}
       onClick={handleItemClick}
     />
   ) : (
