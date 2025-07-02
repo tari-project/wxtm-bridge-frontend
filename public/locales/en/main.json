@@ -66,5 +66,6 @@
   "wrapping": "wrapping",
   "xtm_token": "XTM",
   "no_transactions_found_yet": "No transactions found yet",
-  "start_bridging_to_view": "Start bridging to view your transaction history here"
+  "start_bridging_to_view": "Start bridging to view your transaction history here",
+  "view_on_block_explorer": "View on block explorer"
 }

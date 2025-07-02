@@ -107,6 +107,7 @@ const HistoryBaseItem = memo(function HistoryBaseItem({
   address,
   transactionHash,
 }: BridgeBaseItemProps) {
+  const { t } = useTranslation('main', { useSuspense: false })
   const displayTitle = title.length > 26 ? truncateMiddle(title, 8) : title
   const displayAddress = address ? truncateMiddle(address, 6) : ''
   const etherscanLink = buildEtherscanLink(transactionHash)
@@ -120,7 +121,7 @@ const HistoryBaseItem = memo(function HistoryBaseItem({
             rel="noopener noreferrer"
             className="flex-1 flex items-center justify-center underline"
           >
-            View on block explorer
+            {t('view_on_block_explorer')}
             <HiArrowRightOnRectangle className="ml-2 text-sm" />
           </a>
         </button>
