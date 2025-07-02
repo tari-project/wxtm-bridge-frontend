@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
 
 import {
+  UpdateToTokensSentReqDTO,
   UserTransactionDTO,
   WrapTokenService,
 } from '@tari-project/wxtm-bridge-backend-api'
@@ -8,13 +9,20 @@ import {
 import { parseWxtmTokenAmount } from '@/utils/parse-wxtm-token-amount'
 import useTariSigner from '@/store/signer'
 import useTariAccount from '@/store/account'
+import { stringifyProperties } from '@/utils/stringifyProperties'
 
 export const useBridgeToEthereum = () => {
   const createTransaction = useMutation({
     mutationFn: WrapTokenService.createWrapTokenTransaction,
   })
   const confirmTokenSent = useMutation({
-    mutationFn: WrapTokenService.updateToTokensSent,
+    mutationFn: async ({
+      paymentId,
+      requestBody,
+    }: {
+      paymentId: string
+      requestBody?: UpdateToTokensSentReqDTO
+    }) => WrapTokenService.updateToTokensSent(paymentId, requestBody),
   })
   const getWrapTokenParams = useMutation({
     mutationFn: WrapTokenService.getWrapTokenParams,
@@ -49,7 +57,7 @@ export const useBridgeToEthereum = () => {
       to: ethAddress,
       from: tariAccount.address,
       tokenAmount: parsedAmount,
-      debug: { ...baseNodeStatusBefore },
+      debug: stringifyProperties(baseNodeStatusBefore),
     })
 
     // set ongoing to immediately display wrap modal
@@ -85,8 +93,11 @@ export const useBridgeToEthereum = () => {
     }
 
     const baseNodeStatusAfter = await signer?.getBaseNodeStatus()
-    const { success } = await confirmTokenSent.mutateAsync(paymentId, {
-      debug: { ...baseNodeStatusAfter },
+    const { success } = await confirmTokenSent.mutateAsync({
+      paymentId,
+      requestBody: {
+        debug: stringifyProperties(baseNodeStatusAfter),
+      },
     })
     if (!success) {
       console.error('[ TAPPLET-BRIDGE ] confirm token sent failed')
