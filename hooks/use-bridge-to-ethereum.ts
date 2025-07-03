@@ -8,7 +8,8 @@ import {
 
 import { parseWxtmTokenAmount } from '@/utils/parse-wxtm-token-amount'
 import useTariSigner from '@/store/signer'
-import useTariAccount from '@/store/account'
+import useTariAccountStore from '@/store/account'
+import useBridgeStore from '@/store/bridge'
 import { stringifyProperties } from '@/utils/stringifyProperties'
 
 export const useBridgeToEthereum = () => {
