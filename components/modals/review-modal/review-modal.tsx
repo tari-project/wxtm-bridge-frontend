@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback, useState } from 'react'
 import Image from 'next/image'
 import { IoCloseOutline } from 'react-icons/io5'
 
@@ -32,6 +32,13 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
     handleBridgeToEthereum,
     handleBridgeToTari,
   )
+  const [clicked, setClicked] = useState(false)
+
+  const handleClick = useCallback(() => {
+    if (clicked || !bridgeHandler) return
+    setClicked(true)
+    bridgeHandler()
+  }, [bridgeHandler, clicked])
 
   return (
     <div className="w-full flex flex-col p-6">
@@ -164,8 +171,8 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
 
         <ModalButton
           label={isBridging ? 'Bridging...' : 'Confirm & Bridge'}
-          onClick={bridgeHandler!}
-          disabled={isBridging}
+          onClick={handleClick}
+          disabled={isBridging || clicked}
         />
       </div>
     </div>

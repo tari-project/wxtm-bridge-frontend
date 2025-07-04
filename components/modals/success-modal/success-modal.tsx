@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { SuccessModalProps } from './success-modal.types'
 import { ModalButton } from '@/components/modals/modal-button'
 import { useBridgeInfo } from '@/hooks/use-bridge-info'
-import useTariAccount from '@/store/account'
+import useTariAccountStore from '@/store/account'
 import { formatUnits } from 'ethers'
 import useTariSigner from '@/store/signer'
 import {
@@ -22,14 +22,17 @@ import { useTranslation } from 'react-i18next'
 
 export const SuccessModal: React.FC<SuccessModalProps> = ({
   closeModal,
+  amount: amountProp,
+  amountAfterFee: amountAfterFeeProp,
+  destinationAddress: destAddressProp,
   tariWalletAddress,
   ethereumAddress,
   fromNetwork,
 }) => {
   const { t } = useTranslation('main', { useSuspense: false })
   const signer = useTariSigner((s) => s.signer)
-  const ongoingBridgeTx = useTariAccount((s) => s.ongoingBridgeTx)
-  const removeOngoingTransaction = useTariAccount(
+  const ongoingBridgeTx = useTariAccountStore((s) => s.ongoingBridgeTx)
+  const removeOngoingTransaction = useTariAccountStore(
     (s) => s.removeOngoingTransaction,
   )
   const { fromToken, toToken } = useBridgeInfo(
@@ -46,41 +49,39 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
     setTimeout(() => setCopied(false), 1500)
   }, [])
 
-  const handleAddWxtmToWallet = useCallback(
-    (e: React.MouseEvent) => {
-      console.info(
-        '[ TAPPLET-BRIDGE ] Adding WXTM token to the wallet initiated',
-      )
-      addXtmToWallet()
-        .then(() => {
-          console.info(
-            '[ TAPPLET-BRIDGE ] Adding WXTM token to the wallet successful',
-          )
-        })
-        .catch((error) => {
-          sendErrorMessage(
-            `Request failed. Feature not supported by your wallet app.`,
-            e,
-          )
-          console.error(
-            '[ TAPPLET-BRIDGE ] Fail to add WXTM token to the wallet: ',
-            error,
-          )
-        })
-    },
-    [addXtmToWallet],
-  )
+  const handleAddWxtmToWallet = useCallback(() => {
+    console.info('[ TAPPLET-BRIDGE ] Adding WXTM token to the wallet initiated')
+    addXtmToWallet()
+      .then(() => {
+        console.info(
+          '[ TAPPLET-BRIDGE ] Adding WXTM token to the wallet successful',
+        )
+      })
+      .catch((error) => {
+        sendErrorMessage(
+          `Request failed. Feature not supported by your wallet app.`,
+        )
+        console.error(
+          '[ TAPPLET-BRIDGE ] Fail to add WXTM token to the wallet: ',
+          error,
+        )
+      })
+  }, [addXtmToWallet])
   const handleOnClick = useCallback(async () => {
     closeModal()
     removeOngoingTransaction()
     if (signer) await signer.removeOngoingBridgeTx()
   }, [closeModal, removeOngoingTransaction, signer])
 
-  const amount = ongoingBridgeTx?.tokenAmount
+  const amount = amountProp
+    ? parseFloat(formatUnits(amountProp, 6)).toPrecision()
+    : ongoingBridgeTx?.tokenAmount
     ? parseFloat(formatUnits(ongoingBridgeTx?.tokenAmount, 6)).toPrecision()
     : '0'
 
-  const amountToReceive = ongoingBridgeTx?.amountAfterFee
+  const amountToReceive = amountAfterFeeProp
+    ? parseFloat(formatUnits(amountAfterFeeProp, 6)).toPrecision()
+    : ongoingBridgeTx?.amountAfterFee
     ? parseFloat(formatUnits(ongoingBridgeTx?.amountAfterFee, 6)).toPrecision()
     : '0'
 
@@ -159,7 +160,9 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
             <div className="text-xs text-gray-500">
               {t('destination_address')}
             </div>
-            <div className="text-sm">{ongoingBridgeTx?.destinationAddress}</div>
+            <div className="text-sm">
+              {destAddressProp || ongoingBridgeTx?.destinationAddress}
+            </div>
           </div>
 
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>

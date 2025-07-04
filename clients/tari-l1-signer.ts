@@ -1,3 +1,4 @@
+import { BackendBridgeTransaction } from '@/types/transactions'
 import {
   TariL1SignerParameters,
   SignerMethodNames,
@@ -183,6 +184,17 @@ export class TariL1Signer {
   public async getBridgeEnvs(): Promise<[string, string] | undefined> {
     return this.sendRequest({
       methodName: 'getBridgeEnvs',
+      args: [],
+    })
+  }
+
+  /**
+   * @description get Tari Account bridge transactions from backend
+   * @returns Bridge transactions
+   */
+  public async getBackendBridgeTxs(): Promise<BackendBridgeTransaction[]> {
+    return this.sendRequest({
+      methodName: 'getBackendBridgeTxs',
       args: [],
     })
   }

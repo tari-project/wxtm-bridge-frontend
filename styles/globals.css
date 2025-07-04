@@ -43,6 +43,12 @@ body {
   }
 }
 
+@media (max-height: 700px) {
+  .fixed-box {
+    max-height: 130px;
+  }
+}
+
 @media (max-height: 800px) {
   .text-small {
     font-size: 30px;
