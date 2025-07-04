@@ -2,14 +2,18 @@ import React, { useCallback } from 'react'
 import Image from 'next/image'
 import { FailedModalProps } from './failed-modal.types'
 import { ModalButton } from '@/components/modals/modal-button'
-import useTariAccount from '@/store/account'
+
+import useTariAccountStore from '@/store/account'
 import useTariSigner from '@/store/signer'
 import { useTranslation } from 'react-i18next'
 
-export const FailedModal: React.FC<FailedModalProps> = ({ closeModal }) => {
+export const FailedModal: React.FC<FailedModalProps> = ({
+  closeModal,
+  paymentId: paymentIdProp,
+}) => {
   const signer = useTariSigner((s) => s.signer)
-  const ongoingBridgeTx = useTariAccount((s) => s.ongoingBridgeTx)
-  const removeOngoingTransaction = useTariAccount(
+  const ongoingBridgeTx = useTariAccountStore((s) => s.ongoingBridgeTx)
+  const removeOngoingTransaction = useTariAccountStore(
     (s) => s.removeOngoingTransaction,
   )
   const { t } = useTranslation('main', { useSuspense: false })
@@ -46,7 +50,9 @@ export const FailedModal: React.FC<FailedModalProps> = ({ closeModal }) => {
         <div className="flex flex-col my-4">
           <div className="font-medium">
             <div className="text-xs text-gray-500">{t('transaction_id')}</div>
-            <div className="text-sm">{ongoingBridgeTx?.paymentId}</div>
+            <div className="text-sm">
+              {paymentIdProp || ongoingBridgeTx?.paymentId}
+            </div>
           </div>
 
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>

@@ -2,38 +2,47 @@ import React from 'react'
 import Image from 'next/image'
 import { WrapModalProps } from './wrap-modal.types'
 import { useBridgeInfo } from '@/hooks/use-bridge-info'
-import useTariAccount from '@/store/account'
+import useTariAccountStore from '@/store/account'
 import { getModalTitle } from '@/utils/transaction'
 import { openExternalLink } from '@/utils/universe'
 import { config } from '@/config'
 import { formatUnits } from 'ethers'
 import { useTranslation } from 'react-i18next'
+import { IoCloseOutline } from 'react-icons/io5'
 
 export const WrapModal: React.FC<WrapModalProps> = ({
   tariWalletAddress,
   ethereumAddress,
   fromNetwork,
   feesData,
+  closeModal,
+  amountAfterFee: amountAfterFeeProp,
+  destinationAddress: destAddressProp,
+  transactionStatus,
 }) => {
   const { i18n, t } = useTranslation('main', { useSuspense: false })
-  const ongoingBridgeTx = useTariAccount((s) => s.ongoingBridgeTx)
+  const ongoingBridgeTx = useTariAccountStore((s) => s.ongoingBridgeTx)
   const bridgeInfo = useBridgeInfo(
     fromNetwork,
     ethereumAddress!,
     tariWalletAddress!,
   )
-  const amountAfterFeePending = ongoingBridgeTx?.amountAfterFee
+  const amountAfterFeePending = amountAfterFeeProp
+    ? parseFloat(formatUnits(amountAfterFeeProp, 6)).toPrecision()
+    : ongoingBridgeTx?.amountAfterFee
     ? parseFloat(formatUnits(ongoingBridgeTx.amountAfterFee, 6)).toPrecision()
     : feesData.amountAfterFee
 
   const destAddressPending =
-    ongoingBridgeTx?.destinationAddress ?? bridgeInfo.destAddress
+    destAddressProp ||
+    ongoingBridgeTx?.destinationAddress ||
+    bridgeInfo.destAddress
 
   // Pass the current language to getModalTitle
   const { title, subtext } = getModalTitle(
     bridgeInfo,
     feesData,
-    ongoingBridgeTx,
+    transactionStatus || ongoingBridgeTx,
     i18n.language,
   )
 
@@ -41,6 +50,15 @@ export const WrapModal: React.FC<WrapModalProps> = ({
     <div className="w-full flex flex-col p-6">
       <div className="mt-2">
         {/* Top Section */}
+        <div className="w-full flex justify-end">
+          <button
+            className="text-black font-bold hover:cursor-pointer
+                     cursor-pointer flex text-xl rounded-full p-1 bg-black/10 hover:bg-black/20"
+            onClick={closeModal}
+          >
+            <IoCloseOutline />
+          </button>
+        </div>
         <div className="flex flex-col items-center justify-center">
           <div className="w-[63px] h-[63px] rounded-full overflow-hidden mr-1 relative">
             <Image

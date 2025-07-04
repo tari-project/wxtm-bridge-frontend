@@ -5,7 +5,7 @@ import { TextField } from '@mui/material'
 import { BridgeInputProps } from './bridge-input.types'
 import { useBridgeInfo } from '@/hooks/use-bridge-info'
 import { config } from '@/config'
-import useTariAccount from '@/store/account'
+import useTariAccountStore from '@/store/account'
 
 export const BridgeInput: React.FC<BridgeInputProps> = ({
   fromNetwork,
@@ -14,7 +14,7 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
 }) => {
   const [valueLength, setValueLength] = useState(5)
   const { fromToken } = useBridgeInfo(fromNetwork)
-  const available_balance = useTariAccount((s) => s.available_balance)
+  const availableBalance = useTariAccountStore((s) => s.availableBalance)
 
   // Helper to block invalid keys
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -98,7 +98,7 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
           if (amount > config.MAX_BRIDGE_AMOUNT) {
             return `Max amount is ${config.MAX_BRIDGE_AMOUNT} ${fromToken}`
           }
-          if (amount > available_balance) {
+          if (amount > availableBalance) {
             return `Not enough ${fromToken}`
           }
           return true

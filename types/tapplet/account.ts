@@ -16,4 +16,7 @@ export interface PendingBridgeTx {
   paymentId: string
 }
 
-export type PendingUserTransaction = Omit<UserTransactionDTO, 'feeAmount'>
+export type OngoingUserTransaction = Omit<UserTransactionDTO, 'feeAmount'> & {
+  modalClosedByUser?: boolean
+}
+

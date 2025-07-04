@@ -1,40 +1,46 @@
 'use client'
 
-import { ReactNode, useState, useEffect } from 'react'
-import { WagmiProvider, State, Config } from 'wagmi'
+import { ReactNode, useState, useEffect, useRef } from 'react'
+import { WagmiProvider, State, Config, cookieToInitialState } from 'wagmi'
 import { getConfig } from '@/utils/config'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { cookieToInitialState } from 'wagmi'
-import useTariAccount from '@/store/account'
-import useTariSigner from '@/store/signer'
+import { useTariAccountStore } from '@/store/account'
 import { TariL1SignerParameters } from '@/types/tapplet'
 import TariL1Signer from '@/clients/tari-l1-signer'
 import { MessageType, useIframeMessage } from '@/utils/useIframeMessage'
+import useAppStore from '@/store/app'
+import useTariSignerStore from '@/store/signer'
+import { getInitConfig } from '@/utils/universe'
 
 export const Providers = ({ children }: { children: ReactNode }) => {
-  const projectId = useTariAccount((s) => s.walletconnect_id)
+  const projectId = useAppStore((s) => s.walletConnectProjectId)
+  const signer = useTariSignerStore((s) => s.signer)
+  const setLanguage = useAppStore((s) => s.setLanguage)
+  const setTheme = useAppStore((s) => s.setTheme)
+  const setAppConfig = useAppStore((s) => s.setAppConfig)
+  const setSigner = useTariSignerStore((s) => s.setSigner)
+  const setTariAccount = useTariAccountStore((s) => s.setTariAccount)
   const [config, setConfig] = useState<Config | null>(null)
-  const [queryClient] = useState(() => new QueryClient())
   const [initialState, setInitialState] = useState<State | undefined>(undefined)
-  const { setTariAccount } = useTariAccount()
-  const setLanguage = useTariAccount((s) => s.setLanguage)
-  const { signer, setSigner } = useTariSigner()
+  const [queryClient] = useState(() => new QueryClient())
+  const initializedRef = useRef(false)
 
   useEffect(() => {
-    if (projectId) {
-      setConfig(getConfig())
-    }
+    if (!projectId || initializedRef.current) return
+
+    const cfg = getConfig(projectId)
+    setConfig(cfg)
+
+    // Get initial state only once
+    const cookieHeader = document.cookie
+    const state = cookieToInitialState(cfg, cookieHeader)
+    setInitialState(state)
+
+    initializedRef.current = true
   }, [projectId])
 
   useEffect(() => {
-    if (projectId && config) {
-      const cookieHeader = document.cookie
-      const state = cookieToInitialState(config, cookieHeader)
-      setInitialState(state)
-    }
-  }, [config, projectId])
-
-  useEffect(() => {
+    let cancelled = false
     const initializeSignerAndAccount = async () => {
       try {
         if (!signer) {
@@ -43,52 +49,45 @@ export const Providers = ({ children }: { children: ReactNode }) => {
             onConnection: setTariAccount,
           }
           const newSigner = new TariL1Signer(signerParams)
-          setSigner(newSigner)
+          if (!cancelled) setSigner(newSigner)
         }
-
-        const id = await setTariAccount()
-        setConfig(getConfig(id))
+        if (!cancelled) {
+          await setAppConfig()
+          await setTariAccount()
+          getInitConfig()
+        }
       } catch (error) {
         console.error('[ TAPPLET-BRIDGE ] Failed to set Tari Account:', error)
       }
     }
-
     initializeSignerAndAccount()
-  }, [setSigner, setTariAccount, signer])
+    return () => {
+      cancelled = true
+    }
+  }, [setAppConfig, setSigner, setTariAccount, signer])
 
   useIframeMessage((event) => {
     switch (event.data.type) {
-      case MessageType.SIGNER_CALL:
-        console.info(
-          '[ TAPPLET-BRIDGE ] Received SIGNER_CALL message from parent window',
-        )
-        break
-      case MessageType.RESIZE:
-        console.info(
-          '[ TAPPLET-BRIDGE ] Received RESIZE message from parent window',
-        )
+      case MessageType.SET_THEME:
+        const theme = event.data.payload.theme
+        setTheme(theme)
         break
       case MessageType.SET_LANGUAGE:
         const language = event.data.payload.language
-        console.info('[ TAPPLET-BRIDGE ] Received SET_LANGUAGE: ', language)
         setLanguage(language)
         break
     }
   })
-  if (!initialState)
-    console.debug('[ TAPPLET-BRIDGE ] provider initial state undefined')
+
+  if (!config) {
+    return (
+      <div className="h-5 w-5 animate-spin rounded-full border-b-[3px] border-white"></div>
+    )
+  }
 
   return (
-    <>
-      {projectId.length ? (
-        <WagmiProvider config={getConfig()} initialState={initialState}>
-          <QueryClientProvider client={queryClient}>
-            {children}
-          </QueryClientProvider>
-        </WagmiProvider>
-      ) : (
-        <h1>...</h1>
-      )}
-    </>
+    <WagmiProvider config={config} initialState={initialState}>
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    </WagmiProvider>
   )
 }

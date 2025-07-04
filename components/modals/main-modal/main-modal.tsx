@@ -54,7 +54,7 @@ export const MainModal: React.FC<MainModalProps> = ({
         />
       )
 
-    if (failed) return <FailedModal closeModal={closeModal} />
+    if (failed) return <FailedModal closeModal={closeModal} paymentId={undefined} />
 
     if (!isConnected && step === 0)
       return <ConnectionModal closeModal={closeModal} />
