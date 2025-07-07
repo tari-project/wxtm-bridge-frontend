@@ -36,13 +36,13 @@ export const useBridgeTransaction = () => {
     if (!tariAccount) return null
     const walletAddress = tariAccount.address
 
-    console.warn('🚀 [ TAPPLET-BRIDGE ] getu user txs', getFromTU)
+    console.info(
+      `🚀 [ TAPPLET-BRIDGE ] get user txs from ${getFromTU ? 'TU' : 'backend'}`,
+    )
     let transactions: BackendBridgeTransaction[]
     if (getFromTU) {
-      console.warn('🚀 [ TAPPLET-BRIDGE ] fetch from TU')
       transactions = await getBackendBridgeTxsFromTU()
     } else {
-      console.warn('🚀 [ TAPPLET-BRIDGE ] fetch from backend')
       const result = await getUserTxs.mutateAsync(walletAddress)
       transactions = result.transactions
     }
