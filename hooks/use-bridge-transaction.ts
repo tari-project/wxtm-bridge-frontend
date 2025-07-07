@@ -27,6 +27,8 @@ export const useBridgeTransaction = () => {
     getFromTU = false,
   ): Promise<OngoingUserTransaction | null> => {
     const ongoingBridgeTx = useTariAccountStore.getState().ongoingBridgeTx
+    const setBackendBridgeTxs =
+      useTariAccountStore.getState().setBackendBridgeTxs
     const lastOngoingPaymentIdFromTU =
       useTariAccountStore.getState().lastOngoingPaymentIdFromTU
     const tariAccount = useTariAccountStore.getState().tariAccount
@@ -45,6 +47,7 @@ export const useBridgeTransaction = () => {
     } else {
       const result = await getUserTxs.mutateAsync(walletAddress)
       transactions = result.transactions
+      setBackendBridgeTxs(transactions)
     }
 
     if (Array.isArray(transactions) && transactions.length > 0) {
