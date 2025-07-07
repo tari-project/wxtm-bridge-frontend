@@ -2,7 +2,6 @@ import { AccountData, OngoingUserTransaction } from '@/types/tapplet'
 import { create } from 'zustand'
 import useTariSigner from './signer'
 import { BackendBridgeTransaction } from '@/types/transactions'
-import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
 
 interface State {
   tariAccount?: AccountData
@@ -16,24 +15,13 @@ interface State {
 interface Actions {
   setTariAccount: () => Promise<void>
   setOngoingTransaction: (tx: OngoingUserTransaction) => void
+  setBackendBridgeTxs: (txs: BackendBridgeTransaction[]) => void
   removeOngoingTransaction: () => void
   getBackendBridgeTxsFromTU: () => Promise<BackendBridgeTransaction[]>
   setDetailedTx: (detailedTx: BackendBridgeTransaction | null) => void
 }
 
 type TariL1WalletStoreState = State & Actions
-
-//TODO REMOVE
-const exampleItem: BackendBridgeTransaction = {
-  amountAfterFee: '1234',
-  createdAt: 'Jun 20, 13:31',
-  destinationAddress: 'ss',
-  feeAmount: '5',
-  paymentId: 'paymentId',
-  status: UserTransactionDTO.status.PENDING,
-  sourceAddress: 'sourceAddress',
-  tokenAmount: '1420000000',
-}
 
 const initialState: State = {
   tariAccount: {
@@ -43,15 +31,7 @@ const initialState: State = {
   availableBalance: 0,
   ongoingBridgeTx: undefined,
   lastOngoingPaymentIdFromTU: '',
-  // TODO backendBridgeTxs: []
-  backendBridgeTxs: [
-    exampleItem,
-    exampleItem,
-    exampleItem,
-    exampleItem,
-    exampleItem,
-    exampleItem,
-  ],
+  backendBridgeTxs: [],
 }
 
 export const useTariAccountStore = create<TariL1WalletStoreState>()((set) => ({
@@ -67,7 +47,6 @@ export const useTariAccountStore = create<TariL1WalletStoreState>()((set) => ({
       const account = await signer.getAccount()
       const balance = await signer.getTariBalance()
       const ongoingBridgeTx = await signer.getOngoingBridgeTx()
-      const backendBridgeTxs = await signer.getBackendBridgeTxs()
       set({
         tariAccount: {
           account_id: account.account_id,
@@ -75,7 +54,6 @@ export const useTariAccountStore = create<TariL1WalletStoreState>()((set) => ({
         },
         availableBalance: balance.available_balance,
         lastOngoingPaymentIdFromTU: ongoingBridgeTx?.paymentId ?? '',
-        backendBridgeTxs: backendBridgeTxs,
       })
 
       return
@@ -118,6 +96,11 @@ export const useTariAccountStore = create<TariL1WalletStoreState>()((set) => ({
       )
       return []
     }
+  },
+  setBackendBridgeTxs: (txs: BackendBridgeTransaction[]) => {
+    set({
+      backendBridgeTxs: txs,
+    })
   },
   setDetailedTx: (detailedTx: BackendBridgeTransaction | null) =>
     set({
