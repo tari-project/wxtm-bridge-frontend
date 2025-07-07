@@ -46,6 +46,7 @@ export default function Home() {
     control,
     setValue,
     formState: { errors, isValid },
+    resetField,
   } = useForm<BridgeFormValues>({
     defaultValues: { amount: '' },
     mode: 'onChange',
@@ -170,6 +171,12 @@ export default function Home() {
     setModalStep(2)
   }
 
+  const handleCloseModal = () => {
+    resetField('amount', { defaultValue: '' })
+    handleSetOngoingModalOpen(false)
+    setModalStep(1)
+  }
+
   return (
     <main className="relative min-h-screen w-full flex flex-col px-20 items-center justify-center">
       <Header onConnectClick={handleConnectClick} />
@@ -196,13 +203,11 @@ export default function Home() {
 
       {modalOpen && !isTransactionDetailsOpen && (
         <MainModal
-          setModalOpen={handleSetOngoingModalOpen}
           success={
             ongoingBridgeTx?.status === UserTransactionDTO.status.SUCCESS
           }
           failed={ongoingBridgeTx?.status === UserTransactionDTO.status.TIMEOUT}
           step={modalStep}
-          setStep={setModalStep}
           handleBridgeToEthereum={handleBridgeToEthereum}
           handleBridgeToTari={handleBridgeToTari}
           isBridging={isBridgingShowModal}
@@ -212,6 +217,7 @@ export default function Home() {
           fromNetwork={fromNetwork}
           toNetwork={toNetwork}
           feesData={feesData}
+          closeModal={handleCloseModal}
         />
       )}
     </main>

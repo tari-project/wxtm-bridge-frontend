@@ -11,11 +11,9 @@ import { MainModalProps } from './main-modal.types'
 import { FailedModal } from '../failed-modal'
 
 export const MainModal: React.FC<MainModalProps> = ({
-  setModalOpen,
   success,
   failed,
   step,
-  setStep,
   handleBridgeToEthereum,
   handleBridgeToTari,
   isBridging,
@@ -25,14 +23,10 @@ export const MainModal: React.FC<MainModalProps> = ({
   fromNetwork,
   toNetwork,
   feesData,
+  closeModal,
 }) => {
   const { isConnected } = useAccount()
   const modalRef = useRef<HTMLDivElement>(null)
-
-  const closeModal = () => {
-    setModalOpen(false)
-    setStep(1)
-  }
 
   // const handleOutsideClick = (e: React.MouseEvent<HTMLDivElement>) => {
   //   if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
@@ -54,7 +48,8 @@ export const MainModal: React.FC<MainModalProps> = ({
         />
       )
 
-    if (failed) return <FailedModal closeModal={closeModal} paymentId={undefined} />
+    if (failed)
+      return <FailedModal closeModal={closeModal} paymentId={undefined} />
 
     if (!isConnected && step === 0)
       return <ConnectionModal closeModal={closeModal} />
