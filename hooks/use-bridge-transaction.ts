@@ -38,13 +38,10 @@ export const useBridgeTransaction = () => {
     if (!tariAccount) return null
     const walletAddress = tariAccount.address
 
-    console.info(
-      `🚀 [ TAPPLET-BRIDGE ] get user txs from ${getFromTU ? 'TU' : 'backend'}`,
+    console.debug(
+      `[ TAPPLET-BRIDGE ] get txs from ${getFromTU ? 'TU' : 'backend'}`,
     )
-    console.info(
-      `🚀 [ TAPPLET-BRIDGE ] last onfoing from TU'`,
-      lastOngoingPaymentIdFromTU,
-    )
+
     let transactions: BackendBridgeTransaction[]
     if (getFromTU) {
       transactions = await getBackendBridgeTxsFromTU()

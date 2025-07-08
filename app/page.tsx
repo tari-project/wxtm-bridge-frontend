@@ -47,7 +47,6 @@ export default function Home() {
   const isSuccess =
     ongoingBridgeTx?.status === UserTransactionDTO.status.SUCCESS
 
-  console.warn('[ TAPPLET-BRIDGE ] ONGOING BRIDGE TX:', ongoingBridgeTx)
   const {
     watch,
     control,
@@ -135,7 +134,6 @@ export default function Home() {
     setModalOpen(true)
   }
   const handleSetOngoingModalOpen = (open: boolean) => {
-    console.warn('close modal')
     setModalOpen(open)
     if (ongoingBridgeTx)
       setLastOngoingBridgeTx({ ...ongoingBridgeTx, showModal: false })
