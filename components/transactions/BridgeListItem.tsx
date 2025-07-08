@@ -242,29 +242,8 @@ const BridgeHistoryListItem = memo(function ListItem({
     />
   )
 
-  // const detailsButton = (
-  //   <Button
-  //     variant="outlined"
-  //     onClick={(e) => {
-  //       e.stopPropagation()
-  //       setDetailedTx?.({ ...item, createdAt: time })
-  //     }}
-  //   >
-  //     {t(`history.view-details`)}
-  //   </Button>
-  // )
-
   return (
-    <ItemWrapper
-      ref={ref}
-      data-index={index}
-      style={{ height: 48 }}
-      // onMouseEnter={() => !isHistoryList && setHovering(true)}
-      // onMouseLeave={() => !isHistoryList && setHovering(false)}
-    >
-      {/* <AnimatePresence>
-        {hovering && <BridgeItemHover button={detailsButton} />}
-      </AnimatePresence> */}
+    <ItemWrapper ref={ref} data-index={index} style={{ height: 48 }}>
       {baseItem}
     </ItemWrapper>
   )
