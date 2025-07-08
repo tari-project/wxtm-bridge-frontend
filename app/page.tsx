@@ -191,7 +191,6 @@ export default function Home() {
         setFromNetwork={setFromNetwork}
         toNetwork={toNetwork}
         setToNetwork={setToNetwork}
-        isOngoingBridgeTx={isBridgingShowModal}
       />
 
       {detailedTx && (
