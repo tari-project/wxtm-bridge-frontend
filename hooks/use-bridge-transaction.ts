@@ -14,8 +14,8 @@ export const useBridgeTransaction = () => {
     mutationFn: WrapTokenService.getUserTransactions,
   })
 
-  const setOngoingTransaction =
-    useTariAccountStore.getState().setOngoingTransaction
+  const setLastOngoingBridgeTx =
+    useTariAccountStore.getState().setLastOngoingBridgeTx
   const removeOngoingTransaction =
     useTariAccountStore.getState().removeOngoingTransaction
 
@@ -41,6 +41,10 @@ export const useBridgeTransaction = () => {
     console.info(
       `🚀 [ TAPPLET-BRIDGE ] get user txs from ${getFromTU ? 'TU' : 'backend'}`,
     )
+    console.info(
+      `🚀 [ TAPPLET-BRIDGE ] last onfoing from TU'`,
+      lastOngoingPaymentIdFromTU,
+    )
     let transactions: BackendBridgeTransaction[]
     if (getFromTU) {
       transactions = await getBackendBridgeTxsFromTU()
@@ -64,7 +68,7 @@ export const useBridgeTransaction = () => {
           ongoing.paymentId !== ongoingBridgeTx?.paymentId ||
           ongoing.status !== ongoingBridgeTx?.status
         )
-          setOngoingTransaction(ongoing)
+          setLastOngoingBridgeTx(ongoing)
         return ongoing
       }
 
@@ -85,7 +89,7 @@ export const useBridgeTransaction = () => {
       )
 
       if (ongoingCompleted) {
-        setOngoingTransaction(ongoingCompleted)
+        setLastOngoingBridgeTx({ ...ongoingCompleted, showModal: true })
         return ongoingCompleted
       }
     } else {

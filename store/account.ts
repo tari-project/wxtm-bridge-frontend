@@ -14,7 +14,7 @@ interface State {
 
 interface Actions {
   setTariAccount: () => Promise<void>
-  setOngoingTransaction: (tx: OngoingUserTransaction) => void
+  setLastOngoingBridgeTx: (tx: OngoingUserTransaction) => void
   setBackendBridgeTxs: (txs: BackendBridgeTransaction[]) => void
   removeOngoingTransaction: () => void
   getBackendBridgeTxsFromTU: () => Promise<BackendBridgeTransaction[]>
@@ -65,7 +65,7 @@ export const useTariAccountStore = create<TariL1WalletStoreState>()((set) => ({
     }
   },
 
-  setOngoingTransaction: (tx: OngoingUserTransaction) => {
+  setLastOngoingBridgeTx: (tx: OngoingUserTransaction) => {
     set({
       ongoingBridgeTx: tx,
     })

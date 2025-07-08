@@ -39,8 +39,8 @@ export const useBridgeToEthereum = () => {
   const setWrapTokenFeePercentageBps = useBridgeStore(
     (s) => s.setWrapTokenFeePercentageBps,
   )
-  const setOngoingTransaction = useTariAccountStore(
-    (s) => s.setOngoingTransaction,
+  const setLastOngoingBridgeTx = useTariAccountStore(
+    (s) => s.setLastOngoingBridgeTx,
   )
 
   const bridgeToEthereum = async ({
@@ -65,13 +65,14 @@ export const useBridgeToEthereum = () => {
     })
 
     // set ongoing to immediately display wrap modal
-    setOngoingTransaction({
+    setLastOngoingBridgeTx({
       destinationAddress: ethAddress,
       tokenAmount: parsedAmount,
       amountAfterFee: parseWxtmTokenAmount(amountAfterFee),
       status: UserTransactionDTO.status.PENDING,
       createdAt: '',
       paymentId: paymentId,
+      showModal: true,
     })
     console.debug('[ TAPPLET-BRIDGE ] created tx with id: ', paymentId)
 
