@@ -2,7 +2,7 @@
   "amount_to_bridge": "Amount to Bridge",
   "amount_to_receive": "Amount to receive",
   "bridge_description_prefix": "Wrap XTM to create wXTM on Ethereum. wXTM isn't your\neveryday Ethereum token anon. It's a powerful ",
-  "bridge_description_suffix": " that in future can exist on nearly any chain you desire.",
+  "bridge_description_suffix": " that in the future can exist on nearly any chain you desire.",
   "bridge_one_way_notice": "Tari Bridge currently operates one way (XTM to wXTM). Tari contributors expect to launch wXTM unwrapping in July 2025 or sooner.\nHaving trouble?",
   "bridge_title_prefix": "Bridge your",
   "bridge_title_suffix_break": "to \n any chain",
