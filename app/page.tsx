@@ -54,9 +54,6 @@ export default function Home() {
 
   const amount = watch('amount')
   const feesData = useBridgeToEthereumFees(amount)
-  const isBridgingShowModal = false
-  /** @dev Disabled as now user is allowed to process multiple transactions */
-  // !!ongoingBridgeTx && !ongoingBridgeTx.modalClosedByUser
 
   // Fetch bridge transaction parameters once on mount or when tariAccount changes
   useEffect(() => {
@@ -209,7 +206,6 @@ export default function Home() {
           step={modalStep}
           handleBridgeToEthereum={handleBridgeToEthereum}
           handleBridgeToTari={handleBridgeToTari}
-          isBridging={isBridgingShowModal}
           amount={amount}
           ethereumAddress={ethAddress}
           tariWalletAddress={tariAccount?.address}

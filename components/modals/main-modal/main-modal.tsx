@@ -16,7 +16,6 @@ export const MainModal: React.FC<MainModalProps> = ({
   step,
   handleBridgeToEthereum,
   handleBridgeToTari,
-  isBridging,
   amount,
   tariWalletAddress,
   ethereumAddress,
@@ -60,7 +59,6 @@ export const MainModal: React.FC<MainModalProps> = ({
           closeModal={closeModal}
           handleBridgeToEthereum={handleBridgeToEthereum}
           handleBridgeToTari={handleBridgeToTari}
-          isBridging={isBridging}
           ethereumAddress={ethereumAddress}
           tariWalletAddress={tariWalletAddress}
           fromNetwork={fromNetwork}

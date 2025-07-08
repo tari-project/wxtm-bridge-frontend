@@ -12,7 +12,6 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
   closeModal,
   handleBridgeToEthereum,
   handleBridgeToTari,
-  isBridging,
   amount,
   tariWalletAddress,
   ethereumAddress,
@@ -170,9 +169,9 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
         </div>
 
         <ModalButton
-          label={isBridging ? 'Bridging...' : 'Confirm & Bridge'}
+          label={'Confirm & Bridge'}
           onClick={handleClick}
-          disabled={isBridging || clicked}
+          disabled={clicked}
         />
       </div>
     </div>

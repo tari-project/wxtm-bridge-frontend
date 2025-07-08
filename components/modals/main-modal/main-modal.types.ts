@@ -7,7 +7,6 @@ export type MainModalProps = {
   step: number
   handleBridgeToEthereum: () => void
   handleBridgeToTari: () => void
-  isBridging: boolean
   amount: string
   ethereumAddress?: string
   tariWalletAddress?: string
