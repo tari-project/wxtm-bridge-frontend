@@ -92,7 +92,7 @@ export const useBridgeToEthereum = () => {
       paymentId: paymentId,
     })
 
-    // get user txs to update history
+    // get user txs to update history immediately after the tx starts
     await getUserBackendBridgeTxs()
 
     if (!isSend) {

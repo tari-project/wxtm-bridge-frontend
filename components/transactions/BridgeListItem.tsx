@@ -1,5 +1,4 @@
 import { memo, useRef, useState, useEffect } from 'react'
-// import { AnimatePresence } from 'motion/react'
 import {
   BridgeBaseItemProps,
   BridgeHistoryListItemProps,
@@ -25,8 +24,7 @@ import {
   getTimestampFromTransaction,
   getStatusInfo,
 } from './helpers'
-// import { Button } from '@mui/material'
-// import BridgeItemHover from './BridgeHoveredItem'
+
 import { truncateMiddle } from '@/utils/truncateString'
 import useAppStore from '@/store/app'
 import { BsQuestionCircleFill } from 'react-icons/bs'
@@ -207,7 +205,6 @@ const BridgeHistoryListItem = memo(function ListItem({
   const hideWalletBalance = useAppStore((s) => s.hideWalletBalance)
 
   const ref = useRef<HTMLDivElement>(null)
-  // const [hovering, setHovering] = useState(false)
 
   const earningsFormatted = hideWalletBalance
     ? `***`
