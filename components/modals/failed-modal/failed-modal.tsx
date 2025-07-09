@@ -57,7 +57,7 @@ export const FailedModal: React.FC<FailedModalProps> = ({
 
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
           <ModalButton
-            label={t('retry')}
+            label={t('close')}
             onClick={handleOnClick}
             disabled={false}
           />

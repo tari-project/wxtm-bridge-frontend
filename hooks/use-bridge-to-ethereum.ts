@@ -11,6 +11,7 @@ import useTariSigner from '@/store/signer'
 import useTariAccountStore from '@/store/account'
 import useBridgeStore from '@/store/bridge'
 import { stringifyProperties } from '@/utils/stringifyProperties'
+import { useBridgeTransaction } from './use-bridge-transaction'
 
 export const useBridgeToEthereum = () => {
   const createTransaction = useMutation({
@@ -28,7 +29,7 @@ export const useBridgeToEthereum = () => {
   const getWrapTokenParams = useMutation({
     mutationFn: WrapTokenService.getWrapTokenParams,
   })
-
+  const { getUserBackendBridgeTxs } = useBridgeTransaction()
   const signer = useTariSigner((s) => s.signer)
   const tariAccount = useTariAccountStore((s) => s.tariAccount)
   const tariColdWalletAddress = useBridgeStore((s) => s.tariColdWalletAddress)
@@ -38,8 +39,8 @@ export const useBridgeToEthereum = () => {
   const setWrapTokenFeePercentageBps = useBridgeStore(
     (s) => s.setWrapTokenFeePercentageBps,
   )
-  const setOngoingTransaction = useTariAccountStore(
-    (s) => s.setOngoingTransaction,
+  const setLastOngoingBridgeTx = useTariAccountStore(
+    (s) => s.setLastOngoingBridgeTx,
   )
 
   const bridgeToEthereum = async ({
@@ -64,13 +65,14 @@ export const useBridgeToEthereum = () => {
     })
 
     // set ongoing to immediately display wrap modal
-    setOngoingTransaction({
+    setLastOngoingBridgeTx({
       destinationAddress: ethAddress,
       tokenAmount: parsedAmount,
       amountAfterFee: parseWxtmTokenAmount(amountAfterFee),
       status: UserTransactionDTO.status.PENDING,
       createdAt: '',
       paymentId: paymentId,
+      showModal: true,
     })
     console.debug('[ TAPPLET-BRIDGE ] created tx with id: ', paymentId)
 
@@ -90,6 +92,9 @@ export const useBridgeToEthereum = () => {
       destinationAddress: ethAddress,
       paymentId: paymentId,
     })
+
+    // get user txs to update history immediately after the tx starts
+    await getUserBackendBridgeTxs()
 
     if (!isSend) {
       console.error('[ TAPPLET-BRIDGE ] send one sided failed')

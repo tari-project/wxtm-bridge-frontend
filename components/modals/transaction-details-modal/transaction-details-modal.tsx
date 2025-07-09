@@ -47,16 +47,20 @@ const TransactionDetailsModal = memo(function TransactionDetailsModal({
           <SuccessModal
             closeModal={closeModal}
             amount={transaction.tokenAmount}
-            amountAfterFee={transaction.amountAfterFee}
-            destinationAddress={transaction.destinationAddress}
             tariWalletAddress={transaction.sourceAddress}
             ethereumAddress={transaction.destinationAddress}
             fromNetwork={tariNetwork}
+            detailedTx={transaction}
           />
         )
 
       case 'timeout':
-        return <FailedModal closeModal={closeModal} paymentId={transaction.paymentId} />
+        return (
+          <FailedModal
+            closeModal={closeModal}
+            paymentId={transaction.paymentId}
+          />
+        )
 
       default:
         return <></>

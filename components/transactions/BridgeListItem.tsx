@@ -1,5 +1,4 @@
 import { memo, useRef, useState, useEffect } from 'react'
-// import { AnimatePresence } from 'motion/react'
 import {
   BridgeBaseItemProps,
   BridgeHistoryListItemProps,
@@ -25,8 +24,7 @@ import {
   getTimestampFromTransaction,
   getStatusInfo,
 } from './helpers'
-// import { Button } from '@mui/material'
-// import BridgeItemHover from './BridgeHoveredItem'
+
 import { truncateMiddle } from '@/utils/truncateString'
 import useAppStore from '@/store/app'
 import { BsQuestionCircleFill } from 'react-icons/bs'
@@ -207,7 +205,6 @@ const BridgeHistoryListItem = memo(function ListItem({
   const hideWalletBalance = useAppStore((s) => s.hideWalletBalance)
 
   const ref = useRef<HTMLDivElement>(null)
-  // const [hovering, setHovering] = useState(false)
 
   const earningsFormatted = hideWalletBalance
     ? `***`
@@ -242,29 +239,8 @@ const BridgeHistoryListItem = memo(function ListItem({
     />
   )
 
-  // const detailsButton = (
-  //   <Button
-  //     variant="outlined"
-  //     onClick={(e) => {
-  //       e.stopPropagation()
-  //       setDetailedTx?.({ ...item, createdAt: time })
-  //     }}
-  //   >
-  //     {t(`history.view-details`)}
-  //   </Button>
-  // )
-
   return (
-    <ItemWrapper
-      ref={ref}
-      data-index={index}
-      style={{ height: 48 }}
-      // onMouseEnter={() => !isHistoryList && setHovering(true)}
-      // onMouseLeave={() => !isHistoryList && setHovering(false)}
-    >
-      {/* <AnimatePresence>
-        {hovering && <BridgeItemHover button={detailsButton} />}
-      </AnimatePresence> */}
+    <ItemWrapper ref={ref} data-index={index} style={{ height: 48 }}>
       {baseItem}
     </ItemWrapper>
   )

@@ -14,8 +14,8 @@ export const useBridgeTransaction = () => {
     mutationFn: WrapTokenService.getUserTransactions,
   })
 
-  const setOngoingTransaction =
-    useTariAccountStore.getState().setOngoingTransaction
+  const setLastOngoingBridgeTx =
+    useTariAccountStore.getState().setLastOngoingBridgeTx
   const removeOngoingTransaction =
     useTariAccountStore.getState().removeOngoingTransaction
 
@@ -27,6 +27,8 @@ export const useBridgeTransaction = () => {
     getFromTU = false,
   ): Promise<OngoingUserTransaction | null> => {
     const ongoingBridgeTx = useTariAccountStore.getState().ongoingBridgeTx
+    const setBackendBridgeTxs =
+      useTariAccountStore.getState().setBackendBridgeTxs
     const lastOngoingPaymentIdFromTU =
       useTariAccountStore.getState().lastOngoingPaymentIdFromTU
     const tariAccount = useTariAccountStore.getState().tariAccount
@@ -36,15 +38,17 @@ export const useBridgeTransaction = () => {
     if (!tariAccount) return null
     const walletAddress = tariAccount.address
 
-    console.warn('🚀 [ TAPPLET-BRIDGE ] getu user txs', getFromTU)
+    console.debug(
+      `[ TAPPLET-BRIDGE ] get txs from ${getFromTU ? 'TU' : 'backend'}`,
+    )
+
     let transactions: BackendBridgeTransaction[]
     if (getFromTU) {
-      console.warn('🚀 [ TAPPLET-BRIDGE ] fetch from TU')
       transactions = await getBackendBridgeTxsFromTU()
     } else {
-      console.warn('🚀 [ TAPPLET-BRIDGE ] fetch from backend')
       const result = await getUserTxs.mutateAsync(walletAddress)
       transactions = result.transactions
+      setBackendBridgeTxs(transactions)
     }
 
     if (Array.isArray(transactions) && transactions.length > 0) {
@@ -61,7 +65,7 @@ export const useBridgeTransaction = () => {
           ongoing.paymentId !== ongoingBridgeTx?.paymentId ||
           ongoing.status !== ongoingBridgeTx?.status
         )
-          setOngoingTransaction(ongoing)
+          setLastOngoingBridgeTx(ongoing)
         return ongoing
       }
 
@@ -82,7 +86,7 @@ export const useBridgeTransaction = () => {
       )
 
       if (ongoingCompleted) {
-        setOngoingTransaction(ongoingCompleted)
+        setLastOngoingBridgeTx({ ...ongoingCompleted, showModal: true })
         return ongoingCompleted
       }
     } else {

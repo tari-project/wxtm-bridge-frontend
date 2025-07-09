@@ -7,12 +7,12 @@ import { ModalButton } from '@/components/modals/modal-button'
 import { useBridgeInfo } from '@/hooks/use-bridge-info'
 import { config } from '@/config'
 import { truncateAddress } from '@/utils/truncate'
+import { useTranslation } from 'react-i18next'
 
 export const ReviewModal: React.FC<ReviewModalProps> = ({
   closeModal,
   handleBridgeToEthereum,
   handleBridgeToTari,
-  isBridging,
   amount,
   tariWalletAddress,
   ethereumAddress,
@@ -25,6 +25,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
     isOverHighBridgeThreshold,
   },
 }) => {
+  const { t } = useTranslation('main', { useSuspense: false })
   const { fromToken, toToken, destAddress, bridgeHandler } = useBridgeInfo(
     fromNetwork,
     ethereumAddress!,
@@ -170,9 +171,9 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
         </div>
 
         <ModalButton
-          label={isBridging ? 'Bridging...' : 'Confirm & Bridge'}
+          label={t('confirm_and_bridge')}
           onClick={handleClick}
-          disabled={isBridging || clicked}
+          disabled={clicked}
         />
       </div>
     </div>
