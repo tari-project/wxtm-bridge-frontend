@@ -8,7 +8,6 @@ export type ReviewModalProps = {
   MainModalProps,
   | 'handleBridgeToEthereum'
   | 'handleBridgeToTari'
-  | 'isBridging'
   | 'amount'
   | 'tariWalletAddress'
   | 'ethereumAddress'

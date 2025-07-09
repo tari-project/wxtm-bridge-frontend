@@ -77,7 +77,6 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
       name="amount"
       control={control}
       rules={{
-        required: 'Amount is required',
         min: {
           value: config.MIN_BRIDGE_AMOUNT,
           message: `Min amount is ${config.MIN_BRIDGE_AMOUNT.toLocaleString()} ${fromToken}`,
@@ -91,6 +90,9 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
           message: 'Max 6 decimal places allowed',
         },
         validate: (value) => {
+          if (value === '' || value === undefined) {
+            return 'Amount is required'
+          }
           const amount = parseFloat(value)
           if (isNaN(amount)) {
             return 'Amount must be a valid number'

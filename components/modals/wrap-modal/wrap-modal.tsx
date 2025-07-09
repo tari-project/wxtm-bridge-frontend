@@ -9,6 +9,7 @@ import { config } from '@/config'
 import { formatUnits } from 'ethers'
 import { useTranslation } from 'react-i18next'
 import { IoCloseOutline } from 'react-icons/io5'
+import { ModalButton } from '../modal-button'
 
 export const WrapModal: React.FC<WrapModalProps> = ({
   tariWalletAddress,
@@ -120,7 +121,11 @@ export const WrapModal: React.FC<WrapModalProps> = ({
           <div className="py-[0.5px] w-full bg-gray-300 mt-2 mb-4"></div> */}
 
           {/* Section 1 */}
-          {/* <ModalButton label={t('done')} onClick={closeModal} disabled={false} /> */}
+          <ModalButton
+            label={t('close')}
+            onClick={closeModal}
+            disabled={false}
+          />
           <div className="mt-8 text-center text-xs text-gray-500">
             {t('having_trouble')}{' '}
             <a
