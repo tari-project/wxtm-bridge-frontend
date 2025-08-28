@@ -49,7 +49,7 @@ export const BridgeForm: React.FC<MainComponentProps> = ({
   })
 
   const evm_balance = data?.value
-    ? parseFloat(ethers.formatEther(data?.value)).toPrecision(4)
+    ? ethers.formatEther(data?.value) // parseFloat(ethers.formatEther(data?.value)).toPrecision(4)
     : '0'
   const isDisabled = chain === undefined
 

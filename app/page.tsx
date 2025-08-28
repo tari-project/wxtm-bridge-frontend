@@ -13,6 +13,7 @@ import { BridgeFormValues } from '@/components/bridge-input'
 import { Network } from '@/components/network-box'
 import useTariAccountStore from '@/store/account'
 import { useBridgeToEthereumFees } from '@/hooks/use-bridge-to-ethereum-fees'
+import { useBridgeToTari } from '@/hooks/use-bridge-to-tari'
 import { useBridgeTransaction } from '@/hooks/use-bridge-transaction'
 import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
 
@@ -30,8 +31,10 @@ export default function Home() {
   })
 
   const { bridgeToEthereum, getBridgeTxParams } = useBridgeToEthereum()
+  const { bridgeToTari } = useBridgeToTari()
   const { getUserBackendBridgeTxs } = useBridgeTransaction()
   const tariAccount = useTariAccountStore((s) => s.tariAccount)
+  const setTariAccount = useTariAccountStore((s) => s.setTariAccount)
   const detailedTx = useTariAccountStore((s) => s.detailedTx)
   const setDetailedTx = useTariAccountStore((s) => s.setDetailedTx)
   const ongoingBridgeTx = useTariAccountStore((s) => s.ongoingBridgeTx)
@@ -85,6 +88,7 @@ export default function Home() {
     const fetchUserTransactions = async () => {
       try {
         await getUserBackendBridgeTxs()
+        await setTariAccount()
       } catch (error) {
         console.error(
           '[ TAPPLET-BRIDGE ] Failed to get user transactions:',
@@ -101,7 +105,7 @@ export default function Home() {
       clearInterval(intervalId)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tariAccount])
+  }, [tariAccount?.address])
 
   useEffect(() => {
     if (modalOpen && modalStep === 0 && isConnected) {
@@ -163,9 +167,16 @@ export default function Home() {
     getUserBackendBridgeTxs,
   ])
 
-  const handleBridgeToTari = () => {
+  /** @TODO Implement proper function call */
+  const handleBridgeToTari = useCallback(() => {
+    if (!amount || !ethAddress) {
+      return
+    }
+
+    bridgeToTari()
+
     setModalStep(2)
-  }
+  }, [amount, ethAddress, bridgeToTari])
 
   const handleCloseModal = () => {
     resetField('amount', { defaultValue: '' })
