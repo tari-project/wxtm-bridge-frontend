@@ -12,8 +12,8 @@ export const NetworkBox: React.FC<NetworkBoxProps> = ({
   onToggle,
   onSelect,
 }) => {
-  /** @dev Development */
-  const arrowsDisabled = true
+  /** @dev Unwrap Disabled Under Development */
+  const arrowsDisabled = false
 
   const getTokenSymbol = () => {
     if (type === 'from') {
