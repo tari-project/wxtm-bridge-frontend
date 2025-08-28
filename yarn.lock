@@ -1030,15 +1030,15 @@
   dependencies:
     "@tanstack/query-core" "5.72.2"
 
-"@tari-project/wxtm-bridge-backend-api@0.1.32":
-  version "0.1.32"
-  resolved "https://registry.npmjs.org/@tari-project/wxtm-bridge-backend-api/-/wxtm-bridge-backend-api-0.1.32.tgz"
-  integrity sha512-0MFlSlU3Q+fi+xJ2zsNkIAC0LFXAshJEZqUYsbeA5LMVjwBysOv+BxRp9fvLQJB0OPhhxKq4OWN1gwOpkU1XDg==
+"@tari-project/wxtm-bridge-backend-api@0.1.43":
+  version "0.1.43"
+  resolved "https://registry.npmjs.org/@tari-project/wxtm-bridge-backend-api/-/wxtm-bridge-backend-api-0.1.43.tgz"
+  integrity sha512-MQ7bJ+p4/7UbmtIf1zy7VZgfCv4GiC0905LQYxXJ0FZfwvHn7SCmAEKJ5EsktyjbtUX7/W56IdfygArRKe/dSw==
 
-"@tari-project/wxtm-bridge-contracts@0.1.9":
-  version "0.1.9"
-  resolved "https://npm.pkg.github.com/download/@tari-project/wxtm-bridge-contracts/0.1.9/d6edbf68dad03fff993db7e02e7ac4092dfc2560"
-  integrity sha512-o77wppwBn3AdW5y46U5lmNIFLiOil+ycHlHa4ovA/ERqnZQgqskkkVPpiGfkYK7MMUUm10BejIdIJtJ3+d86yA==
+"@tari-project/wxtm-bridge-contracts@0.1.10":
+  version "0.1.10"
+  resolved "https://npm.pkg.github.com/download/@tari-project/wxtm-bridge-contracts/0.1.10/937d490a8b43c0d2fa19c7f647082fb2260f548d"
+  integrity sha512-cwZp0+NgdxxVk3u6dTUTLOyrcLIohGdCmDv5IfFSK29BIcCbt2Cxt+wUOD+aaKSayw0dKSBgD8OJTq+V5Jq7Yw==
 
 "@types/debug@^4.1.7":
   version "4.1.12"
