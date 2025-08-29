@@ -169,14 +169,14 @@ export default function Home() {
 
   /** @TODO Implement proper function call */
   const handleBridgeToTari = useCallback(() => {
-    if (!amount || !ethAddress) {
+    if (!amount || !ethAddress || !tariAccount?.address) {
       return
     }
 
-    bridgeToTari()
+    bridgeToTari(amount, ethAddress, tariAccount.address)
 
     setModalStep(2)
-  }, [amount, ethAddress, bridgeToTari])
+  }, [amount, ethAddress, tariAccount?.address, bridgeToTari])
 
   const handleCloseModal = () => {
     resetField('amount', { defaultValue: '' })
