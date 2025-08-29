@@ -6,7 +6,7 @@ import useTariAccountStore from '@/store/account'
 import { getModalTitle } from '@/utils/transaction'
 import { openExternalLink } from '@/utils/universe'
 import { config } from '@/config'
-import { formatUnits } from 'ethers'
+import { utils } from 'ethers'
 import { useTranslation } from 'react-i18next'
 import { IoCloseOutline } from 'react-icons/io5'
 import { ModalButton } from '../modal-button'
@@ -29,9 +29,11 @@ export const WrapModal: React.FC<WrapModalProps> = ({
     tariWalletAddress!,
   )
   const amountAfterFeePending = amountAfterFeeProp
-    ? parseFloat(formatUnits(amountAfterFeeProp, 6)).toPrecision()
+    ? parseFloat(utils.formatUnits(amountAfterFeeProp, 6)).toPrecision()
     : ongoingBridgeTx?.amountAfterFee
-    ? parseFloat(formatUnits(ongoingBridgeTx.amountAfterFee, 6)).toPrecision()
+    ? parseFloat(
+        utils.formatUnits(ongoingBridgeTx.amountAfterFee, 6),
+      ).toPrecision()
     : feesData.amountAfterFee
 
   const destAddressPending =

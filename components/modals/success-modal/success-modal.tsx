@@ -5,7 +5,7 @@ import { SuccessModalProps } from './success-modal.types'
 import { ModalButton } from '@/components/modals/modal-button'
 import { useBridgeInfo } from '@/hooks/use-bridge-info'
 import useTariAccountStore from '@/store/account'
-import { formatUnits } from 'ethers'
+import { utils } from 'ethers'
 import useTariSigner from '@/store/signer'
 import {
   CopyIconWrapper,
@@ -75,13 +75,13 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
   const txAmount = detailedTx
     ? detailedTx.tokenAmount
     : ongoingBridgeTx?.tokenAmount ?? '0'
-  const amount = parseFloat(formatUnits(txAmount, 6)).toPrecision()
+  const amount = parseFloat(utils.formatUnits(txAmount, 6)).toPrecision()
 
   const txAmountToReceive = detailedTx
     ? detailedTx.amountAfterFee
     : ongoingBridgeTx?.amountAfterFee ?? '0'
   const amountToReceive = parseFloat(
-    formatUnits(txAmountToReceive, 6),
+    utils.formatUnits(txAmountToReceive, 6),
   ).toPrecision()
 
   const destAddress = detailedTx

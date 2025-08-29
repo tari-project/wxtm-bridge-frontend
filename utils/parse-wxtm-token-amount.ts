@@ -1,5 +1,5 @@
 import { config } from '@/config'
-import { parseUnits } from 'ethers'
+import { utils } from 'ethers'
 
 export function parseWxtmTokenAmount(amount: string): string {
   if (amount.split('.')[1] && amount.split('.')[1][0].length > 6) {
@@ -8,7 +8,7 @@ export function parseWxtmTokenAmount(amount: string): string {
 
   const sanitizedAmount = amount.replace(/,/g, '')
 
-  const parsed = parseUnits(sanitizedAmount, 6)
+  const parsed = utils.parseUnits(sanitizedAmount, 6)
   return parsed.toString()
 }
 

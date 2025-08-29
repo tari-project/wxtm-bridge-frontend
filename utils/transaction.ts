@@ -2,7 +2,7 @@ import { BridgeInfo } from '@/hooks/use-bridge-info'
 import { BridgeToEthereumFees } from '@/hooks/use-bridge-to-ethereum-fees'
 import { OngoingUserTransaction } from '@/types/tapplet'
 import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
-import { formatUnits } from 'ethers'
+import { utils } from 'ethers'
 import i18n from 'i18next'
 
 export function getModalTitle(
@@ -20,7 +20,7 @@ export function getModalTitle(
     }
 
   const amount = parseFloat(
-    formatUnits(tx.tokenAmount, 6).toString(),
+    utils.formatUnits(tx.tokenAmount, 6).toString(),
   ).toPrecision()
 
   const bridgingTime = feeData.isOverHighBridgeThreshold ? '24-72h' : '12h'

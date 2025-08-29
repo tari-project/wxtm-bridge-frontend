@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { parseUnits, formatUnits } from 'ethers'
+import { utils } from 'ethers'
 
 import { config } from '@/config'
 import { BridgeToEthereumFees } from './use-bridge-to-ethereum-fees.types'
@@ -22,20 +22,19 @@ export const useBridgeToEthereumFees = (
           isOverHighBridgeThreshold: false,
         }
       }
-      const amount = parseUnits(tokenAmount, 6)
-      const parsedThreshold = parseUnits(
+      const amount = utils.parseUnits(tokenAmount, 6)
+      const parsedThreshold = utils.parseUnits(
         config.HIGH_BRIDGE_THRESHOLD.toString(),
         6,
       )
       const isOverHighBridgeThreshold = amount > parsedThreshold
 
-      const feeAmountBN =
-        (amount * BigInt(wrapTokenFeePercentageBps)) / BigInt(10000)
-      const amountAfterFeeBN = amount - feeAmountBN
+      const feeAmountBN = amount.mul(wrapTokenFeePercentageBps).div(10000)
+      const amountAfterFeeBN = amount.sub(feeAmountBN)
 
       return {
-        feeAmount: formatUnits(feeAmountBN, 6).toString(),
-        amountAfterFee: formatUnits(amountAfterFeeBN, 6).toString(),
+        feeAmount: utils.formatUnits(feeAmountBN, 6).toString(),
+        amountAfterFee: utils.formatUnits(amountAfterFeeBN, 6).toString(),
         feePercentage: wrapTokenFeePercentageBps / 100,
         isOverHighBridgeThreshold,
       }
