@@ -16,9 +16,10 @@ import { useBridgeToEthereumFees } from '@/hooks/use-bridge-to-ethereum-fees'
 import { useBridgeToTari } from '@/hooks/use-bridge-to-tari'
 import { useBridgeTransaction } from '@/hooks/use-bridge-transaction'
 import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
+import { DeployedChains } from '@tari-project/wxtm-bridge-contracts/deployments'
 
 export default function Home() {
-  const { isConnected, address: ethAddress } = useAccount()
+  const { isConnected, chain, address: ethAddress } = useAccount()
   const [modalOpen, setModalOpen] = useState(false)
   const [modalStep, setModalStep] = useState<number>(1)
   const [fromNetwork, setFromNetwork] = useState<Network>({
@@ -29,9 +30,13 @@ export default function Home() {
     name: 'Ethereum',
     icon: '/icons/eth.png',
   })
+  const [isUnwrapping, setIsUnwrapping] = useState(false)
+
+  const chainId = (chain?.id ?? 1) as DeployedChains
 
   const { bridgeToEthereum, getBridgeTxParams } = useBridgeToEthereum()
-  const { bridgeToTari } = useBridgeToTari()
+  const { bridgeToTari, isPending, isSuccess, isError, error } =
+    useBridgeToTari(ethAddress || '0x', chainId)
   const { getUserBackendBridgeTxs } = useBridgeTransaction()
   const tariAccount = useTariAccountStore((s) => s.tariAccount)
   const setTariAccount = useTariAccountStore((s) => s.setTariAccount)
@@ -47,7 +52,7 @@ export default function Home() {
   const showModalOngoingTx = ongoingBridgeTx && ongoingBridgeTx.showModal
 
   const isFailed = ongoingBridgeTx?.status === UserTransactionDTO.status.TIMEOUT
-  const isSuccess =
+  const isWrapSuccess =
     ongoingBridgeTx?.status === UserTransactionDTO.status.SUCCESS
 
   const {
@@ -126,6 +131,27 @@ export default function Home() {
     showModalOngoingTx,
   ])
 
+  useEffect(() => {
+    if (isUnwrapping && !isPending && !isSuccess && !isError) {
+      console.debug(`[ TAPPLET-BRIDGE ] Initiating transaction...`)
+    }
+  }, [isUnwrapping])
+
+  useEffect(() => {
+    if (isPending) {
+      console.debug(
+        `[ TAPPLET-BRIDGE ] Transaction Pending Display Info Modal...`,
+      )
+    } else if (isSuccess) {
+      console.debug(`[ TAPPLET-BRIDGE ] Transaction Success!`)
+      setIsUnwrapping(false)
+      setModalStep(2)
+    } else if (isError) {
+      console.error(`[ TAPPLET-BRIDGE ] Transaction Failed:`, error)
+      setIsUnwrapping(false)
+    }
+  }, [isPending, isSuccess, isError, error])
+
   const handleConnectClick = () => {
     if (!isConnected) {
       setModalStep(0)
@@ -167,15 +193,13 @@ export default function Home() {
     getUserBackendBridgeTxs,
   ])
 
-  /** @TODO Implement proper function call */
   const handleBridgeToTari = useCallback(() => {
     if (!amount || !ethAddress || !tariAccount?.address) {
       return
     }
 
+    setIsUnwrapping(true)
     bridgeToTari(amount, ethAddress, tariAccount.address)
-
-    setModalStep(2)
   }, [amount, ethAddress, tariAccount?.address, bridgeToTari])
 
   const handleCloseModal = () => {
@@ -209,7 +233,7 @@ export default function Home() {
 
       {modalOpen && !showModalDetailedTx && (
         <MainModal
-          success={isSuccess}
+          success={isWrapSuccess}
           failed={isFailed}
           step={modalStep}
           handleBridgeToEthereum={handleBridgeToEthereum}
