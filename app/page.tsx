@@ -12,7 +12,7 @@ import { useBridgeToEthereum } from '@/hooks/use-bridge-to-ethereum'
 import { BridgeFormValues } from '@/components/bridge-input'
 import { Network } from '@/components/network-box'
 import useTariAccountStore from '@/store/account'
-import { useBridgeToEthereumFees } from '@/hooks/use-bridge-to-ethereum-fees'
+import { useBridgeFees } from '@/hooks/use-bridge-fees'
 import { useBridgeToTari } from '@/hooks/use-bridge-to-tari'
 import { useBridgeTransaction } from '@/hooks/use-bridge-transaction'
 import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
@@ -31,6 +31,7 @@ export default function Home() {
     icon: '/icons/eth.png',
   })
   const [isUnwrapping, setIsUnwrapping] = useState(false)
+  const [isUnwrappingFailed, setIsUnwrappingFailed] = useState(false)
 
   const chainId = (chain?.id ?? 1) as DeployedChains
 
@@ -51,7 +52,9 @@ export default function Home() {
   const showModalDetailedTx = !!detailedTx
   const showModalOngoingTx = ongoingBridgeTx && ongoingBridgeTx.showModal
 
-  const isFailed = ongoingBridgeTx?.status === UserTransactionDTO.status.TIMEOUT
+  const isFailed =
+    ongoingBridgeTx?.status === UserTransactionDTO.status.TIMEOUT ||
+    isUnwrappingFailed
   const isWrapSuccess =
     ongoingBridgeTx?.status === UserTransactionDTO.status.SUCCESS
 
@@ -67,7 +70,8 @@ export default function Home() {
   })
 
   const amount = watch('amount')
-  const feesData = useBridgeToEthereumFees(amount)
+  const decimals = fromNetwork.name === 'Tari' ? 6 : 18
+  const feesData = useBridgeFees(amount, decimals)
 
   useEffect(() => {
     if (!tariAccount) return
@@ -132,23 +136,21 @@ export default function Home() {
   ])
 
   useEffect(() => {
-    if (isUnwrapping && !isPending && !isSuccess && !isError) {
+    if (isUnwrapping) {
       console.debug(`[ TAPPLET-BRIDGE ] Initiating transaction...`)
+      setModalStep(3)
     }
   }, [isUnwrapping])
 
   useEffect(() => {
-    if (isPending) {
-      console.debug(
-        `[ TAPPLET-BRIDGE ] Transaction Pending Display Info Modal...`,
-      )
-    } else if (isSuccess) {
-      console.debug(`[ TAPPLET-BRIDGE ] Transaction Success!`)
+    if (isSuccess) {
+      console.debug(`[ TAPPLET-BRIDGE ] Unwrap transaction success!`)
       setIsUnwrapping(false)
       setModalStep(2)
     } else if (isError) {
-      console.error(`[ TAPPLET-BRIDGE ] Transaction Failed:`, error)
+      console.error(`[ TAPPLET-BRIDGE ] Unwrap transaction failed:`, error)
       setIsUnwrapping(false)
+      setIsUnwrappingFailed(true)
     }
   }, [isPending, isSuccess, isError, error])
 
@@ -193,17 +195,24 @@ export default function Home() {
     getUserBackendBridgeTxs,
   ])
 
-  const handleBridgeToTari = useCallback(() => {
+  const handleBridgeToTari = useCallback(async () => {
     if (!amount || !ethAddress || !tariAccount?.address) {
       return
     }
 
     setIsUnwrapping(true)
-    bridgeToTari(amount, ethAddress, tariAccount.address)
+    const success = await bridgeToTari(amount, ethAddress, tariAccount.address)
+    if (success) {
+      setIsUnwrapping(false)
+    } else {
+      setIsUnwrapping(false)
+      setIsUnwrappingFailed(true)
+    }
   }, [amount, ethAddress, tariAccount?.address, bridgeToTari])
 
   const handleCloseModal = () => {
     resetField('amount', { defaultValue: '' })
+    setIsUnwrappingFailed(false)
     handleSetOngoingModalOpen(false)
     setModalStep(1)
   }

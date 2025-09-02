@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next'
 export const FailedModal: React.FC<FailedModalProps> = ({
   closeModal,
   paymentId: paymentIdProp,
+  fromNetwork,
 }) => {
   const signer = useTariSigner((s) => s.signer)
   const ongoingBridgeTx = useTariAccountStore((s) => s.ongoingBridgeTx)
@@ -42,18 +43,24 @@ export const FailedModal: React.FC<FailedModalProps> = ({
             {t('something_went_wrong')}
           </div>
           <div className="font-normal text-xs mt-2 text-center px-3">
-            {t('wrap_failed_message')}
+            {fromNetwork === 'Tari'
+              ? t('wrap_failed_message')
+              : t('unwrap_failed_message')}
           </div>
         </div>
 
         {/* Section 1 */}
         <div className="flex flex-col my-4">
-          <div className="font-medium">
-            <div className="text-xs text-gray-500">{t('transaction_id')}</div>
-            <div className="text-sm">
-              {paymentIdProp || ongoingBridgeTx?.paymentId}
+          {fromNetwork === 'Tari' ? (
+            <div className="font-medium">
+              <div className="text-xs text-gray-500">{t('transaction_id')}</div>
+              <div className="text-sm">
+                {paymentIdProp || ongoingBridgeTx?.paymentId}
+              </div>
             </div>
-          </div>
+          ) : (
+            <div></div>
+          )}
 
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
           <ModalButton

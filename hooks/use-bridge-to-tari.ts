@@ -100,14 +100,8 @@ export const useBridgeToTari = (
       const validAfter = BigInt(now)
       const validBefore = BigInt(now + 3600) // 1 hour
 
-      // Generate a random nonce
       const authNonce = ethers.utils.hexlify(ethers.utils.randomBytes(32))
 
-      console.debug(
-        `[ TAPPLET-BRIDGE ] Generating authorization signature... nonce: ${authNonce}, timestamp: ${validBefore}`,
-      )
-
-      // Generate the authorization signature
       const { v, r, s } = await generateAuthorizationSignature(
         ethAddress,
         wXTMBridgeAddress,
@@ -117,15 +111,7 @@ export const useBridgeToTari = (
         authNonce,
       )
 
-      console.debug(`[ TAPPLET-BRIDGE ] Authorization signature generated:`, {
-        v,
-        r,
-        s,
-      })
-
-      console.debug(
-        `[ TAPPLET-BRIDGE ] Processing bridgeToTariWithAuthorization...`,
-      )
+      console.debug(`[ TAPPLET-BRIDGE ] Processing bridge to Tari...`)
 
       const txHash = writeContract({
         address: wXTMBridgeAddress,
@@ -144,10 +130,13 @@ export const useBridgeToTari = (
       })
 
       console.debug(
-        `[ TAPPLET-BRIDGE ] Bridge transaction initiated with txHash: ${txHash}, amount: ${value}`,
+        `[ TAPPLET-BRIDGE ] Bridge transaction executed with txHash: ${txHash}, amount: ${value}`,
       )
+
+      return true
     } catch (err) {
       console.error(`[ TAPPLET-BRIDGE ] Error in bridge process: ${err}`)
+      return false
     }
   }
 

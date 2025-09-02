@@ -28,11 +28,13 @@ export const WrapModal: React.FC<WrapModalProps> = ({
     ethereumAddress!,
     tariWalletAddress!,
   )
+  const decimals = fromNetwork.name === 'Tari' ? 6 : 18
+  /** @TODO Fix amounts for unwrap */
   const amountAfterFeePending = amountAfterFeeProp
-    ? parseFloat(utils.formatUnits(amountAfterFeeProp, 6)).toPrecision()
+    ? parseFloat(utils.formatUnits(amountAfterFeeProp, decimals)).toPrecision()
     : ongoingBridgeTx?.amountAfterFee
     ? parseFloat(
-        utils.formatUnits(ongoingBridgeTx.amountAfterFee, 6),
+        utils.formatUnits(ongoingBridgeTx.amountAfterFee, decimals),
       ).toPrecision()
     : feesData.amountAfterFee
 

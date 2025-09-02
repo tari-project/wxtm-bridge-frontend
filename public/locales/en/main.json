@@ -66,7 +66,10 @@
   "view_smart_contract_audit": "Smart contract audit by Coinspect",
   "wallet_icon_alt": "Wallet icon",
   "wrap_failed_message": "We couldn't complete your wrapping request in time.\nYour XTM remains safe in your Tari wallet — it hasn't been deducted or moved.",
+  "unwrap_failed_message": "We couldn't complete your unwrapping request in time.\nYour wXTM remains safe in your Ethereum wallet — it hasn't been deducted or moved.",
   "wrapped": "wrapped",
   "wrapping": "wrapping",
-  "xtm_token": "XTM"
+  "xtm_token": "XTM",
+  "unwrap_info": "Unwrap needs your approval",
+  "unwrap_info_message": "To proceed and complete unwrapping your wXTM tokens, you need to <bold>sign</bold> and then <bold>approve</bold> the transaction in your MetaMask wallet."
 }

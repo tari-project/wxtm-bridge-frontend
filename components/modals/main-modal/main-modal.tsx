@@ -5,6 +5,7 @@ import { useAccount } from 'wagmi'
 
 import ConnectionModal from '@/components/modals/connection-modal/connection-modal'
 import { ReviewModal } from '@/components/modals/review-modal'
+import { InfoModal } from '@/components/modals/info-modal'
 import { SuccessModal } from '@/components/modals/success-modal'
 import { WrapModal } from '@/components/modals/wrap-modal'
 import { MainModalProps } from './main-modal.types'
@@ -42,7 +43,13 @@ export const MainModal: React.FC<MainModalProps> = ({
       )
 
     if (failed)
-      return <FailedModal closeModal={closeModal} paymentId={undefined} />
+      return (
+        <FailedModal
+          closeModal={closeModal}
+          paymentId={undefined}
+          fromNetwork={fromNetwork.name}
+        />
+      )
 
     if (!isConnected && step === 0)
       return <ConnectionModal closeModal={closeModal} />
@@ -70,6 +77,7 @@ export const MainModal: React.FC<MainModalProps> = ({
           feesData={feesData}
         />
       )
+    if (step === 3) return <InfoModal />
     return null
   }
 

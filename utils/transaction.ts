@@ -1,5 +1,5 @@
 import { BridgeInfo } from '@/hooks/use-bridge-info'
-import { BridgeToEthereumFees } from '@/hooks/use-bridge-to-ethereum-fees'
+import { BridgeFees } from '@/hooks/use-bridge-fees'
 import { OngoingUserTransaction } from '@/types/tapplet'
 import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
 import { utils } from 'ethers'
@@ -7,7 +7,7 @@ import i18n from 'i18next'
 
 export function getModalTitle(
   bridgeInfo: BridgeInfo,
-  feeData: BridgeToEthereumFees,
+  feeData: BridgeFees,
   tx?: OngoingUserTransaction,
   language?: string,
 ): { title: string; subtext: string } {
