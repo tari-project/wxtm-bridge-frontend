@@ -5,7 +5,7 @@ import { WrapModal } from '@/components/modals/wrap-modal'
 import { SuccessModal } from '@/components/modals/success-modal'
 import { FailedModal } from '@/components/modals/failed-modal'
 import { Network } from '@/components/network-box'
-import { BridgeToEthereumFees } from '@/hooks/use-bridge-to-ethereum-fees'
+import { BridgeFees } from '@/hooks/use-bridge-fees'
 
 const TransactionDetailsModal = memo(function TransactionDetailsModal({
   transaction,
@@ -19,7 +19,7 @@ const TransactionDetailsModal = memo(function TransactionDetailsModal({
     icon: '/icons/tari.png',
   }
 
-  const feesData: BridgeToEthereumFees = {
+  const feesData: BridgeFees = {
     feeAmount: transaction.feeAmount,
     amountAfterFee: transaction.amountAfterFee,
     feePercentage: 50,

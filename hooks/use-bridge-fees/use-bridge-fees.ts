@@ -2,12 +2,13 @@ import { useMemo } from 'react'
 import { utils } from 'ethers'
 
 import { config } from '@/config'
-import { BridgeToEthereumFees } from './use-bridge-to-ethereum-fees.types'
+import { BridgeFees } from './use-bridge-fees.types'
 import useBridgeStore from '@/store/bridge'
 
-export const useBridgeToEthereumFees = (
+export const useBridgeFees = (
   tokenAmount: string,
-): BridgeToEthereumFees => {
+  tokenDecimals: number,
+): BridgeFees => {
   const wrapTokenFeePercentageBps = useBridgeStore(
     (s) => s.wrapTokenFeePercentageBps,
   )
@@ -22,19 +23,22 @@ export const useBridgeToEthereumFees = (
           isOverHighBridgeThreshold: false,
         }
       }
-      const amount = utils.parseUnits(tokenAmount, 6)
+      const amount = utils.parseUnits(tokenAmount, tokenDecimals)
       const parsedThreshold = utils.parseUnits(
         config.HIGH_BRIDGE_THRESHOLD.toString(),
-        6,
+        tokenDecimals,
       )
-      const isOverHighBridgeThreshold = amount > parsedThreshold
+
+      const isOverHighBridgeThreshold = amount.gt(parsedThreshold)
 
       const feeAmountBN = amount.mul(wrapTokenFeePercentageBps).div(10000)
       const amountAfterFeeBN = amount.sub(feeAmountBN)
 
       return {
-        feeAmount: utils.formatUnits(feeAmountBN, 6).toString(),
-        amountAfterFee: utils.formatUnits(amountAfterFeeBN, 6).toString(),
+        feeAmount: utils.formatUnits(feeAmountBN, tokenDecimals).toString(),
+        amountAfterFee: utils
+          .formatUnits(amountAfterFeeBN, tokenDecimals)
+          .toString(),
         feePercentage: wrapTokenFeePercentageBps / 100,
         isOverHighBridgeThreshold,
       }

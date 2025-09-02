@@ -1,10 +1,10 @@
 import { MainModalProps } from '@/components/modals/main-modal'
-import { BridgeToEthereumFees } from '@/hooks/use-bridge-to-ethereum-fees'
+import { BridgeFees } from '@/hooks/use-bridge-fees'
 import { BackendBridgeTransaction } from '@/types/transactions'
 
 export type WrapModalProps = {
   closeModal: () => void
-  feesData: BridgeToEthereumFees
+  feesData: BridgeFees
   amountAfterFee?: string
   destinationAddress?: string
   transactionStatus?: BackendBridgeTransaction
