@@ -5,7 +5,18 @@ import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
 import { utils } from 'ethers'
 import i18n from 'i18next'
 
-export function getModalTitle(
+export function getTransactionAmount(tx: OngoingUserTransaction): {
+  amount: string
+  decimals: number
+} {
+  if ('tokenAmount' in tx) {
+    return { amount: tx.tokenAmount, decimals: 6 }
+  } else {
+    return { amount: tx.amount, decimals: 18 }
+  }
+}
+
+export function getWrapModalTitle(
   bridgeInfo: BridgeInfo,
   feeData: BridgeFees,
   tx?: OngoingUserTransaction,
@@ -19,8 +30,9 @@ export function getModalTitle(
       subtext: ``,
     }
 
+  const { amount: tokenAmount, decimals } = getTransactionAmount(tx)
   const amount = parseFloat(
-    utils.formatUnits(tx.tokenAmount, 6).toString(),
+    utils.formatUnits(tokenAmount, decimals).toString(),
   ).toPrecision()
 
   const bridgingTime = feeData.isOverHighBridgeThreshold ? '24-72h' : '12h'

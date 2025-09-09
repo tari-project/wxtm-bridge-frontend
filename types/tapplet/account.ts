@@ -1,4 +1,7 @@
-import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
+import {
+  UserTransactionDTO,
+  UserUnwrappedTransactionDTO,
+} from '@tari-project/wxtm-bridge-backend-api'
 
 export interface AccountData {
   account_id: number
@@ -16,7 +19,9 @@ export interface PendingBridgeTx {
   paymentId: string
 }
 
-export type OngoingUserTransaction = Omit<UserTransactionDTO, 'feeAmount'> & {
+export type OngoingUserTransaction = (
+  | Omit<UserTransactionDTO, 'feeAmount'>
+  | Omit<UserUnwrappedTransactionDTO, 'feeAmount'>
+) & {
   showModal?: boolean
 }
-

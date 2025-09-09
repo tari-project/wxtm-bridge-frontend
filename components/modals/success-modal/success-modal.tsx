@@ -19,6 +19,7 @@ import { config } from '@/config'
 import { CopyIcon } from '@/styles/copyIcon'
 import { sendErrorMessage } from '@/utils/universe'
 import { useTranslation } from 'react-i18next'
+import { getTransactionAmount } from '@/utils/transaction'
 
 export const SuccessModal: React.FC<SuccessModalProps> = ({
   closeModal,
@@ -72,16 +73,15 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
     if (signer) await signer.removeOngoingBridgeTx()
   }, [closeModal, removeOngoingTransaction, signer])
 
-  const txAmount = detailedTx
-    ? detailedTx.tokenAmount
-    : ongoingBridgeTx?.tokenAmount ?? '0'
-  const amount = parseFloat(utils.formatUnits(txAmount, 6)).toPrecision()
+  const transaction = detailedTx || ongoingBridgeTx
+  const { amount: txAmount, decimals } = transaction
+    ? getTransactionAmount(transaction)
+    : { amount: '0', decimals: 6 }
+  const amount = parseFloat(utils.formatUnits(txAmount, decimals)).toPrecision()
 
-  const txAmountToReceive = detailedTx
-    ? detailedTx.amountAfterFee
-    : ongoingBridgeTx?.amountAfterFee ?? '0'
+  const txAmountToReceive = transaction?.amountAfterFee ?? '0'
   const amountToReceive = parseFloat(
-    utils.formatUnits(txAmountToReceive, 6),
+    utils.formatUnits(txAmountToReceive, decimals),
   ).toPrecision()
 
   const destAddress = detailedTx

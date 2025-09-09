@@ -1,7 +1,11 @@
 import { AccountData, OngoingUserTransaction } from '@/types/tapplet'
 import { create } from 'zustand'
 import useTariSigner from './signer'
-import { BackendBridgeTransaction } from '@/types/transactions'
+import {
+  BackendBridgeTransaction,
+  BackendUnwrapTransaction,
+  CombinedBridgeTransaction,
+} from '@/types/transactions'
 
 interface State {
   tariAccount?: AccountData
@@ -9,16 +13,23 @@ interface State {
   ongoingBridgeTx?: OngoingUserTransaction
   lastOngoingPaymentIdFromTU: string
   backendBridgeTxs: BackendBridgeTransaction[]
-  detailedTx?: BackendBridgeTransaction | null
+  backendUnwrapTxs: BackendUnwrapTransaction[]
+  combinedBridgeTxs: CombinedBridgeTransaction[]
+  detailedTx?: CombinedBridgeTransaction | null
 }
 
 interface Actions {
   setTariAccount: () => Promise<void>
   setLastOngoingBridgeTx: (tx: OngoingUserTransaction) => void
   setBackendBridgeTxs: (txs: BackendBridgeTransaction[]) => void
+  setBackendUnwrapTxs: (txs: BackendUnwrapTransaction[]) => void
+  setCombinedBridgeTxs: (
+    wrapTxs: BackendBridgeTransaction[],
+    unwrapTxs: BackendUnwrapTransaction[],
+  ) => void
   removeOngoingTransaction: () => void
   getBackendBridgeTxsFromTU: () => Promise<BackendBridgeTransaction[]>
-  setDetailedTx: (detailedTx: BackendBridgeTransaction | null) => void
+  setDetailedTx: (detailedTx: CombinedBridgeTransaction | null) => void
 }
 
 type TariL1WalletStoreState = State & Actions
@@ -32,6 +43,8 @@ const initialState: State = {
   ongoingBridgeTx: undefined,
   lastOngoingPaymentIdFromTU: '',
   backendBridgeTxs: [],
+  backendUnwrapTxs: [],
+  combinedBridgeTxs: [],
 }
 
 export const useTariAccountStore = create<TariL1WalletStoreState>()((set) => ({
@@ -102,7 +115,28 @@ export const useTariAccountStore = create<TariL1WalletStoreState>()((set) => ({
       backendBridgeTxs: txs,
     })
   },
-  setDetailedTx: (detailedTx: BackendBridgeTransaction | null) =>
+  setBackendUnwrapTxs: (txs: BackendUnwrapTransaction[]) => {
+    set({
+      backendUnwrapTxs: txs,
+    })
+  },
+  setCombinedBridgeTxs: (
+    wrapTxs: BackendBridgeTransaction[],
+    unwrapTxs: BackendUnwrapTransaction[],
+  ) => {
+    const combined: CombinedBridgeTransaction[] = [
+      ...wrapTxs.map((tx) => ({ ...tx, type: 'wrap' as const })),
+      ...unwrapTxs.map((tx) => ({ ...tx, type: 'unwrap' as const })),
+    ].sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    )
+
+    set({
+      combinedBridgeTxs: combined,
+    })
+  },
+  setDetailedTx: (detailedTx: CombinedBridgeTransaction | null) =>
     set({
       detailedTx: detailedTx,
     }),

@@ -2,10 +2,12 @@ import { memo, useRef } from 'react'
 import { TransactionDetailsModalProps } from './transaction-details-modal.types'
 import { getStatusInfo } from '@/components/transactions/helpers'
 import { WrapModal } from '@/components/modals/wrap-modal'
+import { InfoModal } from '@/components/modals/info-modal'
 import { SuccessModal } from '@/components/modals/success-modal'
 import { FailedModal } from '@/components/modals/failed-modal'
 import { Network } from '@/components/network-box'
 import { BridgeFees } from '@/hooks/use-bridge-fees'
+import { getTransactionAmount } from '@/utils/transaction'
 
 const TransactionDetailsModal = memo(function TransactionDetailsModal({
   transaction,
@@ -13,6 +15,7 @@ const TransactionDetailsModal = memo(function TransactionDetailsModal({
 }: TransactionDetailsModalProps) {
   const modalRef = useRef<HTMLDivElement>(null)
   const statusInfo = getStatusInfo(transaction.status)
+  const { amount: tokenAmount } = getTransactionAmount(transaction)
 
   const tariNetwork: Network = {
     name: 'Tari',
@@ -29,7 +32,7 @@ const TransactionDetailsModal = memo(function TransactionDetailsModal({
   const renderModal = () => {
     switch (statusInfo.statusType) {
       case 'pending':
-        return (
+        return transaction.type === 'wrap' ? (
           <WrapModal
             closeModal={closeModal}
             feesData={feesData}
@@ -40,13 +43,15 @@ const TransactionDetailsModal = memo(function TransactionDetailsModal({
             destinationAddress={transaction.destinationAddress}
             transactionStatus={transaction}
           />
+        ) : (
+          <InfoModal />
         )
 
       case 'completed':
         return (
           <SuccessModal
             closeModal={closeModal}
-            amount={transaction.tokenAmount}
+            amount={tokenAmount}
             tariWalletAddress={transaction.sourceAddress}
             ethereumAddress={transaction.destinationAddress}
             fromNetwork={tariNetwork}

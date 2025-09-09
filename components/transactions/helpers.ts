@@ -1,6 +1,13 @@
 import useAppStore from '@/store/app'
-import { BackendBridgeTransaction, TransactionInfo } from '@/types/transactions'
-import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
+import {
+  BackendBridgeTransaction,
+  TransactionInfo,
+  CombinedBridgeTransaction,
+} from '@/types/transactions'
+import {
+  UserTransactionDTO,
+  UserUnwrappedTransactionDTO,
+} from '@tari-project/wxtm-bridge-backend-api'
 
 function formatTimeStamp(timestamp: number): string {
   const appLanguage = useAppStore.getState().language
@@ -23,14 +30,14 @@ function formatBridgeDateToTimestamp(date: string): number {
 }
 
 function getTimestampFromTransaction(
-  transaction: TransactionInfo | BackendBridgeTransaction,
+  transaction: TransactionInfo | CombinedBridgeTransaction,
 ): number {
   if (isTransactionInfo(transaction)) {
     return transaction.timestamp
-  } else if (isBridgeTransaction(transaction)) {
+  } else {
+    // Both BackendBridgeTransaction and CombinedBridgeTransaction have createdAt
     return formatBridgeDateToTimestamp(transaction.createdAt)
   }
-  throw new Error('Invalid transaction type')
 }
 
 function findFirstNonBridgeTransaction(
@@ -51,24 +58,35 @@ function findByTransactionId(
 }
 
 function isBridgeTransaction(
-  transaction: TransactionInfo | BackendBridgeTransaction,
-): transaction is BackendBridgeTransaction {
+  transaction: TransactionInfo | CombinedBridgeTransaction,
+): transaction is CombinedBridgeTransaction {
   return (
-    'tokenAmount' in transaction && typeof transaction.tokenAmount === 'string'
+    ('tokenAmount' in transaction &&
+      typeof transaction.tokenAmount === 'string') ||
+    ('amount' in transaction && typeof transaction.amount === 'string')
   )
 }
 
 function isTransactionInfo(
-  transaction: TransactionInfo | BackendBridgeTransaction,
+  transaction: TransactionInfo | CombinedBridgeTransaction,
 ): transaction is TransactionInfo {
   return 'tx_id' in transaction && typeof transaction.tx_id === 'string'
 }
 
-const getStatusInfo = (status: UserTransactionDTO.status | undefined) => {
+const getStatusInfo = (
+  status:
+    | UserTransactionDTO.status
+    | UserUnwrappedTransactionDTO.status
+    | undefined,
+) => {
   if (
+    // Wrap
     status === UserTransactionDTO.status.PENDING ||
     status === UserTransactionDTO.status.PROCESSING ||
-    status === UserTransactionDTO.status.TOKENS_RECEIVED
+    status === UserTransactionDTO.status.TOKENS_RECEIVED ||
+    // Unwrap
+    status === UserUnwrappedTransactionDTO.status.PENDING ||
+    status === UserUnwrappedTransactionDTO.status.PROCESSING
   ) {
     return {
       statusType: 'pending' as const,
@@ -76,7 +94,10 @@ const getStatusInfo = (status: UserTransactionDTO.status | undefined) => {
       showIcon: true,
     }
   }
-  if (status === UserTransactionDTO.status.SUCCESS) {
+  if (
+    status === UserTransactionDTO.status.SUCCESS ||
+    status === UserUnwrappedTransactionDTO.status.SUCCESS
+  ) {
     return {
       statusType: 'completed' as const,
       text: 'Completed',
@@ -85,6 +106,8 @@ const getStatusInfo = (status: UserTransactionDTO.status | undefined) => {
   }
   if (status === UserTransactionDTO.status.TIMEOUT) {
     return { statusType: 'timeout' as const, text: 'Timeout', showIcon: false }
+  } else if (status === UserUnwrappedTransactionDTO.status.ERROR) {
+    return { statusType: 'error' as const, text: 'Error', showIcon: false }
   }
   return { statusType: 'default' as const, text: status, showIcon: false }
 }

@@ -24,13 +24,17 @@ import {
   getTimestampFromTransaction,
   getStatusInfo,
 } from './helpers'
+import { getTransactionAmount } from '@/utils/transaction'
 
 import { truncateMiddle } from '@/utils/truncateString'
 import useAppStore from '@/store/app'
 import { BsQuestionCircleFill } from 'react-icons/bs'
 import { openExternalLink } from '@/utils/universe'
 import { HiArrowRightOnRectangle } from 'react-icons/hi2'
-import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
+import {
+  UserTransactionDTO,
+  UserUnwrappedTransactionDTO,
+} from '@tari-project/wxtm-bridge-backend-api'
 import { buildEtherscanLink } from '@/utils/tariNetwork'
 
 const BaseItem = memo(function BaseItem({
@@ -111,7 +115,10 @@ const HistoryBaseItem = memo(function HistoryBaseItem({
   const etherscanLink = buildEtherscanLink(transactionHash)
 
   const renderExplorerSection = () => {
-    if (status === UserTransactionDTO.status.SUCCESS) {
+    if (
+      status === UserTransactionDTO.status.SUCCESS ||
+      status === UserUnwrappedTransactionDTO.status.SUCCESS
+    ) {
       return (
         <button className="flex flex-[1] p-3 hover:cursor-pointer">
           <a
@@ -129,7 +136,9 @@ const HistoryBaseItem = memo(function HistoryBaseItem({
     if (
       status === UserTransactionDTO.status.PENDING ||
       status === UserTransactionDTO.status.PROCESSING ||
-      status === UserTransactionDTO.status.TOKENS_RECEIVED
+      status === UserTransactionDTO.status.TOKENS_RECEIVED ||
+      status === UserUnwrappedTransactionDTO.status.PENDING ||
+      status === UserUnwrappedTransactionDTO.status.PROCESSING
     ) {
       return (
         <div className="flex flex-[1] p-3">
@@ -206,21 +215,23 @@ const BridgeHistoryListItem = memo(function ListItem({
 
   const ref = useRef<HTMLDivElement>(null)
 
+  const { amount: tokenAmount } = getTransactionAmount(item)
   const earningsFormatted = hideWalletBalance
     ? `***`
-    : formatNumber(
-        Number(item.tokenAmount),
-        FormatPreset.XTM_COMPACT,
-      ).toLowerCase()
+    : formatNumber(Number(tokenAmount), FormatPreset.XTM_COMPACT).toLowerCase()
   const time = formatTimeStamp(getTimestampFromTransaction(item))
 
+  const transactionTitle =
+    item.type === 'wrap' ? 'Bridge XTM to wXTM' : 'Bridge wXTM to XTM'
+
   const handleItemClick = () => {
-    setDetailedTx?.({ ...item, createdAt: time })
+    const detailedTx = { ...item, createdAt: time }
+    setDetailedTx?.(detailedTx)
   }
 
   const baseItem = isHistoryList ? (
     <HistoryBaseItem
-      title={'Bridge XTM to wXTM'}
+      title={transactionTitle}
       time={time}
       value={earningsFormatted}
       status={item?.status}
@@ -230,7 +241,7 @@ const BridgeHistoryListItem = memo(function ListItem({
     />
   ) : (
     <BaseItem
-      title={'Bridge XTM to wXTM'}
+      title={transactionTitle}
       time={time}
       value={earningsFormatted}
       status={item?.status}

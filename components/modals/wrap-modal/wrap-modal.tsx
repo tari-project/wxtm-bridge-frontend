@@ -3,7 +3,7 @@ import Image from 'next/image'
 import { WrapModalProps } from './wrap-modal.types'
 import { useBridgeInfo } from '@/hooks/use-bridge-info'
 import useTariAccountStore from '@/store/account'
-import { getModalTitle } from '@/utils/transaction'
+import { getWrapModalTitle } from '@/utils/transaction'
 import { openExternalLink } from '@/utils/universe'
 import { config } from '@/config'
 import { utils } from 'ethers'
@@ -44,7 +44,7 @@ export const WrapModal: React.FC<WrapModalProps> = ({
     bridgeInfo.destAddress
 
   // Pass the current language to getModalTitle
-  const { title, subtext } = getModalTitle(
+  const { title, subtext } = getWrapModalTitle(
     bridgeInfo,
     feesData,
     transactionStatus || ongoingBridgeTx,

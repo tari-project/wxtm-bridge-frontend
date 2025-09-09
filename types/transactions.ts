@@ -1,4 +1,7 @@
-import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
+import {
+  UserTransactionDTO,
+  UserUnwrappedTransactionDTO,
+} from '@tari-project/wxtm-bridge-backend-api'
 
 export interface TransactionInfo {
   tx_id: number
@@ -55,20 +58,29 @@ export interface BridgeBaseItemProps {
   time: string
   value: string
   chip?: string
-  status?: UserTransactionDTO.status
+  status?: UserTransactionDTO.status | UserUnwrappedTransactionDTO.status
   address?: string
   transactionHash?: string
   onClick?: () => void
 }
 
 export interface BridgeHistoryListItemProps {
-  item: BackendBridgeTransaction
+  item: CombinedBridgeTransaction
   index: number
   itemIsNew?: boolean
-  setDetailedTx?: (item: BackendBridgeTransaction | null) => void
+  setDetailedTx?: (item: CombinedBridgeTransaction | null) => void
 }
 
 export interface BackendBridgeTransaction extends UserTransactionDTO {
   sourceAddress?: string
   mined_in_block_height?: number
 }
+
+export interface BackendUnwrapTransaction extends UserUnwrappedTransactionDTO {
+  sourceAddress?: string
+  mined_in_block_height?: number
+}
+
+export type CombinedBridgeTransaction =
+  | (BackendBridgeTransaction & { type: 'wrap' })
+  | (BackendUnwrapTransaction & { type: 'unwrap' })
