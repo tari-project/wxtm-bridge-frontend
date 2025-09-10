@@ -79,3 +79,16 @@ export function getWrapModalTitle(
       }
   }
 }
+
+/** @TODO Implementation needed */
+export function getUnwrapModalTitle(
+  bridgeInfo: BridgeInfo,
+  feeData: BridgeFees,
+  tx?: OngoingUserTransaction,
+  language?: string,
+): { title: string; subtext: string } {
+  return {
+    title: 'unknown_transaction_status',
+    subtext: ``,
+  }
+}

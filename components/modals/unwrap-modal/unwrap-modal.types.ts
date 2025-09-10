@@ -2,7 +2,7 @@ import { MainModalProps } from '@/components/modals/main-modal'
 import { BridgeFees } from '@/hooks/use-bridge-fees'
 import { CombinedBridgeTransaction } from '@/types/transactions'
 
-export type WrapModalProps = {
+export type UnwrapModalProps = {
   closeModal: () => void
   feesData: BridgeFees
   amountAfterFee?: string

@@ -20,6 +20,7 @@ function formatTimeStamp(timestamp: number): string {
   })
 }
 
+/** @TODO Refactor createdAt for unwraps into timestamp */
 function formatBridgeDateToTimestamp(date: string): number {
   //2025-05-28T08:53:02.859Z
   const dateObj = new Date(date)
@@ -35,7 +36,6 @@ function getTimestampFromTransaction(
   if (isTransactionInfo(transaction)) {
     return transaction.timestamp
   } else {
-    // Both BackendBridgeTransaction and CombinedBridgeTransaction have createdAt
     return formatBridgeDateToTimestamp(transaction.createdAt)
   }
 }

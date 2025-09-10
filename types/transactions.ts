@@ -62,6 +62,7 @@ export interface BridgeBaseItemProps {
   address?: string
   transactionHash?: string
   onClick?: () => void
+  transactionType?: 'wrap' | 'unwrap'
 }
 
 export interface BridgeHistoryListItemProps {

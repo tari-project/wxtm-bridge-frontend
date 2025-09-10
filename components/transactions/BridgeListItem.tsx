@@ -44,6 +44,7 @@ const BaseItem = memo(function BaseItem({
   chip,
   onClick,
   status,
+  transactionType,
 }: BridgeBaseItemProps) {
   // note re. isPositiveValue:
   // amounts in the tx response are always positive numbers but
@@ -54,7 +55,14 @@ const BaseItem = memo(function BaseItem({
     <ContentWrapper onClick={onClick}>
       <Content>
         <BlockInfoWrapper>
-          <TitleWrapper title={title}>{displayTitle}</TitleWrapper>
+          <TitleWrapper
+            title={title}
+            style={{
+              color: transactionType === 'wrap' ? '#000' : '#000',
+            }}
+          >
+            {displayTitle}
+          </TitleWrapper>
           <TimeWrapper variant="p">{time}</TimeWrapper>
         </BlockInfoWrapper>
       </Content>
@@ -70,9 +78,16 @@ const BaseItem = memo(function BaseItem({
           </div>
 
           <ValueWrapper>
-            <ValueChangeWrapper
-              $isPositiveValue={false}
-            >{`-`}</ValueChangeWrapper>
+            {transactionType === 'wrap' && (
+              <ValueChangeWrapper
+                $isPositiveValue={false}
+              >{`-`}</ValueChangeWrapper>
+            )}
+            {transactionType === 'unwrap' && (
+              <ValueChangeWrapper
+                $isPositiveValue={true}
+              >{`+`}</ValueChangeWrapper>
+            )}
             {value}
             <CurrencyText>{`XTM`}</CurrencyText>
           </ValueWrapper>
@@ -108,6 +123,7 @@ const HistoryBaseItem = memo(function HistoryBaseItem({
   status,
   address,
   transactionHash,
+  transactionType,
 }: BridgeBaseItemProps) {
   const { t } = useTranslation('main', { useSuspense: false })
   const displayTitle = title.length > 26 ? truncateMiddle(title, 8) : title
@@ -116,6 +132,7 @@ const HistoryBaseItem = memo(function HistoryBaseItem({
 
   const renderExplorerSection = () => {
     if (
+      transactionType === 'unwrap' ||
       status === UserTransactionDTO.status.SUCCESS ||
       status === UserUnwrappedTransactionDTO.status.SUCCESS
     ) {
@@ -133,12 +150,13 @@ const HistoryBaseItem = memo(function HistoryBaseItem({
       )
     }
 
+    // Show loading dots only for pending wrap transactions
+    // (unwrap transactions always show explorer link above)
     if (
-      status === UserTransactionDTO.status.PENDING ||
-      status === UserTransactionDTO.status.PROCESSING ||
-      status === UserTransactionDTO.status.TOKENS_RECEIVED ||
-      status === UserUnwrappedTransactionDTO.status.PENDING ||
-      status === UserUnwrappedTransactionDTO.status.PROCESSING
+      transactionType === 'wrap' &&
+      (status === UserTransactionDTO.status.PENDING ||
+        status === UserTransactionDTO.status.PROCESSING ||
+        status === UserTransactionDTO.status.TOKENS_RECEIVED)
     ) {
       return (
         <div className="flex flex-[1] p-3">
@@ -163,7 +181,14 @@ const HistoryBaseItem = memo(function HistoryBaseItem({
         onClick={onClick}
       >
         <div className="flex-1 flex items-center">
-          <TitleWrapper title={title}>{displayTitle}</TitleWrapper>
+          <TitleWrapper
+            title={title}
+            style={{
+              color: transactionType === 'wrap' ? '#000' : '#000',
+            }}
+          >
+            {displayTitle}
+          </TitleWrapper>
         </div>
 
         <div className="flex-1 flex items-center justify-center">
@@ -172,9 +197,16 @@ const HistoryBaseItem = memo(function HistoryBaseItem({
 
         <div className="flex-1 flex items-center justify-center">
           <ValueWrapper>
-            <ValueChangeWrapper
-              $isPositiveValue={false}
-            >{`-`}</ValueChangeWrapper>
+            {transactionType === 'wrap' && (
+              <ValueChangeWrapper
+                $isPositiveValue={false}
+              >{`-`}</ValueChangeWrapper>
+            )}
+            {transactionType === 'unwrap' && (
+              <ValueChangeWrapper
+                $isPositiveValue={true}
+              >{`+`}</ValueChangeWrapper>
+            )}
             {value}
             <CurrencyText>{`XTM`}</CurrencyText>
           </ValueWrapper>
@@ -215,10 +247,13 @@ const BridgeHistoryListItem = memo(function ListItem({
 
   const ref = useRef<HTMLDivElement>(null)
 
-  const { amount: tokenAmount } = getTransactionAmount(item)
+  const { amount: tokenAmount, decimals } = getTransactionAmount(item)
+  // Convert to XTM base units (6 decimals) for consistent formatting
+  const normalizedAmount =
+    (Number(tokenAmount) / Math.pow(10, decimals)) * Math.pow(10, 6)
   const earningsFormatted = hideWalletBalance
     ? `***`
-    : formatNumber(Number(tokenAmount), FormatPreset.XTM_COMPACT).toLowerCase()
+    : formatNumber(normalizedAmount, FormatPreset.XTM_COMPACT).toLowerCase()
   const time = formatTimeStamp(getTimestampFromTransaction(item))
 
   const transactionTitle =
@@ -238,6 +273,7 @@ const BridgeHistoryListItem = memo(function ListItem({
       address={item?.sourceAddress || item?.destinationAddress}
       transactionHash={item?.transactionHash}
       onClick={handleItemClick}
+      transactionType={item.type}
     />
   ) : (
     <BaseItem
@@ -247,6 +283,7 @@ const BridgeHistoryListItem = memo(function ListItem({
       status={item?.status}
       chip={itemIsNew ? t('new') : ''}
       onClick={handleItemClick}
+      transactionType={item.type}
     />
   )
 

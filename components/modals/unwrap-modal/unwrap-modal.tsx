@@ -1,9 +1,9 @@
 import React from 'react'
 import Image from 'next/image'
-import { WrapModalProps } from './wrap-modal.types'
+import { UnwrapModalProps } from './unwrap-modal.types'
 import { useBridgeInfo } from '@/hooks/use-bridge-info'
 import useTariAccountStore from '@/store/account'
-import { getWrapModalTitle } from '@/utils/transaction'
+import { getUnwrapModalTitle } from '@/utils/transaction'
 import { openExternalLink } from '@/utils/universe'
 import { config } from '@/config'
 import { utils } from 'ethers'
@@ -13,7 +13,7 @@ import { ModalButton } from '../modal-button'
 import { truncateAddress } from '@/utils/truncate'
 
 /** @TODO Refactor and get rid of conditional display here create unwrap-modal and use it for unwrap txs */
-export const WrapModal: React.FC<WrapModalProps> = ({
+export const UnwrapModal: React.FC<UnwrapModalProps> = ({
   tariWalletAddress,
   ethereumAddress,
   fromNetwork,
@@ -48,8 +48,8 @@ export const WrapModal: React.FC<WrapModalProps> = ({
       ? truncateAddress(destAddressRaw || '', 15)
       : destAddressRaw
 
-  // Pass the current language to getModalTitle
-  const { title, subtext } = getWrapModalTitle(
+  /** @TODO Implement getUnwrapModalTitle function */
+  const { title, subtext } = getUnwrapModalTitle(
     bridgeInfo,
     feesData,
     transactionStatus || ongoingBridgeTx,

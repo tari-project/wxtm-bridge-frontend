@@ -2,7 +2,7 @@ import { memo, useRef } from 'react'
 import { TransactionDetailsModalProps } from './transaction-details-modal.types'
 import { getStatusInfo } from '@/components/transactions/helpers'
 import { WrapModal } from '@/components/modals/wrap-modal'
-import { InfoModal } from '@/components/modals/info-modal'
+import { UnwrapModal } from '@/components/modals/unwrap-modal'
 import { SuccessModal } from '@/components/modals/success-modal'
 import { FailedModal } from '@/components/modals/failed-modal'
 import { Network } from '@/components/network-box'
@@ -20,6 +20,11 @@ const TransactionDetailsModal = memo(function TransactionDetailsModal({
   const tariNetwork: Network = {
     name: 'Tari',
     icon: '/icons/tari.png',
+  }
+
+  const ethereumNetwork: Network = {
+    name: 'Ethereum',
+    icon: '/icons/eth.png',
   }
 
   const feesData: BridgeFees = {
@@ -44,7 +49,16 @@ const TransactionDetailsModal = memo(function TransactionDetailsModal({
             transactionStatus={transaction}
           />
         ) : (
-          <InfoModal />
+          <UnwrapModal
+            closeModal={closeModal}
+            feesData={feesData}
+            tariWalletAddress={transaction.destinationAddress}
+            ethereumAddress={transaction.sourceAddress}
+            fromNetwork={ethereumNetwork}
+            amountAfterFee={transaction.amountAfterFee}
+            destinationAddress={transaction.destinationAddress}
+            transactionStatus={transaction}
+          />
         )
 
       case 'completed':

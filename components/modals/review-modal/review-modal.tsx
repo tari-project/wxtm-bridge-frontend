@@ -126,7 +126,11 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
               {'Destination address'} <span>({toNetwork.name})</span>
             </div>
 
-            <div className="text-sm">{destAddress}</div>
+            <div className="text-sm">
+              {destAddress === tariWalletAddress
+                ? truncateAddress(tariWalletAddress!, 15)
+                : ethereumAddress}
+            </div>
           </div>
 
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
