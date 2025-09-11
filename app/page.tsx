@@ -120,7 +120,11 @@ export default function Home() {
     if (modalOpen && modalStep === 0 && isConnected) {
       setModalOpen(false)
       setModalStep(1)
-    } else if (!showModalDetailedTx && showModalOngoingTx) {
+    } else if (
+      !showModalDetailedTx &&
+      showModalOngoingTx &&
+      (isSuccess || ongoingBridgeTx.type === 'wrap')
+    ) {
       setModalStep(2)
       setModalOpen(true)
     } else if (showModalDetailedTx && modalOpen) {
@@ -130,6 +134,7 @@ export default function Home() {
     isConnected,
     modalOpen,
     modalStep,
+    isSuccess,
     ongoingBridgeTx,
     showModalDetailedTx,
     showModalOngoingTx,
