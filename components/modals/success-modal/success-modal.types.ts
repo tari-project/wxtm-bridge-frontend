@@ -4,6 +4,7 @@ import { CombinedBridgeTransaction } from '@/types/transactions'
 export type SuccessModalProps = {
   closeModal: () => void
   detailedTx?: CombinedBridgeTransaction
+  type: 'wrap' | 'unwrap'
 } & Pick<
   MainModalProps,
   'amount' | 'tariWalletAddress' | 'ethereumAddress' | 'fromNetwork'

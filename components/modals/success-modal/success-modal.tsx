@@ -1,12 +1,18 @@
-import React, { useCallback, useState } from 'react'
 import Image from 'next/image'
+import React, { useCallback, useState } from 'react'
 
-import { SuccessModalProps } from './success-modal.types'
 import { ModalButton } from '@/components/modals/modal-button'
+import { config } from '@/config'
 import { useBridgeInfo } from '@/hooks/use-bridge-info'
+import { useWalletUtils } from '@/hooks/use-wallet'
 import useTariAccountStore from '@/store/account'
-import { utils } from 'ethers'
 import useTariSigner from '@/store/signer'
+import { CopyIcon } from '@/styles/copyIcon'
+import { getTransactionAmount } from '@/utils/transaction'
+import { truncateAddress } from '@/utils/truncate'
+import { sendErrorMessage } from '@/utils/universe'
+import { utils } from 'ethers'
+import { useTranslation } from 'react-i18next'
 import {
   CopyIconWrapper,
   CopyText,
@@ -14,12 +20,7 @@ import {
   OfficialContractAddressConainer,
   OfficialContractAddressWrapper,
 } from './success-modal.styles'
-import { useWalletUtils } from '@/hooks/use-wallet'
-import { config } from '@/config'
-import { CopyIcon } from '@/styles/copyIcon'
-import { sendErrorMessage } from '@/utils/universe'
-import { useTranslation } from 'react-i18next'
-import { getTransactionAmount } from '@/utils/transaction'
+import { SuccessModalProps } from './success-modal.types'
 
 export const SuccessModal: React.FC<SuccessModalProps> = ({
   closeModal,
@@ -28,6 +29,7 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
   ethereumAddress,
   fromNetwork,
   detailedTx,
+  type,
 }) => {
   const { t } = useTranslation('main', { useSuspense: false })
   const signer = useTariSigner((s) => s.signer)
@@ -84,10 +86,14 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
     utils.formatUnits(txAmountToReceive, decimals),
   ).toPrecision()
 
-  const destAddress = detailedTx
+  const destAddressRaw = detailedTx
     ? detailedTx.destinationAddress
     : ongoingBridgeTx?.destinationAddress ?? ''
 
+  const destAddress =
+    type === 'unwrap'
+      ? truncateAddress(destAddressRaw || '', 15)
+      : destAddressRaw
   return (
     <div className="w-full flex flex-col p-6">
       <div className="mt-2">
@@ -103,7 +109,7 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
             />
           </div>
           <div className="font-semibold text-lg mt-2">
-            {t(fromToken === 'wXTM' ? 'success_unwrapped' : 'success_wrapped', {
+            {t(type === 'unwrap' ? 'success_unwrapped' : 'success_wrapped', {
               amount,
               fromToken,
             })}

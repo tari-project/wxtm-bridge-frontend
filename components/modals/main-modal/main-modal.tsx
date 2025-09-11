@@ -40,6 +40,7 @@ export const MainModal: React.FC<MainModalProps> = ({
           tariWalletAddress={tariWalletAddress}
           ethereumAddress={ethereumAddress}
           fromNetwork={fromNetwork}
+          type={type}
         />
       )
 
