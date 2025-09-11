@@ -59,7 +59,9 @@ const TransactionDetailsModal = memo(function TransactionDetailsModal({
             amount={tokenAmount}
             tariWalletAddress={transaction.sourceAddress}
             ethereumAddress={transaction.destinationAddress}
-            fromNetwork={tariNetwork}
+            fromNetwork={
+              transaction.type === 'wrap' ? tariNetwork : ethereumNetwork
+            }
             detailedTx={transaction}
             type={transaction.type}
           />
