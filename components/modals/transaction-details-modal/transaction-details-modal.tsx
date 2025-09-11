@@ -61,6 +61,7 @@ const TransactionDetailsModal = memo(function TransactionDetailsModal({
             ethereumAddress={transaction.destinationAddress}
             fromNetwork={tariNetwork}
             detailedTx={transaction}
+            type={transaction.type}
           />
         )
 
