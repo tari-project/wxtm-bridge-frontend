@@ -37,7 +37,7 @@
   "pending_subtext": "You'll receive {{amount}} {{fromToken}} in no more than {{bridgingTime}}. Funds are automatically transferred from your linked Tari Universe wallet. You don't need to do anything else.",
   "pending_title": "We're {{action}} your {{amount}} {{fromToken}}",
   "please_connect_supported_network": "Please connect to one of our supported networks to continue",
-  "processing_subtext": "We've received your request. Your funds will be wrapped as soon as the process begins. No action is needed.",
+  "processing_subtext": "We've received your request. Your funds will be {{action}} as soon as the process begins. No action is needed.",
   "processing_title": "Waiting for confirmation...",
   "retry": "Retry",
   "see_faq": "View FAQs",

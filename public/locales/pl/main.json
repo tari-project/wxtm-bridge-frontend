@@ -37,7 +37,7 @@
   "pending_subtext": "Otrzymasz {{amount}} {{fromToken}} w ciągu maksymalnie {{bridgingTime}}. Środki są automatycznie przenoszone z twojego powiązanego portfela Tari Universe. Nie musisz nic więcej robić.",
   "pending_title": "Pracujemy nad {{action}} twoje {{amount}} {{fromToken}}",
   "please_connect_supported_network": "Proszę połączyć się z jedną z obsługiwanych sieci, aby kontynuować",
-  "processing_subtext": "Otrzymaliśmy twoje żądanie. Twoje środki zostaną zamienione, gdy tylko proces się rozpocznie. Nie musisz nic robić.",
+  "processing_subtext": "Otrzymaliśmy twoje żądanie. Twoje środki zostaną {{action}}, gdy tylko proces się rozpocznie. Nie musisz nic robić.",
   "processing_title": "Oczekiwanie na potwierdzenie...",
   "retry": "Spróbuj ponownie",
   "see_faq": "zobacz nasze FAQ",

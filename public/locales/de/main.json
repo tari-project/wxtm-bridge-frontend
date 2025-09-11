@@ -37,7 +37,7 @@
   "pending_subtext": "Sie erhalten {{amount}} {{fromToken}} in nicht mehr als {{bridgingTime}}. Die Mittel werden automatisch von Ihrer verknüpften Tari Universe-Wallet übertragen. Sie müssen nichts weiter tun.",
   "pending_title": "Wir {{action}} Ihre {{amount}} {{fromToken}}",
   "please_connect_supported_network": "Bitte verbinden Sie sich mit einem unserer unterstützten Netzwerke, um fortzufahren",
-  "processing_subtext": "Wir haben Ihre Anfrage erhalten. Ihre Mittel werden eingewickelt, sobald der Prozess beginnt. Es ist keine Aktion erforderlich.",
+  "processing_subtext": "Wir haben Ihre Anfrage erhalten. Ihre Mittel werden {{action}}, sobald der Prozess beginnt. Es ist keine Aktion erforderlich.",
   "processing_title": "Warten auf Bestätigung...",
   "retry": "Erneut versuchen",
   "see_faq": "sehen Sie unser FAQ",

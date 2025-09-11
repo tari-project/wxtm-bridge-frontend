@@ -4,12 +4,12 @@ import React, { useRef } from 'react'
 import { useAccount } from 'wagmi'
 
 import ConnectionModal from '@/components/modals/connection-modal/connection-modal'
-import { ReviewModal } from '@/components/modals/review-modal'
 import { InfoModal } from '@/components/modals/info-modal'
+import { ReviewModal } from '@/components/modals/review-modal'
 import { SuccessModal } from '@/components/modals/success-modal'
 import { WrapModal } from '@/components/modals/wrap-modal'
-import { MainModalProps } from './main-modal.types'
 import { FailedModal } from '../failed-modal'
+import { MainModalProps } from './main-modal.types'
 
 export const MainModal: React.FC<MainModalProps> = ({
   success,
@@ -24,6 +24,7 @@ export const MainModal: React.FC<MainModalProps> = ({
   toNetwork,
   feesData,
   closeModal,
+  type,
 }) => {
   const { isConnected } = useAccount()
   const modalRef = useRef<HTMLDivElement>(null)
@@ -75,6 +76,7 @@ export const MainModal: React.FC<MainModalProps> = ({
           ethereumAddress={ethereumAddress}
           fromNetwork={fromNetwork}
           feesData={feesData}
+          type={type}
         />
       )
     if (step === 3) return <InfoModal />

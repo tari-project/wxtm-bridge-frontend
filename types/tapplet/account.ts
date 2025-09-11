@@ -24,4 +24,5 @@ export type OngoingUserTransaction = (
   | Omit<UserUnwrappedTransactionDTO, 'feeAmount'>
 ) & {
   showModal?: boolean
+  type: 'wrap' | 'unwrap'
 }

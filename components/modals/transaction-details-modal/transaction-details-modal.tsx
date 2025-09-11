@@ -1,13 +1,12 @@
-import { memo, useRef } from 'react'
-import { TransactionDetailsModalProps } from './transaction-details-modal.types'
-import { getStatusInfo } from '@/components/transactions/helpers'
-import { WrapModal } from '@/components/modals/wrap-modal'
-import { UnwrapModal } from '@/components/modals/unwrap-modal'
-import { SuccessModal } from '@/components/modals/success-modal'
 import { FailedModal } from '@/components/modals/failed-modal'
+import { SuccessModal } from '@/components/modals/success-modal'
+import { WrapModal } from '@/components/modals/wrap-modal'
 import { Network } from '@/components/network-box'
+import { getStatusInfo } from '@/components/transactions/helpers'
 import { BridgeFees } from '@/hooks/use-bridge-fees'
 import { getTransactionAmount } from '@/utils/transaction'
+import { memo, useRef } from 'react'
+import { TransactionDetailsModalProps } from './transaction-details-modal.types'
 
 const TransactionDetailsModal = memo(function TransactionDetailsModal({
   transaction,
@@ -37,27 +36,19 @@ const TransactionDetailsModal = memo(function TransactionDetailsModal({
   const renderModal = () => {
     switch (statusInfo.statusType) {
       case 'pending':
-        return transaction.type === 'wrap' ? (
+        return (
           <WrapModal
             closeModal={closeModal}
             feesData={feesData}
             tariWalletAddress={transaction.sourceAddress}
             ethereumAddress={transaction.destinationAddress}
-            fromNetwork={tariNetwork}
+            fromNetwork={
+              transaction.type === 'wrap' ? tariNetwork : ethereumNetwork
+            }
             amountAfterFee={transaction.amountAfterFee}
             destinationAddress={transaction.destinationAddress}
             transactionStatus={transaction}
-          />
-        ) : (
-          <UnwrapModal
-            closeModal={closeModal}
-            feesData={feesData}
-            tariWalletAddress={transaction.destinationAddress}
-            ethereumAddress={transaction.sourceAddress}
-            fromNetwork={ethereumNetwork}
-            amountAfterFee={transaction.amountAfterFee}
-            destinationAddress={transaction.destinationAddress}
-            transactionStatus={transaction}
+            type={transaction.type}
           />
         )
 

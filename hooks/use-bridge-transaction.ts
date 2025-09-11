@@ -1,10 +1,10 @@
 import { useMutation } from '@tanstack/react-query'
 
 import {
-  WrapTokenService,
-  UserTransactionDTO,
   TokensUnwrappedService,
+  UserTransactionDTO,
   UserUnwrappedTransactionDTO,
+  WrapTokenService,
 } from '@tari-project/wxtm-bridge-backend-api'
 
 import useTariAccountStore from '@/store/account'
@@ -81,6 +81,12 @@ export const useBridgeTransaction = () => {
         ...wrapTransactions.map((tx) => ({ ...tx, type: 'wrap' as const })),
         ...unwrapTransactions.map((tx) => ({ ...tx, type: 'unwrap' as const })),
       ]
+
+      combinedTransactions.sort((a, b) => {
+        const dateA = new Date(a.createdAt).getTime()
+        const dateB = new Date(b.createdAt).getTime()
+        return dateB - dateA // Sort descending by date
+      })
     }
 
     if (
@@ -103,10 +109,12 @@ export const useBridgeTransaction = () => {
         }
       })
       if (ongoing) {
-        // update only if tx has changed
         if (
-          ongoing.paymentId !== ongoingBridgeTx?.paymentId ||
-          ongoing.status !== ongoingBridgeTx?.status
+          (ongoing.paymentId !== ongoingBridgeTx?.paymentId ||
+            ongoing.status !== ongoingBridgeTx?.status) &&
+          (!ongoingBridgeTx ||
+            new Date(ongoing.createdAt).getTime() >
+              new Date(ongoingBridgeTx?.createdAt).getTime())
         ) {
           const ongoingTransaction: OngoingUserTransaction = ongoing
           setLastOngoingBridgeTx(ongoingTransaction)

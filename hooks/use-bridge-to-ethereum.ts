@@ -6,10 +6,10 @@ import {
   WrapTokenService,
 } from '@tari-project/wxtm-bridge-backend-api'
 
-import { parseWxtmTokenAmount } from '@/utils/parse-wxtm-token-amount'
-import useTariSigner from '@/store/signer'
 import useTariAccountStore from '@/store/account'
 import useBridgeStore from '@/store/bridge'
+import useTariSigner from '@/store/signer'
+import { parseWxtmTokenAmount } from '@/utils/parse-wxtm-token-amount'
 import { stringifyProperties } from '@/utils/stringifyProperties'
 import { useBridgeTransaction } from './use-bridge-transaction'
 
@@ -70,9 +70,10 @@ export const useBridgeToEthereum = () => {
       tokenAmount: parsedAmount,
       amountAfterFee: parseWxtmTokenAmount(amountAfterFee),
       status: UserTransactionDTO.status.PENDING,
-      createdAt: '',
+      createdAt: new Date().toISOString(),
       paymentId: paymentId,
       showModal: true,
+      type: 'wrap',
     })
     console.debug('[ TAPPLET-BRIDGE ] created tx with id: ', paymentId)
 

@@ -1,20 +1,20 @@
 'use client'
-import './i18initializer'
-import React, { useState, useEffect, useCallback } from 'react'
-import { useAccount } from 'wagmi'
+import { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { useAccount } from 'wagmi'
+import './i18initializer'
 
-import { MainModal } from '@/components/modals/main-modal'
-import { TransactionDetailsModal } from '@/components/modals/transaction-details-modal'
+import { BridgeFormValues } from '@/components/bridge-input'
 import { Header } from '@/components/header'
 import { MainComponent } from '@/components/main'
-import { useBridgeToEthereum } from '@/hooks/use-bridge-to-ethereum'
-import { BridgeFormValues } from '@/components/bridge-input'
+import { MainModal } from '@/components/modals/main-modal'
+import { TransactionDetailsModal } from '@/components/modals/transaction-details-modal'
 import { Network } from '@/components/network-box'
-import useTariAccountStore from '@/store/account'
 import { useBridgeFees } from '@/hooks/use-bridge-fees'
+import { useBridgeToEthereum } from '@/hooks/use-bridge-to-ethereum'
 import { useBridgeToTari } from '@/hooks/use-bridge-to-tari'
 import { useBridgeTransaction } from '@/hooks/use-bridge-transaction'
+import useTariAccountStore from '@/store/account'
 import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
 import { DeployedChains } from '@tari-project/wxtm-bridge-contracts/deployments'
 
@@ -254,6 +254,7 @@ export default function Home() {
           toNetwork={toNetwork}
           feesData={feesData}
           closeModal={handleCloseModal}
+          type={ongoingBridgeTx?.type || 'wrap'}
         />
       )}
     </main>

@@ -1,13 +1,16 @@
-import { useReadContract, useWriteContract, useWalletClient } from 'wagmi'
+import useTariAccountStore from '@/store/account'
+import { parseWxtmTokenAmount } from '@/utils/parse-wxtm-token-amount'
+import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
 import {
-  getDeployments,
   DeployedChains,
+  getDeployments,
 } from '@tari-project/wxtm-bridge-contracts/deployments'
 import {
   WXTM__factory,
   WXTMBridge__factory,
 } from '@tari-project/wxtm-bridge-contracts/typechain/factories/contracts'
 import { ethers } from 'ethers'
+import { useReadContract, useWalletClient, useWriteContract } from 'wagmi'
 
 export const useBridgeToTari = (
   ethAddress: `0x${string}`,
@@ -25,6 +28,10 @@ export const useBridgeToTari = (
     functionName: 'eip712Domain',
     args: [],
   })
+
+  const setLastOngoingBridgeTx = useTariAccountStore(
+    (s) => s.setLastOngoingBridgeTx,
+  )
 
   const { writeContract, isPending, isSuccess, isError, error } =
     useWriteContract()
@@ -132,6 +139,23 @@ export const useBridgeToTari = (
       console.debug(
         `[ TAPPLET-BRIDGE ] Bridge transaction executed with txHash: ${txHash}, amount: ${value}`,
       )
+
+      const amountAfterFee =
+        (value * ethers.utils.parseUnits('0.995', 18).toBigInt()) / BigInt(1e18)
+
+      // set ongoing to immediately display wrap modal
+      setLastOngoingBridgeTx({
+        destinationAddress: tariAddress,
+        tokenAmount: parseWxtmTokenAmount(amount),
+        amountAfterFee: parseWxtmTokenAmount(
+          ethers.utils.formatEther(amountAfterFee.toString()),
+        ),
+        status: UserTransactionDTO.status.PENDING,
+        createdAt: new Date().toISOString(),
+        paymentId: '',
+        showModal: true,
+        type: 'unwrap',
+      })
 
       return true
     } catch (err) {

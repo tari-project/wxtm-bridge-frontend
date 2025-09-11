@@ -14,4 +14,5 @@ export type MainModalProps = {
   toNetwork: Network
   feesData: BridgeFees
   closeModal: () => void
+  type: 'wrap' | 'unwrap'
 }
