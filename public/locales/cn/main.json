@@ -34,7 +34,7 @@
   "network_icon_alt": "{{network}}图标",
   "no_transactions_found_yet": "No transactions found yet",
   "official_wxtm_token_address": "Official wXTM Token Address",
-  "pending_subtext": "您将在不超过{{bridgingTime}}内收到{{amount}} {{fromToken}}。资金将自动从您链接的Tari Universe钱包转移。您无需做其他任何事情。",
+  "pending_subtext": "您将在不超过{{bridgingTime}}内收到{{amount}} {{toToken}}。资金将自动{{direction}}您链接的Tari Universe钱包转移。您无需做其他任何事情。",
   "pending_title": "我们正在{{action}}您的{{amount}} {{fromToken}}",
   "please_connect_supported_network": "请连接到我们支持的网络之一以继续",
   "processing_subtext": "我们已收到您的请求。流程一开始您的资金就会被{{action}}。无需采取任何行动。",
@@ -68,5 +68,7 @@
   "wrap_failed_message": "我们未能及时完成您的包装请求。您的XTM在您的Tari钱包中仍然安全——它没有被扣除或移动。",
   "wrapped": "已包装",
   "wrapping": "包装",
-  "xtm_token": "XTM"
+  "xtm_token": "XTM",
+  "from": "从",
+  "to": "到"
 }

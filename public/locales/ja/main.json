@@ -34,7 +34,7 @@
   "network_icon_alt": "{{network}}アイコン",
   "no_transactions_found_yet": "No transactions found yet",
   "official_wxtm_token_address": "Official wXTM Token Address",
-  "pending_subtext": "{{bridgingTime}}以内に{{amount}} {{fromToken}}を受け取ります。資金はリンクされたTari Universeウォレットから自動的に転送されます。何もする必要はありません。",
+  "pending_subtext": "{{bridgingTime}}以内に{{amount}} {{toToken}}を受け取ります。資金はリンクされたTari Universeウォレット{{direction}}自動的に転送されます。何もする必要はありません。",
   "pending_title": "私たちはあなたの{{amount}} {{fromToken}}を{{action}}しています",
   "please_connect_supported_network": "続行するには、サポートされているネットワークのいずれかに接続してください",
   "processing_subtext": "リクエストを受け取りました。プロセスが始まり次第、資金は{{action}}されます。何もする必要はありません。",
@@ -68,5 +68,7 @@
   "wrap_failed_message": "ラッピングリクエストを時間内に完了できませんでした。\nあなたのXTMはTariウォレットに安全に保管されています\u0014控除も移動もされていません。",
   "wrapped": "ラップ済み",
   "wrapping": "ラッピング中",
-  "xtm_token": "XTM"
+  "xtm_token": "XTM",
+  "from": "から",
+  "to": "に"
 }

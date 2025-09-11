@@ -66,8 +66,9 @@ export function getWrapModalTitle(
         }),
         subtext: t('pending_subtext', {
           amount: amountWithFee,
-          fromToken,
+          toToken: bridgeInfo.toToken,
           bridgingTime,
+          direction: type === 'wrap' ? t('from') : t('to'),
         }),
       }
     case UserTransactionDTO.status.PROCESSING:

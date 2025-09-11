@@ -34,7 +34,7 @@
   "network_icon_alt": "{{network}} ikoon",
   "no_transactions_found_yet": "No transactions found yet",
   "official_wxtm_token_address": "Official wXTM Token Address",
-  "pending_subtext": "Jy sal {{amount}} {{fromToken}} ontvang in nie meer as {{bridgingTime}} nie. Fondse word outomaties oorgedra vanaf jou gekoppelde Tari Universe-beursie. Jy hoef niks anders te doen nie.",
+  "pending_subtext": "Jy sal {{amount}} {{toToken}} ontvang in nie meer as {{bridgingTime}} nie. Fondse word outomaties oorgedra vanaf jou gekoppelde Tari Universe-beursie. Jy hoef niks anders te doen nie.",
   "pending_title": "Ons is besig om jou {{amount}} {{fromToken}} te {{action}}",
   "please_connect_supported_network": "Koppel asseblief aan een van ons ondersteunde netwerke om voort te gaan",
   "processing_subtext": "Ons het jou versoek ontvang. Jou fondse sal {{action}} word sodra die proses begin. Geen aksie is nodig nie.",

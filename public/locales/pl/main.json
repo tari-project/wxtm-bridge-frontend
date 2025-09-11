@@ -34,7 +34,7 @@
   "network_icon_alt": "Ikona {{network}}",
   "no_transactions_found_yet": "No transactions found yet",
   "official_wxtm_token_address": "Official wXTM Token Address",
-  "pending_subtext": "Otrzymasz {{amount}} {{fromToken}} w ciągu maksymalnie {{bridgingTime}}. Środki są automatycznie przenoszone z twojego powiązanego portfela Tari Universe. Nie musisz nic więcej robić.",
+  "pending_subtext": "Otrzymasz {{amount}} {{toToken}} w ciągu maksymalnie {{bridgingTime}}. Środki są automatycznie przenoszone {{direction}} twojego powiązanego portfela Tari Universe. Nie musisz nic więcej robić.",
   "pending_title": "Pracujemy nad {{action}} twoje {{amount}} {{fromToken}}",
   "please_connect_supported_network": "Proszę połączyć się z jedną z obsługiwanych sieci, aby kontynuować",
   "processing_subtext": "Otrzymaliśmy twoje żądanie. Twoje środki zostaną {{action}}, gdy tylko proces się rozpocznie. Nie musisz nic robić.",
@@ -68,5 +68,7 @@
   "wrap_failed_message": "Nie udało nam się zrealizować twojego żądania zamiany na czas.\nTwoje XTM pozostaje bezpieczne w twoim portfelu Tari \u0014 nie zostało odjęte ani przeniesione.",
   "wrapped": "zamieniony",
   "wrapping": "zamiana",
-  "xtm_token": "XTM"
+  "xtm_token": "XTM",
+  "from": "z",
+  "to": "do"
 }

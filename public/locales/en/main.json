@@ -34,7 +34,7 @@
   "network_icon_alt": "{{network}} icon",
   "no_transactions_found_yet": "No transactions found yet",
   "official_wxtm_token_address": "Official wXTM Token Address",
-  "pending_subtext": "You'll receive {{amount}} {{fromToken}} in no more than {{bridgingTime}}. Funds are automatically transferred from your linked Tari Universe wallet. You don't need to do anything else.",
+  "pending_subtext": "You'll receive {{amount}} {{toToken}} in no more than {{bridgingTime}}. Funds are automatically transferred {{direction}} your linked Tari Universe wallet. You don't need to do anything else.",
   "pending_title": "We're {{action}} your {{amount}} {{fromToken}}",
   "please_connect_supported_network": "Please connect to one of our supported networks to continue",
   "processing_subtext": "We've received your request. Your funds will be {{action}} as soon as the process begins. No action is needed.",
@@ -72,4 +72,7 @@
   "xtm_token": "XTM",
   "unwrap_info": "Unwrap needs your approval",
   "unwrap_info_message": "To proceed and complete unwrapping your wXTM tokens, you need to <bold>sign</bold> and then <bold>approve</bold> the transaction in your MetaMask wallet."
+  ,
+  "from": "from",
+  "to": "to"
 }
