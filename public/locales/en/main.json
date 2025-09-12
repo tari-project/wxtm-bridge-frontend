@@ -15,6 +15,7 @@
   "connect_wallet": "Connect Wallet",
   "connect_wallet_subtitle": "This will be the destination for your wXTM",
   "connect_wallet_title": "Connect a Wallet",
+  "connect_to_view": "Connect to view",
   "continue": "Continue",
   "conversion_complete": "Your {{toToken}} conversion has been complete and your funds have been deposited into the address specified.",
   "copied": "Copied!",
@@ -34,10 +35,10 @@
   "network_icon_alt": "{{network}} icon",
   "no_transactions_found_yet": "No transactions found yet",
   "official_wxtm_token_address": "Official wXTM Token Address",
-  "pending_subtext": "You'll receive {{amount}} {{fromToken}} in no more than {{bridgingTime}}. Funds are automatically transferred from your linked Tari Universe wallet. You don't need to do anything else.",
+  "pending_subtext": "You'll receive {{amount}} {{toToken}} in no more than {{bridgingTime}}. Funds are automatically transferred {{direction}} your linked Tari Universe wallet. You don't need to do anything else.",
   "pending_title": "We're {{action}} your {{amount}} {{fromToken}}",
   "please_connect_supported_network": "Please connect to one of our supported networks to continue",
-  "processing_subtext": "We've received your request. Your funds will be wrapped as soon as the process begins. No action is needed.",
+  "processing_subtext": "We've received your request. Your funds will be {{action}} as soon as the process begins. No action is needed.",
   "processing_title": "Waiting for confirmation...",
   "retry": "Retry",
   "see_faq": "View FAQs",
@@ -66,7 +67,13 @@
   "view_smart_contract_audit": "Smart contract audit by Coinspect",
   "wallet_icon_alt": "Wallet icon",
   "wrap_failed_message": "We couldn't complete your wrapping request in time.\nYour XTM remains safe in your Tari wallet — it hasn't been deducted or moved.",
+  "unwrap_failed_message": "We couldn't complete your unwrapping request in time.\nYour wXTM remains safe in your Ethereum wallet — it hasn't been deducted or moved.",
   "wrapped": "wrapped",
   "wrapping": "wrapping",
-  "xtm_token": "XTM"
+  "xtm_token": "XTM",
+  "unwrap_info": "Unwrap needs your approval",
+  "unwrap_info_message": "To proceed and complete unwrapping your wXTM tokens, you need to <bold>sign</bold> and then <bold>approve</bold> the transaction in your MetaMask wallet."
+  ,
+  "from": "from",
+  "to": "to"
 }

@@ -1,16 +1,18 @@
-import React from 'react'
-import Image from 'next/image'
-import { WrapModalProps } from './wrap-modal.types'
+import { config } from '@/config'
 import { useBridgeInfo } from '@/hooks/use-bridge-info'
 import useTariAccountStore from '@/store/account'
-import { getModalTitle } from '@/utils/transaction'
+import { getWrapModalTitle } from '@/utils/transaction'
+import { truncateAddress } from '@/utils/truncate'
 import { openExternalLink } from '@/utils/universe'
-import { config } from '@/config'
-import { formatUnits } from 'ethers'
+import { utils } from 'ethers'
+import Image from 'next/image'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { IoCloseOutline } from 'react-icons/io5'
 import { ModalButton } from '../modal-button'
+import { WrapModalProps } from './wrap-modal.types'
 
+/** @TODO Refactor and get rid of conditional display here create unwrap-modal and use it for unwrap txs */
 export const WrapModal: React.FC<WrapModalProps> = ({
   tariWalletAddress,
   ethereumAddress,
@@ -20,6 +22,7 @@ export const WrapModal: React.FC<WrapModalProps> = ({
   amountAfterFee: amountAfterFeeProp,
   destinationAddress: destAddressProp,
   transactionStatus,
+  type,
 }) => {
   const { i18n, t } = useTranslation('main', { useSuspense: false })
   const ongoingBridgeTx = useTariAccountStore((s) => s.ongoingBridgeTx)
@@ -29,22 +32,32 @@ export const WrapModal: React.FC<WrapModalProps> = ({
     tariWalletAddress!,
   )
   const amountAfterFeePending = amountAfterFeeProp
-    ? parseFloat(formatUnits(amountAfterFeeProp, 6)).toPrecision()
+    ? parseFloat(
+        utils.formatUnits(amountAfterFeeProp, type === 'wrap' ? 6 : 18),
+      ).toPrecision()
     : ongoingBridgeTx?.amountAfterFee
-    ? parseFloat(formatUnits(ongoingBridgeTx.amountAfterFee, 6)).toPrecision()
+    ? parseFloat(
+        utils.formatUnits(ongoingBridgeTx.amountAfterFee, 6),
+      ).toPrecision()
     : feesData.amountAfterFee
 
-  const destAddressPending =
+  const destAddressRaw =
     destAddressProp ||
     ongoingBridgeTx?.destinationAddress ||
     bridgeInfo.destAddress
 
+  const destAddressPending =
+    fromNetwork.name === 'Ethereum'
+      ? truncateAddress(destAddressRaw || '', 15)
+      : destAddressRaw
+
   // Pass the current language to getModalTitle
-  const { title, subtext } = getModalTitle(
+  const { title, subtext } = getWrapModalTitle(
     bridgeInfo,
     feesData,
     transactionStatus || ongoingBridgeTx,
     i18n.language,
+    type,
   )
 
   return (

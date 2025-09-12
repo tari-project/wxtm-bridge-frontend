@@ -34,10 +34,10 @@
   "network_icon_alt": "Ikon {{network}}",
   "no_transactions_found_yet": "No transactions found yet",
   "official_wxtm_token_address": "Official wXTM Token Address",
-  "pending_subtext": "Anda akan menerima {{amount}} {{fromToken}} dalam waktu tidak lebih dari {{bridgingTime}}. Dana secara otomatis ditransfer dari dompet Tari Universe yang terhubung. Anda tidak perlu melakukan apa pun.",
+  "pending_subtext": "Anda akan menerima {{amount}} {{toToken}} dalam waktu tidak lebih dari {{bridgingTime}}. Dana secara otomatis ditransfer {{direction}} dompet Tari Universe yang terhubung. Anda tidak perlu melakukan apa pun.",
   "pending_title": "Kami sedang {{action}} {{amount}} {{fromToken}} Anda",
   "please_connect_supported_network": "Silakan hubungkan ke salah satu jaringan yang didukung untuk melanjutkan",
-  "processing_subtext": "Kami telah menerima permintaan Anda. Dana Anda akan dibungkus segera setelah proses dimulai. Tidak ada tindakan yang diperlukan.",
+  "processing_subtext": "Kami telah menerima permintaan Anda. Dana Anda akan {{action}} segera setelah proses dimulai. Tidak diperlukan tindakan.",
   "processing_title": "Menunggu konfirmasi...",
   "retry": "Coba Lagi",
   "see_faq": "lihat FAQ kami",
@@ -68,5 +68,7 @@
   "wrap_failed_message": "Kami tidak dapat menyelesaikan permintaan pembungkusan Anda tepat waktu.\nXTM Anda tetap aman di dompet Tari Anda \u0014 tidak dikurangi atau dipindahkan.",
   "wrapped": "dibungkus",
   "wrapping": "membungkus",
-  "xtm_token": "XTM"
+  "xtm_token": "XTM",
+  "from": "dari",
+  "to": "ke"
 }

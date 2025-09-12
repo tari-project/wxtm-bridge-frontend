@@ -1,6 +1,6 @@
-import { BackendBridgeTransaction } from '@/types/transactions'
+import { CombinedBridgeTransaction } from '@/types/transactions'
 
 export type TransactionDetailsModalProps = {
-  transaction: BackendBridgeTransaction
+  transaction: CombinedBridgeTransaction
   closeModal: () => void
 }

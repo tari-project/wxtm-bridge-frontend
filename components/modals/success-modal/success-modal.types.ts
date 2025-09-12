@@ -1,9 +1,10 @@
 import { MainModalProps } from '@/components/modals/main-modal'
-import { BackendBridgeTransaction } from '@/types/transactions'
+import { CombinedBridgeTransaction } from '@/types/transactions'
 
 export type SuccessModalProps = {
   closeModal: () => void
-  detailedTx?: BackendBridgeTransaction
+  detailedTx?: CombinedBridgeTransaction
+  type: 'wrap' | 'unwrap'
 } & Pick<
   MainModalProps,
   'amount' | 'tariWalletAddress' | 'ethereumAddress' | 'fromNetwork'

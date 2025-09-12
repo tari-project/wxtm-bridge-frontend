@@ -34,10 +34,10 @@
   "network_icon_alt": "{{network}} simgesi",
   "no_transactions_found_yet": "No transactions found yet",
   "official_wxtm_token_address": "Official wXTM Token Address",
-  "pending_subtext": "{{bridgingTime}} içinde {{amount}} {{fromToken}} alacaksınız. Fonlar, bağlı Tari Universe cüzdanınızdan otomatik olarak aktarılır. Başka bir şey yapmanıza gerek yok.",
+  "pending_subtext": "{{bridgingTime}} içinde {{amount}} {{toToken}} alacaksınız. Fonlar {{direction}} otomatik olarak aktarılır. Başka bir şey yapmanıza gerek yok.",
   "pending_title": "{{amount}} {{fromToken}}\"inizi {{action}}",
   "please_connect_supported_network": "Devam etmek için lütfen desteklenen ağlarımızdan birine bağlanın",
-  "processing_subtext": "Talebinizi aldık. İşlem başladığında fonlarınız sarılacak. Herhangi bir işlem yapmanıza gerek yok.",
+  "processing_subtext": "Talebinizi aldık. İşlem başladığında fonlarınız {{action}} olacak. Herhangi bir işlem yapmanıza gerek yok.",
   "processing_title": "Onay bekleniyor...",
   "retry": "Tekrar Dene",
   "see_faq": "SSS\"mizi görün",
@@ -68,5 +68,7 @@
   "wrap_failed_message": "Sarılma talebinizi zamanında tamamlayamadık.\nXTM\"iniz Tari cüzdanınızda güvende \u0014 kesilmedi veya taşınmadı.",
   "wrapped": "sarılmış",
   "wrapping": "sarılma",
-  "xtm_token": "XTM"
+  "xtm_token": "XTM",
+  "from": "bağlı Tari Universe cüzdanınızdan",
+  "to": "bağlı Tari Universe cüzdanınıza"
 }

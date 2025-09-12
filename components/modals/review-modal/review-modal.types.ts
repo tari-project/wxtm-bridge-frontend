@@ -1,9 +1,9 @@
 import { MainModalProps } from '@/components/modals/main-modal'
-import { BridgeToEthereumFees } from '@/hooks/use-bridge-to-ethereum-fees'
+import { BridgeFees } from '@/hooks/use-bridge-fees'
 
 export type ReviewModalProps = {
   closeModal: () => void
-  feesData: BridgeToEthereumFees
+  feesData: BridgeFees
 } & Pick<
   MainModalProps,
   | 'handleBridgeToEthereum'

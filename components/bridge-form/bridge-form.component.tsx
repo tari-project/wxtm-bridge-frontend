@@ -4,7 +4,6 @@ import React, { useState } from 'react'
 import Image from 'next/image'
 import useTariAccountStore from '@/store/account'
 
-import { ethers } from 'ethers'
 import { useAccount, useBalance } from 'wagmi'
 import { FaArrowRight } from 'react-icons/fa6'
 import { Network, NetworkBox } from '@/components/network-box'
@@ -49,7 +48,7 @@ export const BridgeForm: React.FC<MainComponentProps> = ({
   })
 
   const evm_balance = data?.value
-    ? parseFloat(ethers.formatEther(data?.value)).toPrecision(4)
+    ? formatNumber(Number(data.value), FormatPreset.WXTM_LONG)
     : '0'
   const isDisabled = chain === undefined
 
@@ -189,7 +188,13 @@ export const BridgeForm: React.FC<MainComponentProps> = ({
                           className="font-poppins font-medium text-[12px] leading-[100%] tracking-[-0.03em] text-gray-500 whitespace-nowrap flex items-center gap-1"
                           style={{ fontFeatureSettings: '"cpsp"' }}
                         >
-                          {getBalance(true)}&nbsp;{fromToken}
+                          {fromToken === 'wXTM' && !isConnected ? (
+                            <div>{t('connect_to_view')}</div>
+                          ) : (
+                            <div>
+                              {getBalance(true)}&nbsp;{fromToken}
+                            </div>
+                          )}
                         </div>
                         <button
                           className="w-[31px] h-[13px] flex items-center justify-center gap-[7px] border border-gray-500/50 rounded-3xl px-1.5 hover:cursor-pointer font-poppins font-medium text-[8px] leading-[100%] tracking-[0em]"
