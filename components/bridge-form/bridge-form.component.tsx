@@ -189,7 +189,7 @@ export const BridgeForm: React.FC<MainComponentProps> = ({
                           style={{ fontFeatureSettings: '"cpsp"' }}
                         >
                           {fromToken === 'wXTM' && !isConnected ? (
-                            <div>Connect</div>
+                            <div>{t('connect_to_view')}</div>
                           ) : (
                             <div>
                               {getBalance(true)}&nbsp;{fromToken}

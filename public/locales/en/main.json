@@ -15,6 +15,7 @@
   "connect_wallet": "Connect Wallet",
   "connect_wallet_subtitle": "This will be the destination for your wXTM",
   "connect_wallet_title": "Connect a Wallet",
+  "connect_to_view": "Connect to view",
   "continue": "Continue",
   "conversion_complete": "Your {{toToken}} conversion has been complete and your funds have been deposited into the address specified.",
   "copied": "Copied!",
