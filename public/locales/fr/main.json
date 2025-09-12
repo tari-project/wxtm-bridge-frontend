@@ -34,10 +34,10 @@
   "network_icon_alt": "Icône {{network}}",
   "no_transactions_found_yet": "No transactions found yet",
   "official_wxtm_token_address": "Official wXTM Token Address",
-  "pending_subtext": "Vous recevrez {{amount}} {{fromToken}} en pas plus de {{bridgingTime}}. Les fonds sont automatiquement transférés depuis votre portefeuille Tari Universe lié. Vous n\"avez rien d\"autre à faire.",
+  "pending_subtext": "Vous recevrez {{amount}} {{toToken}} en pas plus de {{bridgingTime}}. Les fonds sont automatiquement transférés {{direction}} votre portefeuille Tari Universe lié. Vous n\"avez rien d\"autre à faire.",
   "pending_title": "Nous sommes en train de {{action}} votre {{amount}} {{fromToken}}",
   "please_connect_supported_network": "Veuillez vous connecter à l\"un de nos réseaux pris en charge pour continuer",
-  "processing_subtext": "Nous avons reçu votre demande. Vos fonds seront enveloppés dès que le processus commencera. Aucune action n\"est nécessaire.",
+  "processing_subtext": "Nous avons reçu votre demande. Vos fonds seront {{action}} dès que le processus commencera. Aucune action n'est requise.",
   "processing_title": "En attente de confirmation...",
   "retry": "Réessayer",
   "see_faq": "voir notre FAQ",
@@ -68,5 +68,7 @@
   "wrap_failed_message": "Nous n\"avons pas pu compléter votre demande d\"enveloppement à temps.\nVotre XTM reste en sécurité dans votre portefeuille Tari \u0014 il n\"a pas été déduit ou déplacé.",
   "wrapped": "enveloppé",
   "wrapping": "enveloppement",
-  "xtm_token": "XTM"
+  "xtm_token": "XTM",
+  "from": "depuis",
+  "to": "vers"
 }

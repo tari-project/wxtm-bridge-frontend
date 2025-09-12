@@ -3,6 +3,7 @@ export enum FormatPreset {
   XTM_DECIMALS = 'xtm-decimals',
   XTM_COMPACT = 'xtm-compact',
   XTM_LONG = 'xtm-crypto',
+  WXTM_LONG = 'wxtm-crypto',
   DECIMAL_COMPACT = 'decimal-compact',
   COMPACT = 'compact',
 }
@@ -11,8 +12,8 @@ const removeDecimals = (value: number, decimals: number) => {
   return value / Math.pow(10, decimals)
 }
 
-const removeXTMCryptoDecimals = (value: number) => {
-  return removeDecimals(value, 6)
+const removeCryptoDecimals = (value: number, decimals: number) => {
+  return removeDecimals(value, decimals)
 }
 
 /**
@@ -57,13 +58,13 @@ const formatPercent = (value = 0) =>
   formatValue(value, { style: 'percent', maximumFractionDigits: 2 })
 
 const formatXTMDecimals = (value: number) =>
-  formatValue(removeXTMCryptoDecimals(value), {
+  formatValue(removeCryptoDecimals(value, 6), {
     style: 'decimal',
     minimumFractionDigits: 6,
   })
 
 const formatXTMCompact = (value: number) =>
-  formatValue(removeXTMCryptoDecimals(roundCompactDecimals(value)), {
+  formatValue(removeCryptoDecimals(roundCompactDecimals(value), 6), {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
     notation: 'compact',
@@ -71,8 +72,15 @@ const formatXTMCompact = (value: number) =>
   })
 
 const formatXTMLong = (value: number) =>
-  formatValue(removeXTMCryptoDecimals(roundToTwoDecimals(value)), {
+  formatValue(removeCryptoDecimals(roundToTwoDecimals(value), 6), {
     maximumFractionDigits: 2,
+    notation: 'standard',
+    style: 'decimal',
+  })
+
+const formatWXTMLong = (value: number) =>
+  formatValue(removeCryptoDecimals(roundToTwoDecimals(value), 18), {
+    maximumFractionDigits: 6,
     notation: 'standard',
     style: 'decimal',
   })
@@ -94,6 +102,8 @@ export function formatNumber(value: number, preset: FormatPreset): string {
       return formatXTMCompact(value)
     case FormatPreset.XTM_LONG:
       return formatXTMLong(value)
+    case FormatPreset.WXTM_LONG:
+      return formatWXTMLong(value)
     case FormatPreset.XTM_DECIMALS:
       return formatXTMDecimals(value)
     case FormatPreset.DECIMAL_COMPACT:

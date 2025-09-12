@@ -24,7 +24,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
 }) => {
   const { t } = useTranslation('main', { useSuspense: false })
   const [showHistory, setShowHistory] = useState(false)
-  const bridgeTxs = useTariAccountStore((s) => s.backendBridgeTxs)
+  const bridgeTxs = useTariAccountStore((s) => s.combinedBridgeTxs)
 
   return (
     <section className="w-[90%] max-w-[83rem] mx-auto">

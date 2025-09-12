@@ -14,7 +14,7 @@ export const Header: React.FC<HeaderProps> = ({ onConnectClick }) => {
   const chainId = useChainId()
   const { address, isConnected, chain } = useAccount()
   const [showNetworkModal, setShowNetworkModal] = useState(false)
-  const bridgeTxs = useTariAccountStore((s) => s.backendBridgeTxs)
+  const bridgeTxs = useTariAccountStore((s) => s.combinedBridgeTxs)
   const exampleItem = bridgeTxs.find((tx) => tx.paymentId !== '')
   const setDetailedTx = useTariAccountStore((s) => s.setDetailedTx)
 

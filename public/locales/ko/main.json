@@ -34,10 +34,10 @@
   "network_icon_alt": "{{network}} 아이콘",
   "no_transactions_found_yet": "No transactions found yet",
   "official_wxtm_token_address": "Official wXTM Token Address",
-  "pending_subtext": "{{bridgingTime}} 내에 {{amount}} {{fromToken}}을(를) 받게 됩니다. 자금은 연결된 Tari Universe 지갑에서 자동으로 전송됩니다. 추가 조치는 필요하지 않습니다.",
+  "pending_subtext": "{{bridgingTime}} 내에 {{amount}} {{toToken}}을(를) 받게 됩니다. 자금은 연결된 Tari Universe 지갑{{direction}} 자동으로 전송됩니다. 추가 조치는 필요하지 않습니다.",
   "pending_title": "귀하의 {{amount}} {{fromToken}}을(를) {{action}} 중입니다",
   "please_connect_supported_network": "계속하려면 지원되는 네트워크 중 하나에 연결하세요",
-  "processing_subtext": "요청을 받았습니다. 프로세스가 시작되면 자금이 랩핑됩니다. 추가 조치는 필요하지 않습니다.",
+  "processing_subtext": "요청을 받았습니다. 프로세스가 시작되면 자금이 {{action}}됩니다. 추가 조치는 필요하지 않습니다.",
   "processing_title": "확인 대기 중...",
   "retry": "재시도",
   "see_faq": "FAQ 보기",
@@ -68,5 +68,7 @@
   "wrap_failed_message": "랩핑 요청을 제시간에 완료할 수 없었습니다.\n귀하의 XTM은 Tari 지갑에 안전하게 보관되어 있으며, 차감되거나 이동되지 않았습니다.",
   "wrapped": "랩핑됨",
   "wrapping": "랩핑",
-  "xtm_token": "XTM"
+  "xtm_token": "XTM",
+  "from": "에서",
+  "to": "으로"
 }

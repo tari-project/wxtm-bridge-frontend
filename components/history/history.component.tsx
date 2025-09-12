@@ -13,7 +13,7 @@ import {
 } from '../transactions/ListItem.styles'
 
 export const TransactionHistory: React.FC = ({}) => {
-  const bridgeTxs = useTariAccountStore((s) => s.backendBridgeTxs)
+  const bridgeTxs = useTariAccountStore((s) => s.combinedBridgeTxs)
   const setDetailedTx = useTariAccountStore((s) => s.setDetailedTx)
   const targetRef = useRef<HTMLDivElement>(null)
   const [, setIsScrolled] = useState(false)

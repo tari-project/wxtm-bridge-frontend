@@ -1,23 +1,25 @@
 'use client'
-import './i18initializer'
-import React, { useState, useEffect, useCallback } from 'react'
-import { useAccount } from 'wagmi'
+import { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { useAccount } from 'wagmi'
+import './i18initializer'
 
-import { MainModal } from '@/components/modals/main-modal'
-import { TransactionDetailsModal } from '@/components/modals/transaction-details-modal'
+import { BridgeFormValues } from '@/components/bridge-input'
 import { Header } from '@/components/header'
 import { MainComponent } from '@/components/main'
-import { useBridgeToEthereum } from '@/hooks/use-bridge-to-ethereum'
-import { BridgeFormValues } from '@/components/bridge-input'
+import { MainModal } from '@/components/modals/main-modal'
+import { TransactionDetailsModal } from '@/components/modals/transaction-details-modal'
 import { Network } from '@/components/network-box'
-import useTariAccountStore from '@/store/account'
-import { useBridgeToEthereumFees } from '@/hooks/use-bridge-to-ethereum-fees'
+import { useBridgeFees } from '@/hooks/use-bridge-fees'
+import { useBridgeToEthereum } from '@/hooks/use-bridge-to-ethereum'
+import { useBridgeToTari } from '@/hooks/use-bridge-to-tari'
 import { useBridgeTransaction } from '@/hooks/use-bridge-transaction'
+import useTariAccountStore from '@/store/account'
 import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
+import { DeployedChains } from '@tari-project/wxtm-bridge-contracts/deployments'
 
 export default function Home() {
-  const { isConnected, address: ethAddress } = useAccount()
+  const { isConnected, chain, address: ethAddress } = useAccount()
   const [modalOpen, setModalOpen] = useState(false)
   const [modalStep, setModalStep] = useState<number>(1)
   const [fromNetwork, setFromNetwork] = useState<Network>({
@@ -28,10 +30,17 @@ export default function Home() {
     name: 'Ethereum',
     icon: '/icons/eth.png',
   })
+  const [isUnwrapping, setIsUnwrapping] = useState(false)
+  const [isUnwrappingFailed, setIsUnwrappingFailed] = useState(false)
+
+  const chainId = (chain?.id ?? 1) as DeployedChains
 
   const { bridgeToEthereum, getBridgeTxParams } = useBridgeToEthereum()
+  const { bridgeToTari, isPending, isSuccess, isError, error } =
+    useBridgeToTari(ethAddress || '0x', chainId)
   const { getUserBackendBridgeTxs } = useBridgeTransaction()
   const tariAccount = useTariAccountStore((s) => s.tariAccount)
+  const setTariAccount = useTariAccountStore((s) => s.setTariAccount)
   const detailedTx = useTariAccountStore((s) => s.detailedTx)
   const setDetailedTx = useTariAccountStore((s) => s.setDetailedTx)
   const ongoingBridgeTx = useTariAccountStore((s) => s.ongoingBridgeTx)
@@ -43,8 +52,10 @@ export default function Home() {
   const showModalDetailedTx = !!detailedTx
   const showModalOngoingTx = ongoingBridgeTx && ongoingBridgeTx.showModal
 
-  const isFailed = ongoingBridgeTx?.status === UserTransactionDTO.status.TIMEOUT
-  const isSuccess =
+  const isFailed =
+    ongoingBridgeTx?.status === UserTransactionDTO.status.TIMEOUT ||
+    isUnwrappingFailed
+  const isWrapSuccess =
     ongoingBridgeTx?.status === UserTransactionDTO.status.SUCCESS
 
   const {
@@ -59,7 +70,8 @@ export default function Home() {
   })
 
   const amount = watch('amount')
-  const feesData = useBridgeToEthereumFees(amount)
+  const decimals = fromNetwork.name === 'Tari' ? 6 : 18
+  const feesData = useBridgeFees(amount, decimals)
 
   useEffect(() => {
     if (!tariAccount) return
@@ -85,6 +97,7 @@ export default function Home() {
     const fetchUserTransactions = async () => {
       try {
         await getUserBackendBridgeTxs()
+        await setTariAccount()
       } catch (error) {
         console.error(
           '[ TAPPLET-BRIDGE ] Failed to get user transactions:',
@@ -101,13 +114,17 @@ export default function Home() {
       clearInterval(intervalId)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tariAccount])
+  }, [tariAccount?.address])
 
   useEffect(() => {
     if (modalOpen && modalStep === 0 && isConnected) {
       setModalOpen(false)
       setModalStep(1)
-    } else if (!showModalDetailedTx && showModalOngoingTx) {
+    } else if (
+      !showModalDetailedTx &&
+      showModalOngoingTx &&
+      (isSuccess || ongoingBridgeTx.type === 'wrap')
+    ) {
       setModalStep(2)
       setModalOpen(true)
     } else if (showModalDetailedTx && modalOpen) {
@@ -117,10 +134,30 @@ export default function Home() {
     isConnected,
     modalOpen,
     modalStep,
+    isSuccess,
     ongoingBridgeTx,
     showModalDetailedTx,
     showModalOngoingTx,
   ])
+
+  useEffect(() => {
+    if (isUnwrapping) {
+      console.debug(`[ TAPPLET-BRIDGE ] Initiating transaction...`)
+      setModalStep(3)
+    }
+  }, [isUnwrapping])
+
+  useEffect(() => {
+    if (isSuccess) {
+      console.debug(`[ TAPPLET-BRIDGE ] Unwrap transaction success!`)
+      setIsUnwrapping(false)
+      setModalStep(2)
+    } else if (isError) {
+      console.error(`[ TAPPLET-BRIDGE ] Unwrap transaction failed:`, error)
+      setIsUnwrapping(false)
+      setIsUnwrappingFailed(true)
+    }
+  }, [isPending, isSuccess, isError, error])
 
   const handleConnectClick = () => {
     if (!isConnected) {
@@ -163,12 +200,24 @@ export default function Home() {
     getUserBackendBridgeTxs,
   ])
 
-  const handleBridgeToTari = () => {
-    setModalStep(2)
-  }
+  const handleBridgeToTari = useCallback(async () => {
+    if (!amount || !ethAddress || !tariAccount?.address) {
+      return
+    }
+
+    setIsUnwrapping(true)
+    const success = await bridgeToTari(amount, ethAddress, tariAccount.address)
+    if (success) {
+      setIsUnwrapping(false)
+    } else {
+      setIsUnwrapping(false)
+      setIsUnwrappingFailed(true)
+    }
+  }, [amount, ethAddress, tariAccount?.address, bridgeToTari])
 
   const handleCloseModal = () => {
     resetField('amount', { defaultValue: '' })
+    setIsUnwrappingFailed(false)
     handleSetOngoingModalOpen(false)
     setModalStep(1)
   }
@@ -198,7 +247,7 @@ export default function Home() {
 
       {modalOpen && !showModalDetailedTx && (
         <MainModal
-          success={isSuccess}
+          success={isWrapSuccess}
           failed={isFailed}
           step={modalStep}
           handleBridgeToEthereum={handleBridgeToEthereum}
@@ -210,6 +259,7 @@ export default function Home() {
           toNetwork={toNetwork}
           feesData={feesData}
           closeModal={handleCloseModal}
+          type={ongoingBridgeTx?.type || 'wrap'}
         />
       )}
     </main>

@@ -266,7 +266,7 @@ export const HistoryListWrapper = styled(m.div)`
 `
 
 export const StatusWrapper = styled.span<{
-  $status: 'pending' | 'completed' | 'timeout' | 'default'
+  $status: 'pending' | 'completed' | 'timeout' | 'error' | 'default'
 }>`
   color: ${({ $status }) => {
     switch ($status) {

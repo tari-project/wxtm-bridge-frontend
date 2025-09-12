@@ -12,27 +12,20 @@ export const NetworkBox: React.FC<NetworkBoxProps> = ({
   onToggle,
   onSelect,
 }) => {
-  /** @dev Development */
-  const arrowsDisabled = true
+  /** @dev Unwrap Disabled Under Development */
+  const arrowsDisabled = false
 
   const getTokenSymbol = () => {
     if (type === 'from') {
       return selected.name === 'Tari' ? 'XTM' : 'wXTM'
     } else {
       if (selected.name === 'Tari') return 'XTM'
-      if (selected.name === 'Solana') return 'SOL'
       return 'wXTM'
     }
   }
 
   const getFilteredNetworks = () => {
-    if (type === 'from') {
-      // For "From" box, only show networks that aren't currently selected
-      return networks.filter((network) => network.name !== selected.name)
-    } else {
-      // For "To" box, show all networks
-      return networks
-    }
+    return networks.filter((network) => network.name !== selected.name)
   }
 
   const tokenSymbol = getTokenSymbol()

@@ -1,17 +1,26 @@
 import { useMutation } from '@tanstack/react-query'
 
 import {
-  WrapTokenService,
+  TokensUnwrappedService,
   UserTransactionDTO,
+  UserUnwrappedTransactionDTO,
+  WrapTokenService,
 } from '@tari-project/wxtm-bridge-backend-api'
 
 import useTariAccountStore from '@/store/account'
 import { OngoingUserTransaction } from '@/types/tapplet'
-import { BackendBridgeTransaction } from '@/types/transactions'
+import {
+  BackendBridgeTransaction,
+  BackendUnwrapTransaction,
+  CombinedBridgeTransaction,
+} from '@/types/transactions'
 
 export const useBridgeTransaction = () => {
-  const getUserTxs = useMutation({
+  const getUserWrapTxs = useMutation({
     mutationFn: WrapTokenService.getUserTransactions,
+  })
+  const getUserUnwrapTxs = useMutation({
+    mutationFn: TokensUnwrappedService.getUserTransactions,
   })
 
   const setLastOngoingBridgeTx =
@@ -29,6 +38,10 @@ export const useBridgeTransaction = () => {
     const ongoingBridgeTx = useTariAccountStore.getState().ongoingBridgeTx
     const setBackendBridgeTxs =
       useTariAccountStore.getState().setBackendBridgeTxs
+    const setBackendUnwrapTxs =
+      useTariAccountStore.getState().setBackendUnwrapTxs
+    const setCombinedBridgeTxs =
+      useTariAccountStore.getState().setCombinedBridgeTxs
     const lastOngoingPaymentIdFromTU =
       useTariAccountStore.getState().lastOngoingPaymentIdFromTU
     const tariAccount = useTariAccountStore.getState().tariAccount
@@ -42,30 +55,70 @@ export const useBridgeTransaction = () => {
       `[ TAPPLET-BRIDGE ] get txs from ${getFromTU ? 'TU' : 'backend'}`,
     )
 
-    let transactions: BackendBridgeTransaction[]
+    let wrapTransactions: BackendBridgeTransaction[] = []
+    let unwrapTransactions: BackendUnwrapTransaction[] = []
+    let combinedTransactions: CombinedBridgeTransaction[] = []
+
     if (getFromTU) {
-      transactions = await getBackendBridgeTxsFromTU()
+      /** @TODO We would need to add getter for unwraps in TU and add those in below combinedTransactions */
+      wrapTransactions = await getBackendBridgeTxsFromTU()
+      combinedTransactions = wrapTransactions.map((tx) => ({
+        ...tx,
+        type: 'wrap' as const,
+      }))
     } else {
-      const result = await getUserTxs.mutateAsync(walletAddress)
-      transactions = result.transactions
-      setBackendBridgeTxs(transactions)
+      const wrapResult = await getUserWrapTxs.mutateAsync(walletAddress)
+      const unwrapResult = await getUserUnwrapTxs.mutateAsync(walletAddress)
+
+      wrapTransactions = wrapResult.transactions
+      unwrapTransactions = unwrapResult.transactions
+
+      setBackendBridgeTxs(wrapTransactions)
+      setBackendUnwrapTxs(unwrapTransactions)
+      setCombinedBridgeTxs(wrapTransactions, unwrapTransactions)
+
+      combinedTransactions = [
+        ...wrapTransactions.map((tx) => ({ ...tx, type: 'wrap' as const })),
+        ...unwrapTransactions.map((tx) => ({ ...tx, type: 'unwrap' as const })),
+      ]
+
+      combinedTransactions.sort((a, b) => {
+        const dateA = new Date(a.createdAt).getTime()
+        const dateB = new Date(b.createdAt).getTime()
+        return dateB - dateA // Sort descending by date
+      })
     }
 
-    if (Array.isArray(transactions) && transactions.length > 0) {
-      // Find a pending transaction
-      const ongoing = transactions.find(
-        (tx) =>
-          tx.status === UserTransactionDTO.status.PENDING ||
-          tx.status === UserTransactionDTO.status.PROCESSING ||
-          tx.status === UserTransactionDTO.status.TOKENS_RECEIVED,
-      )
+    if (
+      Array.isArray(combinedTransactions) &&
+      combinedTransactions.length > 0
+    ) {
+      // Find a pending transaction (checking both wrap and unwrap statuses)
+      const ongoing = combinedTransactions.find((tx) => {
+        if (tx.type === 'wrap') {
+          return (
+            tx.status === UserTransactionDTO.status.PENDING ||
+            tx.status === UserTransactionDTO.status.PROCESSING ||
+            tx.status === UserTransactionDTO.status.TOKENS_RECEIVED
+          )
+        } else {
+          return (
+            tx.status === UserUnwrappedTransactionDTO.status.PENDING ||
+            tx.status === UserUnwrappedTransactionDTO.status.PROCESSING
+          )
+        }
+      })
       if (ongoing) {
-        // update only if tx has changed
         if (
-          ongoing.paymentId !== ongoingBridgeTx?.paymentId ||
-          ongoing.status !== ongoingBridgeTx?.status
-        )
-          setLastOngoingBridgeTx(ongoing)
+          (ongoing.paymentId !== ongoingBridgeTx?.paymentId ||
+            ongoing.status !== ongoingBridgeTx?.status) &&
+          (!ongoingBridgeTx ||
+            new Date(ongoing.createdAt).getTime() >
+              new Date(ongoingBridgeTx?.createdAt).getTime())
+        ) {
+          const ongoingTransaction: OngoingUserTransaction = ongoing
+          setLastOngoingBridgeTx(ongoingTransaction)
+        }
         return ongoing
       }
 
@@ -75,19 +128,32 @@ export const useBridgeTransaction = () => {
         ongoingBridgeTx?.paymentId,
         lastOngoingPaymentIdFromTU,
       ])
-      const validStatuses = new Set([
-        UserTransactionDTO.status.SUCCESS,
-        UserTransactionDTO.status.TIMEOUT,
-      ])
+      const ongoingCompleted = combinedTransactions.find((tx) => {
+        const paymentId = tx.paymentId
+        const hasValidPaymentId = validPaymentIds.has(paymentId)
 
-      const ongoingCompleted = transactions.find(
-        ({ paymentId, status }) =>
-          validPaymentIds.has(paymentId) && validStatuses.has(status),
-      )
+        if (tx.type === 'wrap') {
+          return (
+            hasValidPaymentId &&
+            (tx.status === UserTransactionDTO.status.SUCCESS ||
+              tx.status === UserTransactionDTO.status.TIMEOUT)
+          )
+        } else {
+          return (
+            hasValidPaymentId &&
+            (tx.status === UserUnwrappedTransactionDTO.status.SUCCESS ||
+              tx.status === UserUnwrappedTransactionDTO.status.ERROR)
+          )
+        }
+      })
 
       if (ongoingCompleted) {
-        setLastOngoingBridgeTx({ ...ongoingCompleted, showModal: true })
-        return ongoingCompleted
+        const ongoingTransaction: OngoingUserTransaction = {
+          ...ongoingCompleted,
+          showModal: true,
+        }
+        setLastOngoingBridgeTx(ongoingTransaction)
+        return ongoingTransaction
       }
     } else {
       // No transactions found, clear any pending transaction

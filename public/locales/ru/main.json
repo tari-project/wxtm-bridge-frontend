@@ -34,10 +34,10 @@
   "network_icon_alt": "Иконка {{network}}",
   "no_transactions_found_yet": "No transactions found yet",
   "official_wxtm_token_address": "Official wXTM Token Address",
-  "pending_subtext": "Вы получите {{amount}} {{fromToken}} не позднее чем через {{bridgingTime}}. Средства автоматически переводятся из вашего связанного кошелька Tari Universe. Вам не нужно ничего делать.",
+  "pending_subtext": "Вы получите {{amount}} {{toToken}} не позднее чем через {{bridgingTime}}. Средства автоматически переводятся {{direction}} связанный кошелек Tari Universe. Вам не нужно ничего делать.",
   "pending_title": "Мы {{action}} ваш {{amount}} {{fromToken}}",
   "please_connect_supported_network": "Пожалуйста, подключитесь к одной из поддерживаемых нами сетей, чтобы продолжить",
-  "processing_subtext": "Мы получили ваш запрос. Ваши средства будут обернуты, как только начнется процесс. Никаких действий не требуется.",
+  "processing_subtext": "Мы получили ваш запрос. Ваши средства будут {{action}}, как только начнется процесс. Никаких действий не требуется.",
   "processing_title": "Ожидание подтверждения...",
   "retry": "Повторить",
   "see_faq": "см. наш FAQ",
@@ -68,5 +68,7 @@
   "wrap_failed_message": "Мы не смогли завершить ваш запрос на обертку вовремя.\nВаш XTM остается в безопасности в вашем кошельке Tari — он не был списан или перемещен.",
   "wrapped": "обернут",
   "wrapping": "обертка",
-  "xtm_token": "XTM"
+  "xtm_token": "XTM",
+  "from": "из",
+  "to": "в"
 }
