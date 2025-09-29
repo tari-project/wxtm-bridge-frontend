@@ -5,16 +5,15 @@ import { TextField } from '@mui/material'
 import { BridgeInputProps } from './bridge-input.types'
 import { useBridgeInfo } from '@/hooks/use-bridge-info'
 import { config } from '@/config'
-import useTariAccountStore from '@/store/account'
 
 export const BridgeInput: React.FC<BridgeInputProps> = ({
   fromNetwork,
   control,
   errors,
+  availableBalance,
 }) => {
   const [valueLength, setValueLength] = useState(5)
   const { fromToken } = useBridgeInfo(fromNetwork)
-  const availableBalance = useTariAccountStore((s) => s.availableBalance)
 
   // Helper to block invalid keys
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {

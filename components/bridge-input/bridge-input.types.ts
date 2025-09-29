@@ -9,4 +9,5 @@ export type BridgeInputProps = {
   fromNetwork: Network
   control: Control<BridgeFormValues>
   errors: FieldErrors<BridgeFormValues>
+  availableBalance: number,
 }

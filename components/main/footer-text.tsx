@@ -10,7 +10,6 @@ export const FooterText: React.FC = ({}) => {
 
   return (
     <div className="fixed bottom-0 mb-4 left-0 w-full text-center text-xs text-black/50 items-center justify-center whitespace-pre-line leading-[200%]">
-      {t('bridge_one_way_notice')}{' '}
       <a
         onClick={(e) => openExternalLink(config.TARI_BRIDGE_FAQ_URL, e)}
         rel="noopener noreferrer"
