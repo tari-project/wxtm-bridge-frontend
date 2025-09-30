@@ -104,6 +104,12 @@ export const BridgeForm: React.FC<MainComponentProps> = ({
         : (availableBalance / 1_000_000).toString()
       : evm_balance
   }
+  
+   
+  const inputAvailableBalance = () =>
+    fromNetwork.name === 'Tari'
+      ? availableBalance / 1000000
+      : (Number(data?.value) ?? 0) / Math.pow(10, 18)
 
   return (
     <div className="bg-white/50 backdrop-blur-sm shadow-xl rounded-2xl p-4 mx-auto min-h-[130px] fixed-box mb-5">
@@ -164,6 +170,7 @@ export const BridgeForm: React.FC<MainComponentProps> = ({
                         fromNetwork={fromNetwork}
                         control={control}
                         errors={errors}
+                        availableBalance={inputAvailableBalance()}
                       />
                     </div>
                     <div className="hidden lg:flex flex-col">
