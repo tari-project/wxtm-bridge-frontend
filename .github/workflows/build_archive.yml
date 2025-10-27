@@ -54,7 +54,7 @@ jobs:
           npm run build
 
       - name: Artifact upload for Archive
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ env.TS_FILENAME }}_archive_unreleased
           path: "out"
