@@ -14,6 +14,7 @@ import {
   BackendUnwrapTransaction,
   CombinedBridgeTransaction,
 } from '@/types/transactions'
+import { error } from 'next/dist/build/output/log'
 
 export const useBridgeTransaction = () => {
   const getUserWrapTxs = useMutation({
@@ -48,7 +49,10 @@ export const useBridgeTransaction = () => {
     const getBackendBridgeTxsFromTU =
       useTariAccountStore.getState().getBackendBridgeTxsFromTU
 
+    console.debug(`[ TAPPLET-BRIDGE ]  tariAccount =`, tariAccount);
+
     if (!tariAccount) return null
+
     const walletAddress = tariAccount.address
 
     console.debug(

@@ -17,6 +17,7 @@ import { useBridgeTransaction } from '@/hooks/use-bridge-transaction'
 import useTariAccountStore from '@/store/account'
 import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
 import { DeployedChains } from '@tari-project/wxtm-bridge-contracts/deployments'
+import { useBridgeStatus } from '@/hooks/use-bridge-status'
 
 export default function Home() {
   const { isConnected, chain, address: ethAddress } = useAccount()
@@ -35,28 +36,24 @@ export default function Home() {
 
   const chainId = (chain?.id ?? 1) as DeployedChains
 
+  const { isOffline } = useBridgeStatus()
+
   const { bridgeToEthereum, getBridgeTxParams } = useBridgeToEthereum()
-  const { bridgeToTari, isPending, isSuccess, isError, error } =
-    useBridgeToTari(ethAddress || '0x', chainId)
+  const { bridgeToTari, isPending, isSuccess, isError, error } = useBridgeToTari(ethAddress || '0x', chainId)
   const { getUserBackendBridgeTxs } = useBridgeTransaction()
   const tariAccount = useTariAccountStore((s) => s.tariAccount)
   const setTariAccount = useTariAccountStore((s) => s.setTariAccount)
   const detailedTx = useTariAccountStore((s) => s.detailedTx)
   const setDetailedTx = useTariAccountStore((s) => s.setDetailedTx)
   const ongoingBridgeTx = useTariAccountStore((s) => s.ongoingBridgeTx)
-  const setLastOngoingBridgeTx = useTariAccountStore(
-    (s) => s.setLastOngoingBridgeTx,
-  )
+  const setLastOngoingBridgeTx = useTariAccountStore((s) => s.setLastOngoingBridgeTx)
 
   // Prevent main modal from showing when transaction details modal is active
   const showModalDetailedTx = !!detailedTx
   const showModalOngoingTx = ongoingBridgeTx && ongoingBridgeTx.showModal
 
-  const isFailed =
-    ongoingBridgeTx?.status === UserTransactionDTO.status.TIMEOUT ||
-    isUnwrappingFailed
-  const isWrapSuccess =
-    ongoingBridgeTx?.status === UserTransactionDTO.status.SUCCESS
+  const isFailed = ongoingBridgeTx?.status === UserTransactionDTO.status.TIMEOUT || isUnwrappingFailed
+  const isWrapSuccess = ongoingBridgeTx?.status === UserTransactionDTO.status.SUCCESS
 
   const {
     watch,
@@ -80,10 +77,7 @@ export default function Home() {
       try {
         await getBridgeTxParams()
       } catch (error) {
-        console.error(
-          '[ TAPPLET-BRIDGE ] Failed to get bridge transaction params:',
-          error,
-        )
+        console.error('[ TAPPLET-BRIDGE ] Failed to get bridge transaction params:', error)
       }
     }
 
@@ -99,10 +93,7 @@ export default function Home() {
         await getUserBackendBridgeTxs()
         await setTariAccount()
       } catch (error) {
-        console.error(
-          '[ TAPPLET-BRIDGE ] Failed to get user transactions:',
-          error,
-        )
+        console.error('[ TAPPLET-BRIDGE ] Failed to get user transactions:', error)
       }
     }
 
@@ -120,25 +111,13 @@ export default function Home() {
     if (modalOpen && modalStep === 0 && isConnected) {
       setModalOpen(false)
       setModalStep(1)
-    } else if (
-      !showModalDetailedTx &&
-      showModalOngoingTx &&
-      (isSuccess || ongoingBridgeTx.type === 'wrap')
-    ) {
+    } else if (!showModalDetailedTx && showModalOngoingTx && (isSuccess || ongoingBridgeTx.type === 'wrap')) {
       setModalStep(2)
       setModalOpen(true)
     } else if (showModalDetailedTx && modalOpen) {
       setModalOpen(false)
     }
-  }, [
-    isConnected,
-    modalOpen,
-    modalStep,
-    isSuccess,
-    ongoingBridgeTx,
-    showModalDetailedTx,
-    showModalOngoingTx,
-  ])
+  }, [isConnected, modalOpen, modalStep, isSuccess, ongoingBridgeTx, showModalDetailedTx, showModalOngoingTx])
 
   useEffect(() => {
     if (isUnwrapping) {
@@ -172,8 +151,7 @@ export default function Home() {
   }
   const handleSetOngoingModalOpen = (open: boolean) => {
     setModalOpen(open)
-    if (ongoingBridgeTx)
-      setLastOngoingBridgeTx({ ...ongoingBridgeTx, showModal: false })
+    if (ongoingBridgeTx) setLastOngoingBridgeTx({ ...ongoingBridgeTx, showModal: false })
   }
 
   const handleBridgeToEthereum = useCallback(() => {
@@ -192,13 +170,7 @@ export default function Home() {
       .catch((error) => {
         console.error('[ TAPPLET-BRIDGE ] Bridge operation failed:', error)
       })
-  }, [
-    amount,
-    ethAddress,
-    bridgeToEthereum,
-    feesData.amountAfterFee,
-    getUserBackendBridgeTxs,
-  ])
+  }, [amount, ethAddress, bridgeToEthereum, feesData.amountAfterFee, getUserBackendBridgeTxs])
 
   const handleBridgeToTari = useCallback(async () => {
     if (!amount || !ethAddress || !tariAccount?.address) {
@@ -224,7 +196,8 @@ export default function Home() {
 
   return (
     <main className="relative min-h-screen w-full flex flex-col px-20 items-center justify-center">
-      <Header onConnectClick={handleConnectClick} />
+      <Header onConnectClickAction={handleConnectClick} isOffline={isOffline} />
+
       <MainComponent
         onConnectClick={handleConnectClick}
         onContinueClick={handleContinueClick}
@@ -238,12 +211,7 @@ export default function Home() {
         setToNetwork={setToNetwork}
       />
 
-      {detailedTx && (
-        <TransactionDetailsModal
-          transaction={detailedTx}
-          closeModal={() => setDetailedTx(null)}
-        />
-      )}
+      {detailedTx && <TransactionDetailsModal transaction={detailedTx} closeModal={() => setDetailedTx(null)} />}
 
       {modalOpen && !showModalDetailedTx && (
         <MainModal

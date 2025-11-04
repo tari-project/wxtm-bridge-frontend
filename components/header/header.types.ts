@@ -1,3 +1,4 @@
 export type HeaderProps = {
-  onConnectClick: () => void
+  onConnectClickAction: () => void;
+  isOffline: boolean;
 }
