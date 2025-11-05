@@ -8,7 +8,7 @@ import { TransactionHistory } from '../history/history.component'
 import { BridgeForm } from '../bridge-form/bridge-form.component'
 import { HomeText } from './home-text'
 import useTariAccountStore from '@/store/account'
-import { FooterText } from './footer-text'
+
 import { useBridgeStatus } from '@/hooks/use-bridge-status'
 
 export const MainComponent: React.FC<MainComponentProps> = ({
@@ -105,11 +105,10 @@ export const MainComponent: React.FC<MainComponentProps> = ({
   ) : null
 
   return (
-    <section className="w-full mx-auto relative">
+    <section className="w-full h-full mx-auto relative md:w-[90vw] lg:w-[85vw]">
       {offlineMarkup}
       <HomeText />
       {mainMarkup}
-      <FooterText />
     </section>
   )
 }

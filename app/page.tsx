@@ -1,5 +1,5 @@
 'use client'
-import { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useAccount } from 'wagmi'
 import './i18initializer'
@@ -17,6 +17,10 @@ import { useBridgeTransaction } from '@/hooks/use-bridge-transaction'
 import useTariAccountStore from '@/store/account'
 import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
 import { DeployedChains } from '@tari-project/wxtm-bridge-contracts/deployments'
+import { FooterText } from '@/components/main/footer-text'
+
+const DAILY_LIMIT_ERROR = 'Daily wrap limit exceeded'
+const DAILY_LIMIT_ERROR_TYPE = 'Forbidden'
 
 export default function Home() {
   const { isConnected, chain, address: ethAddress } = useAccount()
@@ -39,6 +43,7 @@ export default function Home() {
   const { bridgeToTari, isPending, isSuccess, isError, error } = useBridgeToTari(ethAddress || '0x', chainId)
   const { getUserBackendBridgeTxs } = useBridgeTransaction()
   const tariAccount = useTariAccountStore((s) => s.tariAccount)
+  const setExceededDailyLimit = useTariAccountStore((s) => s.setExceededDailyLimit)
   const setTariAccount = useTariAccountStore((s) => s.setTariAccount)
   const detailedTx = useTariAccountStore((s) => s.detailedTx)
   const setDetailedTx = useTariAccountStore((s) => s.setDetailedTx)
@@ -67,20 +72,18 @@ export default function Home() {
   const decimals = fromNetwork.name === 'Tari' ? 6 : 18
   const feesData = useBridgeFees(amount, decimals)
 
+  const fetchBridgeTxParams = useCallback(async () => {
+    try {
+      await getBridgeTxParams()
+    } catch (error) {
+      console.error('[ TAPPLET-BRIDGE ] Failed to get bridge transaction params:', error)
+    }
+  }, [getBridgeTxParams])
+
   useEffect(() => {
     if (!tariAccount) return
-
-    const fetchBridgeTxParams = async () => {
-      try {
-        await getBridgeTxParams()
-      } catch (error) {
-        console.error('[ TAPPLET-BRIDGE ] Failed to get bridge transaction params:', error)
-      }
-    }
-
-    fetchBridgeTxParams()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tariAccount])
+    void fetchBridgeTxParams()
+  }, [fetchBridgeTxParams, tariAccount])
 
   useEffect(() => {
     if (!tariAccount) return
@@ -161,13 +164,20 @@ export default function Home() {
       ethAddress: ethAddress,
       amountAfterFee: feesData.amountAfterFee,
     })
-      .then(() => {
-        getUserBackendBridgeTxs()
+      .then(async () => {
+        await getUserBackendBridgeTxs()
       })
-      .catch((error) => {
-        console.error('[ TAPPLET-BRIDGE ] Bridge operation failed:', error)
+      .catch((e) => {
+        console.error('[ TAPPLET-BRIDGE ] Bridge operation failed:', e)
+        const error = e as Error
+        const isLimitError =
+          error?.message?.includes(DAILY_LIMIT_ERROR_TYPE) || error?.message?.includes(DAILY_LIMIT_ERROR)
+        setExceededDailyLimit(isLimitError)
+        if (isLimitError) {
+          setModalOpen(false)
+        }
       })
-  }, [amount, ethAddress, bridgeToEthereum, feesData.amountAfterFee, getUserBackendBridgeTxs])
+  }, [amount, ethAddress, bridgeToEthereum, feesData.amountAfterFee, getUserBackendBridgeTxs, setExceededDailyLimit])
 
   const handleBridgeToTari = useCallback(async () => {
     if (!amount || !ethAddress || !tariAccount?.address) {
@@ -191,7 +201,7 @@ export default function Home() {
     setModalStep(1)
   }
   return (
-    <main className="relative min-h-screen w-full flex flex-col px-[max(90px,5vw)] items-center justify-center">
+    <main className="relative min-h-screen w-full flex flex-col pl-(--tu-padding-left) pr-8 items-center justify-center">
       <Header onConnectClickAction={handleConnectClick} />
 
       <MainComponent
@@ -226,6 +236,7 @@ export default function Home() {
           type={ongoingBridgeTx?.type || 'wrap'}
         />
       )}
+      <FooterText />
     </main>
   )
 }

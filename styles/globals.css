@@ -20,6 +20,7 @@ body {
 
 :root {
   --foreground: #171717;
+  --tu-padding-left: calc(80px + var(--spacing) * 8);
 }
 
 body {
@@ -27,11 +28,7 @@ body {
 }
 
 .custom-bg {
-  background: radial-gradient(
-    56.45% 56.45% at 56.2% 43.55%,
-    #fafbff 0%,
-    #b9bac3 100%
-  );
+  background: radial-gradient(56.45% 56.45% at 56.2% 43.55%, #fafbff 0%, #b9bac3 100%);
   background-repeat: no-repeat;
   background-size: cover;
   background-attachment: fixed;

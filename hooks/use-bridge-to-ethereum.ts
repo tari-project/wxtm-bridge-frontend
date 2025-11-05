@@ -9,13 +9,8 @@ import { parseWxtmTokenAmount } from '@/utils/parse-wxtm-token-amount'
 import { stringifyProperties } from '@/utils/stringifyProperties'
 import { useBridgeTransaction } from './use-bridge-transaction'
 
-const DAILY_LIMIT_ERROR = 'Daily wrap limit exceeded'
 export const useBridgeToEthereum = () => {
-  const {
-    mutateAsync: createTransaction,
-    isError: createTransactionIsError,
-    error: createTransactionError,
-  } = useMutation({
+  const createTransaction = useMutation({
     mutationFn: WrapTokenService.createWrapTokenTransaction,
   })
   const confirmTokenSent = useMutation({
@@ -28,7 +23,6 @@ export const useBridgeToEthereum = () => {
   const { getUserBackendBridgeTxs } = useBridgeTransaction()
   const signer = useTariSigner((s) => s.signer)
   const tariAccount = useTariAccountStore((s) => s.tariAccount)
-  const setExceededDailyLimit = useTariAccountStore((s) => s.setExceededDailyLimit)
   const tariColdWalletAddress = useBridgeStore((s) => s.tariColdWalletAddress)
   const setTariColdWalletAddress = useBridgeStore((s) => s.setTariColdWalletAddress)
   const setWrapTokenFeePercentageBps = useBridgeStore((s) => s.setWrapTokenFeePercentageBps)
@@ -48,19 +42,13 @@ export const useBridgeToEthereum = () => {
     const parsedAmount = parseWxtmTokenAmount(amount)
 
     const baseNodeStatusBefore = await signer?.getBaseNodeStatus()
-    const createTxRes = await createTransaction({
+    const { paymentId } = await createTransaction.mutateAsync({
       to: ethAddress,
       from: tariAccount.address,
       tokenAmount: parsedAmount,
       debug: stringifyProperties(baseNodeStatusBefore),
     })
 
-    if (createTransactionIsError) {
-      console.error(`[ TAPPLET-BRIDGE ] create transaction error`, createTransactionError)
-      setExceededDailyLimit(!!createTransactionError?.message?.includes(DAILY_LIMIT_ERROR))
-    }
-
-    const paymentId = createTxRes?.paymentId
     // set ongoing to immediately display wrap modal
     setLastOngoingBridgeTx({
       destinationAddress: ethAddress,
