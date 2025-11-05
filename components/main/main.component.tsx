@@ -25,7 +25,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
 }) => {
   const { t } = useTranslation('main', { useSuspense: false })
   const [showHistory, setShowHistory] = useState(false)
-  const exceededDailyLimit = useTariAccountStore((s) => !s.exceededDailyLimit)
+  const exceededDailyLimit = useTariAccountStore((s) => s.exceededDailyLimit)
   const bridgeTxs = useTariAccountStore((s) => s.combinedBridgeTxs)
 
   const { isOffline } = useBridgeStatus()
@@ -43,18 +43,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
     </div>
   ) : null
 
-  const bridgingMarkup = exceededDailyLimit ? (
-    <div className="flex items-center w-full mx-auto ">
-      <div className="flex flex-col gap-1 items-center p-[25px] w-full rounded-2xl bg-white/30 backdrop-blur-sm shadow-lg">
-        <div className="font-semibold text-center leading-none text-xl text-black font-poppins flex">
-          You&#39;ve exceeded the daily wrap limit.
-        </div>
-        <div className="font-medium text-center leading-none text-lg text-black font-poppins flex">
-          Your transaction was not processed. Don&#39;t worry, you&#39;ll be able to bridge again tomorrow!
-        </div>
-      </div>
-    </div>
-  ) : (
+  const bridgingMarkup = (
     <BridgeForm
       onConnectClick={onConnectClick}
       onContinueClick={onContinueClick}
@@ -70,9 +59,21 @@ export const MainComponent: React.FC<MainComponentProps> = ({
   )
 
   const mainMarkup = !isOffline ? (
-    <div className="mt-[4rem] mt-small">
+    <div className="mt-6">
+      {exceededDailyLimit && (
+        <div className="flex items-center w-fit">
+          <div className="flex flex-col gap-1 items-center p-[16px] w-full rounded-2xl bg-white/30 backdrop-blur-sm shadow-lg">
+            <div className="font-semibold text-center leading-none text-lg text-black font-poppins flex">
+              You&#39;ve exceeded the daily wrap limit.
+            </div>
+            <div className="font-medium text-center leading-none text-sm text-black font-poppins flex">
+              Your transaction was not processed. Don&#39;t worry, you&#39;ll be able to bridge again tomorrow!
+            </div>
+          </div>
+        </div>
+      )}
       <div
-        className="mb-4 flex gap-2"
+        className="mb-4 mt-6 flex gap-2"
         style={{
           color: '#000',
           fontFamily: 'Poppins, sans-serif',

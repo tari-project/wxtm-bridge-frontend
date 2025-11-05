@@ -176,6 +176,7 @@ export default function Home() {
     })
       .then(async () => {
         await getUserBackendBridgeTxs()
+        setExceededDailyLimit(false)
       })
       .catch((e) => {
         console.error('[ TAPPLET-BRIDGE ] Bridge operation failed:', e)
