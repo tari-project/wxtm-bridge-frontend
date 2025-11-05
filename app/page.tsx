@@ -18,12 +18,14 @@ import useTariAccountStore from '@/store/account'
 import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
 import { DeployedChains } from '@tari-project/wxtm-bridge-contracts/deployments'
 import { FooterText } from '@/components/main/footer-text'
+import useBridgeStore from '@/store/bridge'
 
 const DAILY_LIMIT_ERROR = 'Daily wrap limit exceeded'
 const DAILY_LIMIT_ERROR_TYPE = 'Forbidden'
 
 export default function Home() {
   const { isConnected, chain, address: ethAddress } = useAccount()
+  const [hasFetchedParams, setHasFetchedParams] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
   const [modalStep, setModalStep] = useState<number>(1)
   const [fromNetwork, setFromNetwork] = useState<Network>({
@@ -49,6 +51,8 @@ export default function Home() {
   const setDetailedTx = useTariAccountStore((s) => s.setDetailedTx)
   const ongoingBridgeTx = useTariAccountStore((s) => s.ongoingBridgeTx)
   const setLastOngoingBridgeTx = useTariAccountStore((s) => s.setLastOngoingBridgeTx)
+  const tariColdWalletAddress = useBridgeStore((s) => s.tariColdWalletAddress)
+  const wrapTokenFeePercentageBps = useBridgeStore((s) => s.wrapTokenFeePercentageBps)
 
   // Prevent main modal from showing when transaction details modal is active
   const showModalDetailedTx = !!detailedTx
@@ -72,18 +76,24 @@ export default function Home() {
   const decimals = fromNetwork.name === 'Tari' ? 6 : 18
   const feesData = useBridgeFees(amount, decimals)
 
-  const fetchBridgeTxParams = useCallback(async () => {
-    try {
-      await getBridgeTxParams()
-    } catch (error) {
-      console.error('[ TAPPLET-BRIDGE ] Failed to get bridge transaction params:', error)
+  useEffect(() => {
+    if (!tariAccount || hasFetchedParams) return
+    const fetchBridgeTxParams = async () => {
+      try {
+        await getBridgeTxParams()
+      } catch (error) {
+        console.error('[ TAPPLET-BRIDGE ] Failed to get bridge transaction params:', error)
+      }
     }
-  }, [getBridgeTxParams])
+
+    fetchBridgeTxParams().then(() => {
+      setHasFetchedParams(true)
+    })
+  }, [getBridgeTxParams, hasFetchedParams, tariAccount])
 
   useEffect(() => {
-    if (!tariAccount) return
-    void fetchBridgeTxParams()
-  }, [fetchBridgeTxParams, tariAccount])
+    setHasFetchedParams(!!tariColdWalletAddress?.length || !!wrapTokenFeePercentageBps)
+  }, [tariColdWalletAddress?.length, wrapTokenFeePercentageBps])
 
   useEffect(() => {
     if (!tariAccount) return
