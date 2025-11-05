@@ -9,19 +9,25 @@ export const useBridgeStatus = () => {
   })
 
   useEffect(() => {
-    mutateAsync()
-      .then((r) => {
-        setStatus(r.status)
-      })
-      .catch((e) => {
-        console.error('[ TAPPLET-BRIDGE] is offline or unreachable', e)
-        setStatus(GetWrapTokenServiceStatusRespDTO.status.OFFLINE)
-      })
+    function getStatus() {
+      mutateAsync()
+        .then((r) => {
+          setStatus(r.status)
+          console.info('[ TAPPLET-BRIDGE] bridge status=', r.status)
+        })
+        .catch((e) => {
+          console.error('[ TAPPLET-BRIDGE] is offline or unreachable', e)
+          setStatus(GetWrapTokenServiceStatusRespDTO.status.OFFLINE)
+        })
+    }
+    getStatus()
+
+    const statusInterval = setInterval(getStatus, 1000 * 60 * 5) // check every 5 min
+    return () => clearInterval(statusInterval)
   }, [mutateAsync])
 
   return {
     bridgeStatus: status,
-    isOffline: true,
-    //isOffline: status !== GetWrapTokenServiceStatusRespDTO.status.ONLINE
+    isOffline: status !== GetWrapTokenServiceStatusRespDTO.status.ONLINE,
   }
 }

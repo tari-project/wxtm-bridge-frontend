@@ -195,7 +195,7 @@ export default function Home() {
   }
 
   return (
-    <main className="relative min-h-screen w-full flex flex-col px-20 items-center justify-center">
+    <main className="relative min-h-screen w-full flex flex-col px-[max(110px,10vw)] items-center justify-center">
       <Header onConnectClickAction={handleConnectClick} isOffline={isOffline} />
 
       <MainComponent
