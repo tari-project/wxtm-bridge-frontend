@@ -47,7 +47,7 @@ export const useTariAccountStore = create<TariL1WalletStoreState>()((set) => ({
   ...initialState,
   setTariAccount: async () => {
     const signer = useTariSigner.getState().signer
-    // if (process.env.NODE_ENV === 'development') return
+    if (process.env.NODE_ENV === 'development') return
     try {
       if (!signer) {
         console.error('[ TAPPLET-BRIDGE ] signer undefined')

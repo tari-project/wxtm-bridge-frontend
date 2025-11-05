@@ -9,8 +9,9 @@ import { supportedChains, chainsMap } from '@/utils/networksConfig'
 import { HeaderProps } from './header.types'
 import { BridgeHistoryListItem } from '../transactions/BridgeListItem'
 import useTariAccountStore from '@/store/account'
+import { useBridgeStatus } from '@/hooks/use-bridge-status'
 
-export const Header = ({ onConnectClickAction, isOffline }: HeaderProps) => {
+export const Header = ({ onConnectClickAction }: HeaderProps) => {
   const chainId = useChainId()
   const { address, isConnected, chain } = useAccount()
   const [showNetworkModal, setShowNetworkModal] = useState(false)
@@ -18,8 +19,9 @@ export const Header = ({ onConnectClickAction, isOffline }: HeaderProps) => {
   const exampleItem = bridgeTxs.find((tx) => tx.paymentId !== '')
   const setDetailedTx = useTariAccountStore((s) => s.setDetailedTx)
 
-  const isNetworkSupported = chain !== undefined
+  const { isOffline } = useBridgeStatus()
 
+  const isNetworkSupported = chain !== undefined
   const handleDisplayTransaction = () => {
     if (exampleItem) {
       setDetailedTx(exampleItem)
@@ -90,7 +92,7 @@ export const Header = ({ onConnectClickAction, isOffline }: HeaderProps) => {
       {!isOffline && defaultMarkup}
 
       {/* Network Switch Modal */}
-      {!isOffline && showNetworkModal && (
+      {showNetworkModal && (
         <NetworkSwitchModal closeModal={() => setShowNetworkModal(false)} supportedChains={supportedChains} />
       )}
     </>

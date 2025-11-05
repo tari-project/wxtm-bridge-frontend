@@ -105,7 +105,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
   ) : null
 
   return (
-    <section className="w-[90%] max-w-[83rem] mx-auto relative">
+    <section className="w-full mx-auto relative">
       {offlineMarkup}
       <HomeText />
       {mainMarkup}

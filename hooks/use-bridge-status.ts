@@ -28,6 +28,6 @@ export const useBridgeStatus = () => {
 
   return {
     bridgeStatus: status,
-    isOffline: status !== GetWrapTokenServiceStatusRespDTO.status.ONLINE,
+    isOffline: status && status !== GetWrapTokenServiceStatusRespDTO.status.ONLINE,
   }
 }

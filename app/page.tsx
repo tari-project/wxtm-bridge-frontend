@@ -17,7 +17,6 @@ import { useBridgeTransaction } from '@/hooks/use-bridge-transaction'
 import useTariAccountStore from '@/store/account'
 import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
 import { DeployedChains } from '@tari-project/wxtm-bridge-contracts/deployments'
-import { useBridgeStatus } from '@/hooks/use-bridge-status'
 
 export default function Home() {
   const { isConnected, chain, address: ethAddress } = useAccount()
@@ -35,8 +34,6 @@ export default function Home() {
   const [isUnwrappingFailed, setIsUnwrappingFailed] = useState(false)
 
   const chainId = (chain?.id ?? 1) as DeployedChains
-
-  const { isOffline } = useBridgeStatus()
 
   const { bridgeToEthereum, getBridgeTxParams } = useBridgeToEthereum()
   const { bridgeToTari, isPending, isSuccess, isError, error } = useBridgeToTari(ethAddress || '0x', chainId)
@@ -193,10 +190,9 @@ export default function Home() {
     handleSetOngoingModalOpen(false)
     setModalStep(1)
   }
-
   return (
-    <main className="relative min-h-screen w-full flex flex-col px-[max(110px,10vw)] items-center justify-center">
-      <Header onConnectClickAction={handleConnectClick} isOffline={isOffline} />
+    <main className="relative min-h-screen w-full flex flex-col px-[max(90px,5vw)] items-center justify-center">
+      <Header onConnectClickAction={handleConnectClick} />
 
       <MainComponent
         onConnectClick={handleConnectClick}
