@@ -12,6 +12,7 @@ interface State {
   backendUnwrapTxs: BackendUnwrapTransaction[]
   combinedBridgeTxs: CombinedBridgeTransaction[]
   detailedTx?: CombinedBridgeTransaction | null
+  exceededDailyLimit: boolean
 }
 
 interface Actions {
@@ -23,6 +24,7 @@ interface Actions {
   removeOngoingTransaction: () => void
   getBackendBridgeTxsFromTU: () => Promise<BackendBridgeTransaction[]>
   setDetailedTx: (detailedTx: CombinedBridgeTransaction | null) => void
+  setExceededDailyLimit: (exceededDailyLimit: boolean) => void
 }
 
 type TariL1WalletStoreState = State & Actions
@@ -38,6 +40,7 @@ const initialState: State = {
   backendBridgeTxs: [],
   backendUnwrapTxs: [],
   combinedBridgeTxs: [],
+  exceededDailyLimit: false,
 }
 
 export const useTariAccountStore = create<TariL1WalletStoreState>()((set) => ({
@@ -121,6 +124,7 @@ export const useTariAccountStore = create<TariL1WalletStoreState>()((set) => ({
     set({
       detailedTx: detailedTx,
     }),
+  setExceededDailyLimit: (exceededDailyLimit: boolean) => set({ exceededDailyLimit }),
 }))
 
 export default useTariAccountStore

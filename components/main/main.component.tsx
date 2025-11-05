@@ -25,12 +25,13 @@ export const MainComponent: React.FC<MainComponentProps> = ({
 }) => {
   const { t } = useTranslation('main', { useSuspense: false })
   const [showHistory, setShowHistory] = useState(false)
+  const exceededDailyLimit = useTariAccountStore((s) => s.exceededDailyLimit)
   const bridgeTxs = useTariAccountStore((s) => s.combinedBridgeTxs)
 
   const { isOffline } = useBridgeStatus()
 
   const offlineMarkup = isOffline ? (
-    <div className="flex items-center w-full mx-auto absolute -translate-y-full -top-7">
+    <div className="flex items-center w-full mx-auto absolute -translate-y-full -top-8">
       <div className="flex flex-col gap-1 items-center p-[25px] w-full rounded-4xl bg-white/30 backdrop-blur-sm  shadow-lg">
         <div className="font-semibold text-center leading-none text-2xl text-black font-poppins flex">
           The bridge is currently down for maintenance.
@@ -42,7 +43,33 @@ export const MainComponent: React.FC<MainComponentProps> = ({
     </div>
   ) : null
 
-  const markup = isOffline ? null : (
+  const bridgingMarkup = exceededDailyLimit ? (
+    <div className="flex items-center w-full mx-auto ">
+      <div className="flex flex-col gap-1 items-center p-[25px] w-full rounded-2xl bg-white/30 backdrop-blur-sm  shadow-lg">
+        <div className="font-semibold text-center leading-none text-2xl text-black font-poppins flex">
+          You&#39;ve exceeded the daily wrap limit.
+        </div>
+        <div className="font-medium text-center leading-none text-xl text-black font-poppins  flex">
+          Don&#39;t worry, you&#39;ll be able to bridge again tomorrow!
+        </div>
+      </div>
+    </div>
+  ) : (
+    <BridgeForm
+      onConnectClick={onConnectClick}
+      onContinueClick={onContinueClick}
+      control={control}
+      errors={errors}
+      setValue={setValue}
+      isValid={isValid}
+      fromNetwork={fromNetwork}
+      setFromNetwork={setFromNetwork}
+      toNetwork={toNetwork}
+      setToNetwork={setToNetwork}
+    />
+  )
+
+  const mainMarkup = !isOffline ? (
     <div className="mt-[4rem] mt-small">
       <div
         className="mb-4 flex gap-2"
@@ -73,30 +100,15 @@ export const MainComponent: React.FC<MainComponentProps> = ({
         </button>
       </div>
 
-      {showHistory ? (
-        <TransactionHistory />
-      ) : (
-        <BridgeForm
-          onConnectClick={onConnectClick}
-          onContinueClick={onContinueClick}
-          control={control}
-          errors={errors}
-          setValue={setValue}
-          isValid={isValid}
-          fromNetwork={fromNetwork}
-          setFromNetwork={setFromNetwork}
-          toNetwork={toNetwork}
-          setToNetwork={setToNetwork}
-        />
-      )}
+      {showHistory ? <TransactionHistory /> : bridgingMarkup}
     </div>
-  )
+  ) : null
 
   return (
     <section className="w-[90%] max-w-[83rem] mx-auto relative">
       {offlineMarkup}
       <HomeText />
-      {markup}
+      {mainMarkup}
       <FooterText />
     </section>
   )
