@@ -54,9 +54,9 @@ export type IframeMessage =
 // Hook to listen for messages from the parent window
 export function useIframeMessage(onMessage: (event: MessageEvent<IframeMessage>) => void) {
   useEffect(() => {
-    function handleMessage(event: MessageEvent<IframeMessage>) {
+    const handleMessage = (event: MessageEvent<IframeMessage>) => {
       // Optionally, add origin checks here for security
-      onMessage(event)
+      onMessage?.(event)
     }
     window.addEventListener('message', handleMessage)
     return () => {

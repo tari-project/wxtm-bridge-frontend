@@ -85,12 +85,15 @@ export const useAppStore = create<AppStoreState>()((set) => ({
       theme: parsedTheme,
     })
   },
+  setUnwrapEnabled: (unwrapEnabled: boolean) => {
+    console.info(`Unwrap enabled: ${unwrapEnabled}`)
+    set({ unwrapEnabled })
+  },
   setHideWalletBalance: (hideBalance: boolean) => {
     set({
       hideWalletBalance: hideBalance,
     })
   },
-  setUnwrapEnabled: (unwrapEnabled: boolean) => set({ unwrapEnabled }),
 }))
 
 export default useAppStore

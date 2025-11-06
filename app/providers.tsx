@@ -1,13 +1,13 @@
 'use client'
 
-import { ReactNode, useState, useEffect, useRef } from 'react'
+import { ReactNode, useState, useEffect, useRef, useCallback } from 'react'
 import { WagmiProvider, State, Config, cookieToInitialState } from 'wagmi'
 import { getConfig } from '@/utils/config'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useTariAccountStore } from '@/store/account'
 import { TariL1SignerParameters } from '@/types/tapplet'
 import TariL1Signer from '@/clients/tari-l1-signer'
-import { MessageType, useIframeMessage } from '@/utils/useIframeMessage'
+import { IframeMessage, MessageType, useIframeMessage } from '@/utils/useIframeMessage'
 import useAppStore from '@/store/app'
 import useTariSignerStore from '@/store/signer'
 import { getInitConfig } from '@/utils/universe'
@@ -28,7 +28,6 @@ export const Providers = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (!projectId || initializedRef.current) return
-
     const cfg = getConfig(projectId)
     setConfig(cfg)
 
@@ -61,28 +60,34 @@ export const Providers = ({ children }: { children: ReactNode }) => {
         console.error('[ TAPPLET-BRIDGE ] Failed to set Tari Account:', error)
       }
     }
-    initializeSignerAndAccount()
+    void initializeSignerAndAccount()
     return () => {
       cancelled = true
     }
   }, [setAppConfig, setSigner, setTariAccount, signer])
 
-  useIframeMessage((event) => {
-    switch (event.data.type) {
-      case MessageType.SET_FEATURES:
-        const unwrapEnabled = event.data.payload.unwrapEnabled
-        setUnwrapEnabled(unwrapEnabled)
-        break
-      case MessageType.SET_THEME:
-        const theme = event.data.payload.theme
-        setTheme(theme)
-        break
-      case MessageType.SET_LANGUAGE:
-        const language = event.data.payload.language
-        setLanguage(language)
-        break
-    }
-  })
+  const handleMessage = useCallback(
+    (event: MessageEvent<IframeMessage>) => {
+      switch (event.data.type) {
+        case MessageType.SET_THEME:
+          const theme = event?.data?.payload?.theme
+          setTheme(theme)
+          break
+        case MessageType.SET_LANGUAGE:
+          const language = event?.data?.payload?.language
+          void setLanguage(language)
+          break
+        case MessageType.SET_FEATURES:
+          const unwrapEnabled = !!event?.data?.payload?.unwrapEnabled
+          console.info('Received features | unwrap enabled:', unwrapEnabled)
+          setUnwrapEnabled(unwrapEnabled)
+          break
+      }
+    },
+    [setLanguage, setTheme, setUnwrapEnabled],
+  )
+
+  useIframeMessage(handleMessage)
 
   if (!config) {
     return <div className="h-5 w-5 animate-spin rounded-full border-b-[3px] border-white"></div>
