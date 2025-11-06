@@ -16,6 +16,7 @@ export const Providers = ({ children }: { children: ReactNode }) => {
   const projectId = useAppStore((s) => s.walletConnectProjectId)
   const signer = useTariSignerStore((s) => s.signer)
   const setLanguage = useAppStore((s) => s.setLanguage)
+  const setUnwrapEnabled = useAppStore((s) => s.setUnwrapEnabled)
   const setTheme = useAppStore((s) => s.setTheme)
   const setAppConfig = useAppStore((s) => s.setAppConfig)
   const setSigner = useTariSignerStore((s) => s.setSigner)
@@ -68,6 +69,10 @@ export const Providers = ({ children }: { children: ReactNode }) => {
 
   useIframeMessage((event) => {
     switch (event.data.type) {
+      case MessageType.SET_FEATURES:
+        const unwrapEnabled = event.data.payload.unwrapEnabled
+        setUnwrapEnabled(unwrapEnabled)
+        break
       case MessageType.SET_THEME:
         const theme = event.data.payload.theme
         setTheme(theme)
@@ -80,9 +85,7 @@ export const Providers = ({ children }: { children: ReactNode }) => {
   })
 
   if (!config) {
-    return (
-      <div className="h-5 w-5 animate-spin rounded-full border-b-[3px] border-white"></div>
-    )
+    return <div className="h-5 w-5 animate-spin rounded-full border-b-[3px] border-white"></div>
   }
 
   return (

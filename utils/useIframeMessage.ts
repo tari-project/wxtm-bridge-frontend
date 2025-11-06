@@ -5,6 +5,7 @@ export enum MessageType {
   RESIZE = 'resize',
   SET_LANGUAGE = 'SET_LANGUAGE',
   SET_THEME = 'SET_THEME',
+  SET_FEATURES = 'SET_FEATURES',
 }
 
 interface SignerCallMessage {
@@ -29,6 +30,13 @@ interface SetLanguageMessage {
   }
 }
 
+interface SetFeaturesMessage {
+  type: MessageType.SET_FEATURES
+  payload: {
+    unwrapEnabled: boolean
+  }
+}
+
 interface SetThemeMessage {
   type: MessageType.SET_THEME
   payload: {
@@ -41,11 +49,10 @@ export type IframeMessage =
   | ResizeMessage
   | SetLanguageMessage
   | SetThemeMessage
+  | SetFeaturesMessage
 
 // Hook to listen for messages from the parent window
-export function useIframeMessage(
-  onMessage: (event: MessageEvent<IframeMessage>) => void,
-) {
+export function useIframeMessage(onMessage: (event: MessageEvent<IframeMessage>) => void) {
   useEffect(() => {
     function handleMessage(event: MessageEvent<IframeMessage>) {
       // Optionally, add origin checks here for security
