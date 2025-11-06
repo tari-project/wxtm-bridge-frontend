@@ -11,7 +11,6 @@ const nextConfig: NextConfig = {
     loaderFile: './utils/imageLoader.ts',
     path: process.env.NEXT_PUBLIC_PATH,
   }
-
 }
 
 export default nextConfig

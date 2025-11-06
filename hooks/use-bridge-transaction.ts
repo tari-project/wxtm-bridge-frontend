@@ -9,11 +9,7 @@ import {
 
 import useTariAccountStore from '@/store/account'
 import { OngoingUserTransaction } from '@/types/tapplet'
-import {
-  BackendBridgeTransaction,
-  BackendUnwrapTransaction,
-  CombinedBridgeTransaction,
-} from '@/types/transactions'
+import { BackendBridgeTransaction, BackendUnwrapTransaction, CombinedBridgeTransaction } from '@/types/transactions'
 
 export const useBridgeTransaction = () => {
   const getUserWrapTxs = useMutation({
@@ -23,37 +19,29 @@ export const useBridgeTransaction = () => {
     mutationFn: TokensUnwrappedService.getUserTransactions,
   })
 
-  const setLastOngoingBridgeTx =
-    useTariAccountStore.getState().setLastOngoingBridgeTx
-  const removeOngoingTransaction =
-    useTariAccountStore.getState().removeOngoingTransaction
+  const setLastOngoingBridgeTx = useTariAccountStore.getState().setLastOngoingBridgeTx
+  const removeOngoingTransaction = useTariAccountStore.getState().removeOngoingTransaction
 
   /**
    * Fetch user bridge transactions and update the store's ongoing transaction state.
    * Returns the updated ongoing transaction or null if none.
    */
-  const getUserBackendBridgeTxs = async (
-    getFromTU = false,
-  ): Promise<OngoingUserTransaction | null> => {
+  const getUserBackendBridgeTxs = async (getFromTU = false): Promise<OngoingUserTransaction | null> => {
     const ongoingBridgeTx = useTariAccountStore.getState().ongoingBridgeTx
-    const setBackendBridgeTxs =
-      useTariAccountStore.getState().setBackendBridgeTxs
-    const setBackendUnwrapTxs =
-      useTariAccountStore.getState().setBackendUnwrapTxs
-    const setCombinedBridgeTxs =
-      useTariAccountStore.getState().setCombinedBridgeTxs
-    const lastOngoingPaymentIdFromTU =
-      useTariAccountStore.getState().lastOngoingPaymentIdFromTU
+    const setBackendBridgeTxs = useTariAccountStore.getState().setBackendBridgeTxs
+    const setBackendUnwrapTxs = useTariAccountStore.getState().setBackendUnwrapTxs
+    const setCombinedBridgeTxs = useTariAccountStore.getState().setCombinedBridgeTxs
+    const lastOngoingPaymentIdFromTU = useTariAccountStore.getState().lastOngoingPaymentIdFromTU
     const tariAccount = useTariAccountStore.getState().tariAccount
-    const getBackendBridgeTxsFromTU =
-      useTariAccountStore.getState().getBackendBridgeTxsFromTU
+    const getBackendBridgeTxsFromTU = useTariAccountStore.getState().getBackendBridgeTxsFromTU
 
-    if (!tariAccount) return null
-    const walletAddress = tariAccount.address
+    console.debug(`[ TAPPLET-BRIDGE ]  tariAccount =`, tariAccount)
 
-    console.debug(
-      `[ TAPPLET-BRIDGE ] get txs from ${getFromTU ? 'TU' : 'backend'}`,
-    )
+    const walletAddress = tariAccount?.address
+
+    if (!tariAccount || !walletAddress?.length) return null
+
+    console.debug(`[ TAPPLET-BRIDGE ] get txs from ${getFromTU ? 'TU' : 'backend'}`)
 
     let wrapTransactions: BackendBridgeTransaction[] = []
     let unwrapTransactions: BackendUnwrapTransaction[] = []
@@ -89,10 +77,7 @@ export const useBridgeTransaction = () => {
       })
     }
 
-    if (
-      Array.isArray(combinedTransactions) &&
-      combinedTransactions.length > 0
-    ) {
+    if (Array.isArray(combinedTransactions) && combinedTransactions.length > 0) {
       // Find a pending transaction (checking both wrap and unwrap statuses)
       const ongoing = combinedTransactions.find((tx) => {
         if (tx.type === 'wrap') {
@@ -110,11 +95,8 @@ export const useBridgeTransaction = () => {
       })
       if (ongoing) {
         if (
-          (ongoing.paymentId !== ongoingBridgeTx?.paymentId ||
-            ongoing.status !== ongoingBridgeTx?.status) &&
-          (!ongoingBridgeTx ||
-            new Date(ongoing.createdAt).getTime() >
-              new Date(ongoingBridgeTx?.createdAt).getTime())
+          (ongoing.paymentId !== ongoingBridgeTx?.paymentId || ongoing.status !== ongoingBridgeTx?.status) &&
+          (!ongoingBridgeTx || new Date(ongoing.createdAt).getTime() > new Date(ongoingBridgeTx?.createdAt).getTime())
         ) {
           const ongoingTransaction: OngoingUserTransaction = ongoing
           setLastOngoingBridgeTx(ongoingTransaction)
@@ -124,10 +106,7 @@ export const useBridgeTransaction = () => {
 
       // If no pending tx found, but previously had one, check if it succeeded/failed
       // check also with the paymentId from the TU to display modal after the bridge relaunch
-      const validPaymentIds = new Set([
-        ongoingBridgeTx?.paymentId,
-        lastOngoingPaymentIdFromTU,
-      ])
+      const validPaymentIds = new Set([ongoingBridgeTx?.paymentId, lastOngoingPaymentIdFromTU])
       const ongoingCompleted = combinedTransactions.find((tx) => {
         const paymentId = tx.paymentId
         const hasValidPaymentId = validPaymentIds.has(paymentId)
@@ -135,8 +114,7 @@ export const useBridgeTransaction = () => {
         if (tx.type === 'wrap') {
           return (
             hasValidPaymentId &&
-            (tx.status === UserTransactionDTO.status.SUCCESS ||
-              tx.status === UserTransactionDTO.status.TIMEOUT)
+            (tx.status === UserTransactionDTO.status.SUCCESS || tx.status === UserTransactionDTO.status.TIMEOUT)
           )
         } else {
           return (

@@ -10,12 +10,14 @@ interface State {
   bridgeAPI: string
   theme: Theme
   hideWalletBalance: boolean
+  unwrapEnabled: boolean
 }
 
 interface Actions {
   setAppConfig: () => Promise<string | undefined>
   setLanguage: (language: string) => Promise<void>
   setTheme: (theme: string) => void
+  setUnwrapEnabled: (unwrapEnabled: boolean) => void
 }
 
 type AppStoreState = State & Actions
@@ -26,6 +28,7 @@ const initialState: State = {
   bridgeAPI: '',
   theme: 'light',
   hideWalletBalance: false,
+  unwrapEnabled: false,
 }
 
 export const useAppStore = create<AppStoreState>()((set) => ({
@@ -41,10 +44,7 @@ export const useAppStore = create<AppStoreState>()((set) => ({
 
       const envs =
         process.env.NODE_ENV === 'development'
-          ? [
-              process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
-              process.env.NEXT_PUBLIC_BACKEND_API_URL,
-            ]
+          ? [process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID, process.env.NEXT_PUBLIC_BACKEND_API_URL]
           : await signer.getBridgeEnvs()
 
       const walletconnectId = envs?.[0] ?? ''
@@ -62,10 +62,7 @@ export const useAppStore = create<AppStoreState>()((set) => ({
 
       return walletconnectId
     } catch (error) {
-      console.error(
-        '[ TAPPLET-BRIDGE ] error setting the Bridge app config ',
-        error,
-      )
+      console.error('[ TAPPLET-BRIDGE ] error setting the Bridge app config ', error)
     }
   },
   setLanguage: async (languageCode: string) => {
@@ -74,9 +71,7 @@ export const useAppStore = create<AppStoreState>()((set) => ({
         set({
           language: languageCode,
         })
-        console.info(
-          `Changing current language ${i18next.language} to ${languageCode}`,
-        )
+        console.info(`Changing current language ${i18next.language} to ${languageCode}`)
         await changeLanguage(languageCode)
       }
     } catch (e) {
@@ -89,6 +84,10 @@ export const useAppStore = create<AppStoreState>()((set) => ({
     set({
       theme: parsedTheme,
     })
+  },
+  setUnwrapEnabled: (unwrapEnabled: boolean) => {
+    console.info(`Unwrap enabled: ${unwrapEnabled}`)
+    set({ unwrapEnabled })
   },
   setHideWalletBalance: (hideBalance: boolean) => {
     set({

@@ -1,10 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
 
-import {
-  UpdateToTokensSentReqDTO,
-  UserTransactionDTO,
-  WrapTokenService,
-} from '@tari-project/wxtm-bridge-backend-api'
+import { UpdateToTokensSentReqDTO, UserTransactionDTO, WrapTokenService } from '@tari-project/wxtm-bridge-backend-api'
 
 import useTariAccountStore from '@/store/account'
 import useBridgeStore from '@/store/bridge'
@@ -18,13 +14,8 @@ export const useBridgeToEthereum = () => {
     mutationFn: WrapTokenService.createWrapTokenTransaction,
   })
   const confirmTokenSent = useMutation({
-    mutationFn: async ({
-      paymentId,
-      requestBody,
-    }: {
-      paymentId: string
-      requestBody?: UpdateToTokensSentReqDTO
-    }) => WrapTokenService.updateToTokensSent(paymentId, requestBody),
+    mutationFn: async ({ paymentId, requestBody }: { paymentId: string; requestBody?: UpdateToTokensSentReqDTO }) =>
+      WrapTokenService.updateToTokensSent(paymentId, requestBody),
   })
   const getWrapTokenParams = useMutation({
     mutationFn: WrapTokenService.getWrapTokenParams,
@@ -33,15 +24,9 @@ export const useBridgeToEthereum = () => {
   const signer = useTariSigner((s) => s.signer)
   const tariAccount = useTariAccountStore((s) => s.tariAccount)
   const tariColdWalletAddress = useBridgeStore((s) => s.tariColdWalletAddress)
-  const setTariColdWalletAddress = useBridgeStore(
-    (s) => s.setTariColdWalletAddress,
-  )
-  const setWrapTokenFeePercentageBps = useBridgeStore(
-    (s) => s.setWrapTokenFeePercentageBps,
-  )
-  const setLastOngoingBridgeTx = useTariAccountStore(
-    (s) => s.setLastOngoingBridgeTx,
-  )
+  const setTariColdWalletAddress = useBridgeStore((s) => s.setTariColdWalletAddress)
+  const setWrapTokenFeePercentageBps = useBridgeStore((s) => s.setWrapTokenFeePercentageBps)
+  const setLastOngoingBridgeTx = useTariAccountStore((s) => s.setLastOngoingBridgeTx)
 
   const bridgeToEthereum = async ({
     amount,
@@ -115,8 +100,7 @@ export const useBridgeToEthereum = () => {
 
   const getBridgeTxParams = async () => {
     try {
-      const { coldWalletAddress, wrapTokenFeePercentageBps } =
-        await getWrapTokenParams.mutateAsync()
+      const { coldWalletAddress, wrapTokenFeePercentageBps } = await getWrapTokenParams.mutateAsync()
 
       setTariColdWalletAddress(coldWalletAddress)
       setWrapTokenFeePercentageBps(wrapTokenFeePercentageBps)

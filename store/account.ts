@@ -1,11 +1,7 @@
 import { AccountData, OngoingUserTransaction } from '@/types/tapplet'
 import { create } from 'zustand'
 import useTariSigner from './signer'
-import {
-  BackendBridgeTransaction,
-  BackendUnwrapTransaction,
-  CombinedBridgeTransaction,
-} from '@/types/transactions'
+import { BackendBridgeTransaction, BackendUnwrapTransaction, CombinedBridgeTransaction } from '@/types/transactions'
 
 interface State {
   tariAccount?: AccountData
@@ -16,6 +12,7 @@ interface State {
   backendUnwrapTxs: BackendUnwrapTransaction[]
   combinedBridgeTxs: CombinedBridgeTransaction[]
   detailedTx?: CombinedBridgeTransaction | null
+  exceededDailyLimit: boolean
 }
 
 interface Actions {
@@ -23,13 +20,11 @@ interface Actions {
   setLastOngoingBridgeTx: (tx: OngoingUserTransaction) => void
   setBackendBridgeTxs: (txs: BackendBridgeTransaction[]) => void
   setBackendUnwrapTxs: (txs: BackendUnwrapTransaction[]) => void
-  setCombinedBridgeTxs: (
-    wrapTxs: BackendBridgeTransaction[],
-    unwrapTxs: BackendUnwrapTransaction[],
-  ) => void
+  setCombinedBridgeTxs: (wrapTxs: BackendBridgeTransaction[], unwrapTxs: BackendUnwrapTransaction[]) => void
   removeOngoingTransaction: () => void
   getBackendBridgeTxsFromTU: () => Promise<BackendBridgeTransaction[]>
   setDetailedTx: (detailedTx: CombinedBridgeTransaction | null) => void
+  setExceededDailyLimit: (exceededDailyLimit: boolean) => void
 }
 
 type TariL1WalletStoreState = State & Actions
@@ -45,6 +40,7 @@ const initialState: State = {
   backendBridgeTxs: [],
   backendUnwrapTxs: [],
   combinedBridgeTxs: [],
+  exceededDailyLimit: false,
 }
 
 export const useTariAccountStore = create<TariL1WalletStoreState>()((set) => ({
@@ -65,16 +61,13 @@ export const useTariAccountStore = create<TariL1WalletStoreState>()((set) => ({
           account_id: account.account_id,
           address: account.address,
         },
-        availableBalance: balance.available_balance,
+        availableBalance: balance?.available_balance || 0,
         lastOngoingPaymentIdFromTU: ongoingBridgeTx?.paymentId ?? '',
       })
 
       return
     } catch (error) {
-      console.error(
-        '[ TAPPLET-BRIDGE ] error setting the Tari account: ',
-        error,
-      )
+      console.error('[ TAPPLET-BRIDGE ] error setting the Tari account: ', error)
     }
   },
 
@@ -103,10 +96,7 @@ export const useTariAccountStore = create<TariL1WalletStoreState>()((set) => ({
       })
       return backendBridgeTxs
     } catch (error) {
-      console.error(
-        '[ TAPPLET-BRIDGE ] error getting bridge transactions:',
-        error,
-      )
+      console.error('[ TAPPLET-BRIDGE ] error getting bridge transactions:', error)
       return []
     }
   },
@@ -120,17 +110,11 @@ export const useTariAccountStore = create<TariL1WalletStoreState>()((set) => ({
       backendUnwrapTxs: txs,
     })
   },
-  setCombinedBridgeTxs: (
-    wrapTxs: BackendBridgeTransaction[],
-    unwrapTxs: BackendUnwrapTransaction[],
-  ) => {
+  setCombinedBridgeTxs: (wrapTxs: BackendBridgeTransaction[], unwrapTxs: BackendUnwrapTransaction[]) => {
     const combined: CombinedBridgeTransaction[] = [
       ...wrapTxs.map((tx) => ({ ...tx, type: 'wrap' as const })),
       ...unwrapTxs.map((tx) => ({ ...tx, type: 'unwrap' as const })),
-    ].sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    )
+    ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
 
     set({
       combinedBridgeTxs: combined,
@@ -140,6 +124,7 @@ export const useTariAccountStore = create<TariL1WalletStoreState>()((set) => ({
     set({
       detailedTx: detailedTx,
     }),
+  setExceededDailyLimit: (exceededDailyLimit: boolean) => set({ exceededDailyLimit }),
 }))
 
 export default useTariAccountStore

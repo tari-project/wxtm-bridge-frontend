@@ -9,7 +9,7 @@ export const FooterText: React.FC = ({}) => {
   const { t } = useTranslation('main', { useSuspense: false })
 
   return (
-    <div className="fixed bottom-0 mb-4 left-0 w-full text-center text-xs text-black/50 items-center justify-center whitespace-pre-line leading-[200%]">
+    <div className="absolute bottom-2 left-0 w-full text-center text-xs text-black/50 items-center justify-center whitespace-pre-line leading-[200%] pl-(--tu-padding-left)">
       <a
         onClick={(e) => openExternalLink(config.TARI_BRIDGE_FAQ_URL, e)}
         rel="noopener noreferrer"

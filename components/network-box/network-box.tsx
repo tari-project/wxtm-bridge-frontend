@@ -3,17 +3,10 @@ import Image from 'next/image'
 import { IoIosArrowUp, IoIosArrowDown } from 'react-icons/io'
 
 import { NetworkBoxProps } from './network-box.types'
+import useAppStore from '@/store/app'
 
-export const NetworkBox: React.FC<NetworkBoxProps> = ({
-  type,
-  selected,
-  isOpen,
-  networks,
-  onToggle,
-  onSelect,
-}) => {
-  /** @dev Unwrap Disabled Under Development */
-  const arrowsDisabled = false
+export const NetworkBox: React.FC<NetworkBoxProps> = ({ type, selected, isOpen, networks, onToggle, onSelect }) => {
+  const arrowsDisabled = useAppStore((s) => !s.unwrapEnabled)
 
   const getTokenSymbol = () => {
     if (type === 'from') {
@@ -35,29 +28,17 @@ export const NetworkBox: React.FC<NetworkBoxProps> = ({
     <div className="relative">
       <div className="flex items-center gap-3 p-2 px-4 bg-white rounded-xl border border-gray-200 min-h-[90px] max-h-[90px]">
         <div className="w-[38px] h-[38px] relative rounded-full overflow-hidden ml-3">
-          <Image
-            src={selected.icon}
-            fill
-            alt={selected.name}
-            sizes="38px"
-            className="object-cover rounded-full"
-          />
+          <Image src={selected.icon} fill alt={selected.name} sizes="38px" className="object-cover rounded-full" />
         </div>
         <div className="flex flex-col text-xs text-gray-500 font-medium">
           <div>{type === 'from' ? 'From' : 'To'}</div>
-          <div className="text-xl font-bold text-[#171717] -my-1">
-            {tokenSymbol}
-          </div>
+          <div className="text-xl font-bold text-[#171717] -my-1">{tokenSymbol}</div>
           <div>{selected.name}</div>
         </div>
 
         {arrowsDisabled ? null : (
           <div className="ml-auto cursor-pointer mr-2" onClick={onToggle}>
-            {isOpen ? (
-              <IoIosArrowUp className="text-xl" />
-            ) : (
-              <IoIosArrowDown className="text-xl" />
-            )}
+            {isOpen ? <IoIosArrowUp className="text-xl" /> : <IoIosArrowDown className="text-xl" />}
           </div>
         )}
       </div>
@@ -71,17 +52,9 @@ export const NetworkBox: React.FC<NetworkBoxProps> = ({
               onClick={() => onSelect(network)}
             >
               <div className="w-6 h-6 relative">
-                <Image
-                  src={network.icon}
-                  fill
-                  alt={network.name}
-                  sizes="24px"
-                  className="object-cover rounded-full"
-                />
+                <Image src={network.icon} fill alt={network.name} sizes="24px" className="object-cover rounded-full" />
               </div>
-              <span className="text-sm font-medium text-gray-800">
-                {network.name}
-              </span>
+              <span className="text-sm font-medium text-gray-800">{network.name}</span>
             </div>
           ))}
         </div>
