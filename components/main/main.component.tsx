@@ -11,6 +11,8 @@ import useTariAccountStore from '@/store/account'
 
 import { useBridgeStatus } from '@/hooks/use-bridge-status'
 
+// TODO - add translation keys
+
 export const MainComponent: React.FC<MainComponentProps> = ({
   onConnectClick,
   onContinueClick,
@@ -61,13 +63,12 @@ export const MainComponent: React.FC<MainComponentProps> = ({
   const mainMarkup = !isOffline ? (
     <div className="mt-6">
       {exceededDailyLimit && (
-        <div className="flex items-center w-fit">
-          <div className="flex flex-col gap-1 items-center p-[16px] w-full rounded-2xl bg-white/30 backdrop-blur-sm shadow-lg">
-            <div className="font-semibold text-center leading-none text-lg text-black font-poppins flex">
-              You&#39;ve exceeded the daily wrap limit.
-            </div>
-            <div className="font-medium text-center leading-none text-sm text-black font-poppins flex">
-              Your transaction was not processed. Don&#39;t worry, you&#39;ll be able to bridge again tomorrow!
+        <div className="flex items-center justify-center w-[clamp(450px,45vw,60%)]">
+          <div className="py-4 px-2 rounded-2xl bg-white/25 backdrop-blur-sm shadow-lg">
+            <div className="font-normal leading-none text-lg text-center text-balance ">
+              We cannot process your transaction because{' '}
+              <span className="font-medium">the transaction limit has been reached for the day.</span> Please try again
+              tomorrow.
             </div>
           </div>
         </div>
