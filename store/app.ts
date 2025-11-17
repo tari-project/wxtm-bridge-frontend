@@ -11,6 +11,7 @@ interface State {
   theme: Theme
   hideWalletBalance: boolean
   unwrapEnabled: boolean
+  isMainNet: boolean
 }
 
 interface Actions {
@@ -29,6 +30,7 @@ const initialState: State = {
   theme: 'light',
   hideWalletBalance: false,
   unwrapEnabled: false,
+  isMainNet: true,
 }
 
 export const useAppStore = create<AppStoreState>()((set) => ({
@@ -42,6 +44,9 @@ export const useAppStore = create<AppStoreState>()((set) => ({
         return
       }
 
+      const network = await signer.getNetwork()
+      const isMainNet = network?.toLowerCase() === 'mainnet'
+
       const envs =
         process.env.NODE_ENV === 'development'
           ? [process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID, process.env.NEXT_PUBLIC_BACKEND_API_URL]
@@ -52,6 +57,7 @@ export const useAppStore = create<AppStoreState>()((set) => ({
       set({
         walletConnectProjectId: walletconnectId,
         bridgeAPI: bridgeAPI,
+        isMainNet,
       })
 
       // set OpenAPI configuration

@@ -198,6 +198,13 @@ export class TariL1Signer {
       args: [],
     })
   }
+
+  public async getNetwork(): Promise<string | undefined> {
+    return this.sendRequest({
+      methodName: 'getNetwork',
+      args: [],
+    })
+  }
 }
 
 function sendSignerCall<MethodName extends SignerMethodNames>(
