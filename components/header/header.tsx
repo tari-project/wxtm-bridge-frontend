@@ -5,23 +5,26 @@ import Image from 'next/image'
 import { useAccount, useChainId } from 'wagmi'
 import { truncateAddress } from '@/utils/truncate'
 import { NetworkSwitchModal } from '@/components/modals/network-switch-modal'
-import { supportedChains, chainsMap } from '@/utils/networksConfig'
+import { chainsMap } from '@/utils/networksConfig'
 import { HeaderProps } from './header.types'
 import { BridgeHistoryListItem } from '../transactions/BridgeListItem'
 import useTariAccountStore from '@/store/account'
 import { useBridgeStatus } from '@/hooks/use-bridge-status'
+import useAppStore from '@/store/app'
 
 export const Header = ({ onConnectClickAction }: HeaderProps) => {
+  const { getSupportedChains } = useAppStore()
   const chainId = useChainId()
   const { address, isConnected, chain } = useAccount()
   const [showNetworkModal, setShowNetworkModal] = useState(false)
   const bridgeTxs = useTariAccountStore((s) => s.combinedBridgeTxs)
   const exampleItem = bridgeTxs.find((tx) => tx.paymentId !== '')
   const setDetailedTx = useTariAccountStore((s) => s.setDetailedTx)
+  const supportedChains = getSupportedChains();
 
   const { isOffline } = useBridgeStatus()
 
-  const isNetworkSupported = chain !== undefined
+  const isNetworkSupported = chain !== undefined && supportedChains.some((c) => c.id === chain.id)
   const handleDisplayTransaction = () => {
     if (exampleItem) {
       setDetailedTx(exampleItem)

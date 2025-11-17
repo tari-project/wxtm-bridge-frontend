@@ -3,6 +3,7 @@ import useTariSigner from './signer'
 import { OpenAPI } from '@tari-project/wxtm-bridge-backend-api'
 import i18next, { changeLanguage } from 'i18next'
 import { parseTheme, Theme } from '@/types/app'
+import { SupportedChain, supportedChains } from '@/utils/networksConfig'
 
 interface State {
   language: string
@@ -19,6 +20,7 @@ interface Actions {
   setLanguage: (language: string) => Promise<void>
   setTheme: (theme: string) => void
   setUnwrapEnabled: (unwrapEnabled: boolean) => void
+  getSupportedChains: () => SupportedChain[]
 }
 
 type AppStoreState = State & Actions
@@ -33,7 +35,7 @@ const initialState: State = {
   isMainNet: true,
 }
 
-export const useAppStore = create<AppStoreState>()((set) => ({
+export const useAppStore = create<AppStoreState>()((set, get) => ({
   ...initialState,
   setAppConfig: async () => {
     const signer = useTariSigner.getState().signer
@@ -99,6 +101,10 @@ export const useAppStore = create<AppStoreState>()((set) => ({
     set({
       hideWalletBalance: hideBalance,
     })
+  },
+  getSupportedChains: () => {
+    const { isMainNet } = get()
+    return isMainNet ? supportedChains.filter((c) => c.id === 1) : supportedChains.filter((c) => c.id !== 1)
   },
 }))
 
