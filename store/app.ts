@@ -3,6 +3,7 @@ import useTariSigner from './signer'
 import { OpenAPI } from '@tari-project/wxtm-bridge-backend-api'
 import i18next, { changeLanguage } from 'i18next'
 import { parseTheme, Theme } from '@/types/app'
+import { SupportedChain, supportedChains } from '@/utils/networksConfig'
 
 interface State {
   language: string
@@ -11,6 +12,7 @@ interface State {
   theme: Theme
   hideWalletBalance: boolean
   unwrapEnabled: boolean
+  isMainNet: boolean
 }
 
 interface Actions {
@@ -18,6 +20,7 @@ interface Actions {
   setLanguage: (language: string) => Promise<void>
   setTheme: (theme: string) => void
   setUnwrapEnabled: (unwrapEnabled: boolean) => void
+  getSupportedChains: () => SupportedChain[]
 }
 
 type AppStoreState = State & Actions
@@ -29,9 +32,10 @@ const initialState: State = {
   theme: 'light',
   hideWalletBalance: false,
   unwrapEnabled: false,
+  isMainNet: true,
 }
 
-export const useAppStore = create<AppStoreState>()((set) => ({
+export const useAppStore = create<AppStoreState>()((set, get) => ({
   ...initialState,
   setAppConfig: async () => {
     const signer = useTariSigner.getState().signer
@@ -41,6 +45,9 @@ export const useAppStore = create<AppStoreState>()((set) => ({
         console.error('[ TAPPLET-BRIDGE ] signer undefined')
         return
       }
+
+      const network = await signer.getNetwork()
+      const isMainNet = network?.toLowerCase() === 'mainnet'
 
       const envs =
         process.env.NODE_ENV === 'development'
@@ -52,6 +59,7 @@ export const useAppStore = create<AppStoreState>()((set) => ({
       set({
         walletConnectProjectId: walletconnectId,
         bridgeAPI: bridgeAPI,
+        isMainNet,
       })
 
       // set OpenAPI configuration
@@ -93,6 +101,10 @@ export const useAppStore = create<AppStoreState>()((set) => ({
     set({
       hideWalletBalance: hideBalance,
     })
+  },
+  getSupportedChains: () => {
+    const { isMainNet } = get()
+    return isMainNet ? supportedChains.filter((c) => c.id === 1) : supportedChains.filter((c) => c.id !== 1)
   },
 }))
 

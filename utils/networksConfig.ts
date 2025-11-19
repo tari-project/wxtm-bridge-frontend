@@ -1,4 +1,10 @@
-export const supportedChains = [
+export interface SupportedChain {
+  id: number
+  name: string
+  icon: string
+}
+
+export const supportedChains: SupportedChain[] = [
   {
     id: 1,
     name: 'ETH MAINNET',
