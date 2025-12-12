@@ -1,5 +1,5 @@
 import useTariAccountStore from '@/store/account'
-import { parseWxtmTokenAmount } from '@/utils/parse-wxtm-token-amount'
+import { microXtmToXtm, parseWxtmTokenAmount } from '@/utils/parse-wxtm-token-amount'
 import { TokensUnwrappedService, UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
 import {
   DeployedChains,
@@ -102,7 +102,7 @@ export const useBridgeToTari = (
   ) => {
     try {
       const limitMicro = await TokensUnwrappedService.getRemainingDailyLimit()
-      const limitXtm = Number(BigInt(limitMicro) / BigInt(1_000_000))
+      const limitXtm = microXtmToXtm(limitMicro)
       
       const amountNum = parseFloat(amount)
       

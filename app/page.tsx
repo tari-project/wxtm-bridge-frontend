@@ -19,9 +19,11 @@ import { TokensUnwrappedService, UserTransactionDTO } from '@tari-project/wxtm-b
 import { DeployedChains } from '@tari-project/wxtm-bridge-contracts/deployments'
 import { FooterText } from '@/components/main/footer-text'
 import useBridgeStore from '@/store/bridge'
+import { microXtmToXtm } from '@/utils/parse-wxtm-token-amount'
 
 const DAILY_LIMIT_ERROR = 'Daily wrap limit exceeded'
 const DAILY_LIMIT_ERROR_TYPE = 'Forbidden'
+const REFETCH_LIMIT_INTERVAL = 30000
 
 export default function Home() {
   const { isConnected, chain, address: ethAddress } = useAccount()
@@ -158,7 +160,7 @@ export default function Home() {
     const fetchDailyLimit = async () => {
       try {
         const limitMicro = await TokensUnwrappedService.getRemainingDailyLimit()
-        const limitXtm = Number(BigInt(limitMicro) / BigInt(1_000_000))
+        const limitXtm = microXtmToXtm(limitMicro)
         setRemainingDailyLimit(limitXtm)
       } catch (error) {
         console.error('[ TAPPLET-BRIDGE ] Failed to fetch daily limit:', error)
@@ -167,7 +169,7 @@ export default function Home() {
 
     fetchDailyLimit()
 
-    const interval = setInterval(fetchDailyLimit, 30000)
+    const interval = setInterval(fetchDailyLimit, REFETCH_LIMIT_INTERVAL)
     return () => clearInterval(interval)
   }, [fromNetwork.name])
 
