@@ -107,8 +107,7 @@ export const useBridgeToTari = (
       const amountNum = parseFloat(amount)
       
       if (amountNum > limitXtm) {
-        console.error(`[ TAPPLET-BRIDGE ] Daily limit exceeded. Limit: ${limitXtm}, Amount: ${amountNum}`)
-        return false 
+        throw new Error(`[ TAPPLET-BRIDGE ] Daily limit exceeded. Limit: ${limitXtm}, Amount: ${amountNum}`);
       }
 
       const value = BigInt(ethers.utils.parseEther(amount).toString())
