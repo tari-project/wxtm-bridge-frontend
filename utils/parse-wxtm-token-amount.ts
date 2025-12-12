@@ -35,3 +35,7 @@ export function parseToMaxAllowed(
 
   return num
 }
+
+export const microXtmToXtm = (microXtm: string | bigint): number => {
+  return Number(BigInt(microXtm) / BigInt(config.MICRO_XTM_PER_XTM))
+}

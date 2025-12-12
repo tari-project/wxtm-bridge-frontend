@@ -1,6 +1,6 @@
 import useTariAccountStore from '@/store/account'
-import { parseWxtmTokenAmount } from '@/utils/parse-wxtm-token-amount'
-import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
+import { microXtmToXtm, parseWxtmTokenAmount } from '@/utils/parse-wxtm-token-amount'
+import { TokensUnwrappedService, UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
 import {
   DeployedChains,
   getDeployments,
@@ -101,6 +101,15 @@ export const useBridgeToTari = (
     tariAddress: string,
   ) => {
     try {
+      const limitMicro = await TokensUnwrappedService.getRemainingDailyLimit()
+      const limitXtm = microXtmToXtm(limitMicro)
+      
+      const amountNum = parseFloat(amount)
+      
+      if (amountNum > limitXtm) {
+        throw new Error(`[ TAPPLET-BRIDGE ] Daily limit exceeded. Limit: ${limitXtm}, Amount: ${amountNum}`);
+      }
+
       const value = BigInt(ethers.utils.parseEther(amount).toString())
 
       const now = Math.floor(Date.now() / 1000)

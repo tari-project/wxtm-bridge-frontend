@@ -31,6 +31,7 @@ export const BridgeForm: React.FC<MainComponentProps> = ({
   setFromNetwork,
   toNetwork,
   setToNetwork,
+  remainingDailyLimit,
 }) => {
   const { t } = useTranslation('main', { useSuspense: false })
   const [openDropdown, setOpenDropdown] = useState<'from' | 'to' | null>(null)
@@ -171,6 +172,7 @@ export const BridgeForm: React.FC<MainComponentProps> = ({
                         control={control}
                         errors={errors}
                         availableBalance={inputAvailableBalance()}
+                        remainingDailyLimit={remainingDailyLimit}
                       />
                     </div>
                     <div className="hidden lg:flex flex-col">
