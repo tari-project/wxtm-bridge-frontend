@@ -15,7 +15,7 @@ import { useBridgeToEthereum } from '@/hooks/use-bridge-to-ethereum'
 import { useBridgeToTari } from '@/hooks/use-bridge-to-tari'
 import { useBridgeTransaction } from '@/hooks/use-bridge-transaction'
 import useTariAccountStore from '@/store/account'
-import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
+import { TokensUnwrappedService, UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
 import { DeployedChains } from '@tari-project/wxtm-bridge-contracts/deployments'
 import { FooterText } from '@/components/main/footer-text'
 import useBridgeStore from '@/store/bridge'
@@ -38,6 +38,7 @@ export default function Home() {
   })
   const [isUnwrapping, setIsUnwrapping] = useState(false)
   const [isUnwrappingFailed, setIsUnwrappingFailed] = useState(false)
+  const [remainingDailyLimit, setRemainingDailyLimit] = useState<number | undefined>(undefined)
 
   const chainId = (chain?.id ?? 1) as DeployedChains
 
@@ -148,6 +149,28 @@ export default function Home() {
     }
   }, [isPending, isSuccess, isError, error])
 
+  useEffect(() => {
+    if (fromNetwork.name === 'Tari') {
+      setRemainingDailyLimit(undefined)
+      return
+    }
+
+    const fetchDailyLimit = async () => {
+      try {
+        const limitMicro = await TokensUnwrappedService.getRemainingDailyLimit()
+        const limitXtm = Number(BigInt(limitMicro) / BigInt(1_000_000))
+        setRemainingDailyLimit(limitXtm)
+      } catch (error) {
+        console.error('[ TAPPLET-BRIDGE ] Failed to fetch daily limit:', error)
+      }
+    }
+
+    fetchDailyLimit()
+
+    const interval = setInterval(fetchDailyLimit, 30000)
+    return () => clearInterval(interval)
+  }, [fromNetwork.name])
+
   const handleConnectClick = () => {
     if (!isConnected) {
       setModalStep(0)
@@ -226,6 +249,7 @@ export default function Home() {
         setFromNetwork={setFromNetwork}
         toNetwork={toNetwork}
         setToNetwork={setToNetwork}
+        remainingDailyLimit={remainingDailyLimit}
       />
 
       {detailedTx && <TransactionDetailsModal transaction={detailedTx} closeModal={() => setDetailedTx(null)} />}

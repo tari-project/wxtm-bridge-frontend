@@ -12,4 +12,5 @@ export type MainComponentProps = {
   toNetwork: Network
   setToNetwork: React.Dispatch<React.SetStateAction<Network>>
   addWxtmToWallet?: () => void
+  remainingDailyLimit?: number
 } & Pick<BridgeInputProps, 'control' | 'errors'>

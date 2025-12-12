@@ -11,6 +11,7 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
   control,
   errors,
   availableBalance,
+  remainingDailyLimit,
 }) => {
   const [valueLength, setValueLength] = useState(5)
   const { fromToken } = useBridgeInfo(fromNetwork)
@@ -101,6 +102,9 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
           }
           if (amount > availableBalance) {
             return `Not enough ${fromToken}`
+          }
+          if (remainingDailyLimit !== undefined && amount > remainingDailyLimit) {
+            return `Daily limit exceeded. Remaining: ${remainingDailyLimit.toLocaleString()} XTM`
           }
           return true
         },

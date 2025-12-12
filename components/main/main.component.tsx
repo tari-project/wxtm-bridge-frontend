@@ -24,6 +24,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
   setFromNetwork,
   toNetwork,
   setToNetwork,
+  remainingDailyLimit,
 }) => {
   const { t } = useTranslation('main', { useSuspense: false })
   const [showHistory, setShowHistory] = useState(false)
@@ -57,6 +58,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
       setFromNetwork={setFromNetwork}
       toNetwork={toNetwork}
       setToNetwork={setToNetwork}
+      remainingDailyLimit={remainingDailyLimit}
     />
   )
 
