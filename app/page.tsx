@@ -16,7 +16,7 @@ import { useBridgeTransaction } from '@/hooks/use-bridge-transaction'
 import useTariAccountStore, { setDetailedTx, setLastOngoingBridgeTx, setTariAccount } from '@/store/account'
 import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
 import { FooterText } from '@/components/main/footer-text'
-import useBridgeStore from '@/store/bridge'
+import useBridgeStore, { setUnwrapFailed } from '@/store/bridge'
 import { useFetchDailyLimit } from '@/hooks/use-fetch-daily-limit'
 import { setIsModalOpen, setModalStep, useModalStore } from '@/store/modal'
 
@@ -31,6 +31,7 @@ export default function Home() {
   const tariColdWalletAddress = useBridgeStore((s) => s.tariColdWalletAddress)
   const wrapTokenFeePercentageBps = useBridgeStore((s) => s.wrapTokenFeePercentageBps)
   const fromNetwork = useBridgeStore((s) => s.fromNetwork)
+  const isUnwrappingFailed = useBridgeStore((s) => s.unwrapFailed)
 
   const fetchDailyLimit = useFetchDailyLimit()
   const { isConnected, address: ethAddress } = useConnection()
@@ -44,7 +45,7 @@ export default function Home() {
   const amount = useWatch({ control, name: 'amount' })
 
   const [hasFetchedParams, setHasFetchedParams] = useState(false)
-  const [isUnwrappingFailed, setIsUnwrappingFailed] = useState(false)
+
   const [remainingDailyLimit, setRemainingDailyLimit] = useState<number | undefined>(undefined)
 
   // Prevent main modal from showing when transaction details modal is active
@@ -130,7 +131,7 @@ export default function Home() {
   }
   const handleCloseModal = () => {
     resetField('amount', { defaultValue: '' })
-    setIsUnwrappingFailed(false)
+    setUnwrapFailed(false)
     handleSetOngoingModalOpen(false)
     setModalStep(1)
   }

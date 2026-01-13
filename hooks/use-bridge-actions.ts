@@ -7,6 +7,7 @@ import { useBridgeToEthereum } from '@/hooks/use-bridge-to-ethereum'
 import { useBridgeToTari } from '@/hooks/use-bridge-to-tari'
 import type { DeployedChains } from '@/types/contracts'
 import { setIsModalOpen, setModalStep } from '@/store/modal'
+import { setUnwrapFailed } from '@/store/bridge'
 
 const DAILY_LIMIT_ERROR = 'Daily wrap limit exceeded'
 const DAILY_LIMIT_ERROR_TYPE = 'Forbidden'
@@ -75,6 +76,7 @@ export function useBridgeActions({ amount, feesData, closeCallback }: UseBridgeA
 
     if (isError) {
       console.error(`[ TAPPLET-BRIDGE ] Unwrap transaction failed:`, error)
+      setUnwrapFailed(true)
     }
   }, [error, isError, isSuccess])
 

@@ -15,6 +15,7 @@ interface BridgeConfigStoreState {
   wrapTokenFeePercentageBps: number
   unwrapTokenFeePercentageBps: number
   tariColdWalletAddress: string
+  unwrapFailed: boolean
 }
 const initialState: BridgeConfigStoreState = {
   wrapTokenFeePercentageBps: 50, // 0.5% fee
@@ -22,6 +23,7 @@ const initialState: BridgeConfigStoreState = {
   tariColdWalletAddress: '',
   fromNetwork: NETWORKS.Tari,
   toNetwork: NETWORKS.Ethereum,
+  unwrapFailed: false,
 }
 
 export const useBridgeStore = create<BridgeConfigStoreState>()(() => ({
@@ -56,5 +58,7 @@ export const setToNetwork = (toNetworkOption: string) => {
     useBridgeStore.setState({ toNetwork })
   }
 }
+
+export const setUnwrapFailed = (unwrapFailed: boolean) => useBridgeStore.setState({ unwrapFailed })
 
 export default useBridgeStore
