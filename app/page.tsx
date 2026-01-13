@@ -91,6 +91,7 @@ export default function Home() {
     if (!tariAccount) return
     // Poll every 5 min
     const intervalId = setInterval(fetchUserTransactions, 1000 * 60 * 5)
+    void fetchUserTransactions()
     return () => {
       clearInterval(intervalId)
     }

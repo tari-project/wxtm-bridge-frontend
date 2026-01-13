@@ -17,9 +17,7 @@ export type PickMatching<T, V> = {
 export type ExtractMethods<T> = PickMatching<T, Function>
 export type SignerMethods = ExtractMethods<TariL1Signer>
 export type SignerMethodNames = keyof SignerMethods
-export type SignerReturnType<T extends SignerMethodNames> = Awaited<
-  ReturnType<SignerMethods[T]>
->
+export type SignerReturnType<T extends SignerMethodNames> = Awaited<ReturnType<SignerMethods[T]>>
 
 export type SignerRequest<T extends SignerMethodNames> = {
   id: number

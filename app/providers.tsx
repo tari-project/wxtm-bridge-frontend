@@ -20,9 +20,11 @@ export const Providers = ({ children }: { children: ReactNode }) => {
   const [initialState, setInitialState] = useState<State | undefined>()
   const configRef = useRef<Config | null>(null)
   const stateRef = useRef<State | undefined>(undefined)
+  const initializedSignerRef = useRef(false)
 
   useEffect(() => {
     let cancelled = false
+    if (initializedSignerRef.current || signer) return
     const initializeSignerAndAccount = async () => {
       try {
         if (!signer) {
@@ -44,31 +46,26 @@ export const Providers = ({ children }: { children: ReactNode }) => {
         console.error('[ TAPPLET-BRIDGE ] Failed to set Tari Account:', error)
       }
     }
-    void initializeSignerAndAccount()
+    initializeSignerAndAccount().then(() => {
+      initializedSignerRef.current = true
+    })
     return () => {
       cancelled = true
     }
   }, [signer])
 
-  const onMessage = useEffectEvent((event: MessageEvent<string>) => {
-    const parsedData: IframeMessage = JSON.parse(event.data)
-    switch (parsedData.type) {
+  const onMessage = useEffectEvent((event: MessageEvent<IframeMessage>) => {
+    switch (event.data.type) {
       case MessageType.SET_THEME:
-        const theme = parsedData?.payload?.theme
+        const theme = event.data?.payload?.theme
         setTheme(theme)
         break
       case MessageType.SET_LANGUAGE:
-        const language = parsedData?.payload?.language
+        const language = event.data?.payload?.language
         void setLanguage(language)
         break
     }
   })
-
-  useEffect(() => {
-    // listen for messages from the parent window
-    window.addEventListener('message', onMessage)
-    return () => window.removeEventListener('message', onMessage)
-  }, [])
 
   const onInitialized = useEffectEvent(() => {
     setConfig(configRef.current)
@@ -78,16 +75,20 @@ export const Providers = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (!walletConnectProjectId || configRef.current) return
     configRef.current = getConfig(walletConnectProjectId)
-
     // Get initial state only once
     const cookieHeader = document.cookie
     const state = cookieToInitialState(configRef.current, cookieHeader)
-
     if (state) {
       stateRef.current = state
     }
     onInitialized()
   }, [walletConnectProjectId])
+
+  useEffect(() => {
+    // listen for messages from the parent window
+    window.addEventListener('message', onMessage)
+    return () => window.removeEventListener('message', onMessage)
+  }, [])
 
   if (!config) {
     return <div className="h-5 w-5 animate-spin rounded-full border-b-[3px] border-white"></div>

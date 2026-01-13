@@ -54,13 +54,9 @@ export const setAppConfig = async () => {
         ? [process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID, process.env.NEXT_PUBLIC_BACKEND_API_URL]
         : await signer.getBridgeEnvs()
 
-    const walletconnectId = envs?.[0] ?? ''
+    const walletConnectProjectId = envs?.[0] ?? ''
     const bridgeAPI = envs?.[1] ?? ''
-    useAppStore.setState({
-      walletConnectProjectId: walletconnectId,
-      bridgeAPI: bridgeAPI,
-      isMainNet,
-    })
+    useAppStore.setState({ walletConnectProjectId, bridgeAPI, isMainNet })
 
     // set OpenAPI configuration
     OpenAPI.BASE = bridgeAPI
@@ -68,7 +64,7 @@ export const setAppConfig = async () => {
     const appLanguage = await signer.getAppLanguage()
     if (appLanguage) await setLanguage(appLanguage)
 
-    return walletconnectId
+    return walletConnectProjectId
   } catch (error) {
     console.error('[ TAPPLET-BRIDGE ] error setting the Bridge app config ', error)
   }

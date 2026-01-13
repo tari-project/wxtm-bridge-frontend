@@ -34,11 +34,6 @@ export interface BridgeTxDetails {
   paymentId: string
 }
 
-export interface BridgeEnvs {
-  walletconnect_id: string
-  backend_api: string
-}
-
 export class TariL1Signer {
   public signerName = 'TariL1Signer'
   private __id = 0
@@ -52,11 +47,7 @@ export class TariL1Signer {
         window.dispatchEvent(resizeEvent)
       }
     }
-    window.addEventListener(
-      'message',
-      (event) => filterResizeEvent(event),
-      false,
-    )
+    window.addEventListener('message', (event) => filterResizeEvent(event), false)
   }
 
   private async sendRequest<MethodName extends SignerMethodNames>(
@@ -100,11 +91,7 @@ export class TariL1Signer {
    * @param paymentId (optional) payment-id
    * @returns true if tx success; otherwise false
    */
-  public async sendOneSided({
-    amount,
-    address,
-    paymentId,
-  }: SendOneSidedRequest): Promise<boolean> {
+  public async sendOneSided({ amount, address, paymentId }: SendOneSidedRequest): Promise<boolean> {
     return this.sendRequest({
       methodName: 'sendOneSided',
       args: [{ amount, address, paymentId }],
@@ -217,13 +204,7 @@ function sendSignerCall<MethodName extends SignerMethodNames>(
         window.removeEventListener('message', event_ref)
         reject(resp.data.resultError)
       }
-      if (
-        resp &&
-        resp.data &&
-        resp.data.id &&
-        resp.data.id === id &&
-        resp.data.type === 'signer-call'
-      ) {
+      if (resp && resp.data && resp.data.id && resp.data.id === id && resp.data.type === 'signer-call') {
         window.removeEventListener('message', event_ref)
         resolve(resp.data.result)
       }
