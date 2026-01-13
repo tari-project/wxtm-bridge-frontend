@@ -47,8 +47,6 @@ export const setTariAccount = async () => {
     const balance = await signer.getTariBalance()
     const ongoingBridgeTx = await signer.getOngoingBridgeTx()
 
-    console.debug('[ TAPPLET-BRIDGE ]', ongoingBridgeTx)
-
     useTariAccountStore.setState({
       tariAccount: {
         account_id: account.account_id,

@@ -58,8 +58,8 @@ export default function Home() {
 
   const fetchUserTransactions = useCallback(async () => {
     try {
-      await setTariAccount()
       await getUserBackendBridgeTxs()
+      await setTariAccount()
     } catch (error) {
       console.error('[ TAPPLET-BRIDGE ] Failed to get user transactions:', error)
     }
@@ -91,7 +91,6 @@ export default function Home() {
     if (!tariAccount) return
     // Poll every 5 min
     const intervalId = setInterval(fetchUserTransactions, 1000 * 60 * 5)
-    void fetchUserTransactions()
     return () => {
       clearInterval(intervalId)
     }

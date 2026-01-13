@@ -38,8 +38,8 @@ export const Providers = ({ children }: { children: ReactNode }) => {
           }
         }
         if (!cancelled) {
-          await setTariAccount()
           await setAppConfig()
+          await setTariAccount()
           getInitConfig()
         }
       } catch (error) {
