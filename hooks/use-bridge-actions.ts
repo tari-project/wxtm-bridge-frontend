@@ -62,13 +62,15 @@ export function useBridgeActions({ amount, feesData, closeCallback }: UseBridgeA
     console.debug(`[ TAPPLET-BRIDGE ] Initiating transaction...`)
 
     setIsModalOpen(true)
-    setModalStep(3)
 
-    await bridgeToTari(amount, ethAddress, tariAccount.address)
+    const success = await bridgeToTari(amount, ethAddress, tariAccount.address)
+    if (success) {
+      setModalStep(3)
+    }
   }, [amount, bridgeToTari, ethAddress, tariAccount])
 
   useEffect(() => {
-    if (isPending) return
+    console.debug(`[ TAPPLET-BRIDGE ] Unwrap transaction`, error, isError, isPending, isSuccess)
     if (isSuccess) {
       console.debug(`[ TAPPLET-BRIDGE ] Unwrap transaction success!`)
       setModalStep(2)

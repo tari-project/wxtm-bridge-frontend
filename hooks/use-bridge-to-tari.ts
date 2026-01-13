@@ -90,7 +90,7 @@ export const useBridgeToTari = (ethAddress: `0x${string}`, chain: DeployedChains
       const amountNum = parseFloat(amount)
 
       if (amountNum > limitXtm) {
-        return new Error(`[ TAPPLET-BRIDGE ] Daily limit exceeded. Limit: ${limitXtm}, Amount: ${amountNum}`)
+        throw new Error(`[ TAPPLET-BRIDGE ] Daily limit exceeded. Limit: ${limitXtm}, Amount: ${amountNum}`)
       }
 
       const value = BigInt(ethers.utils.parseEther(amount).toString())
