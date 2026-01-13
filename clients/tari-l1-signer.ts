@@ -230,7 +230,6 @@ function sendSignerCall<MethodName extends SignerMethodNames>(
     }
 
     window.addEventListener('message', event_ref, false)
-
     window.parent.postMessage({ ...req, id, type: 'signer-call' }, '*')
   })
 }

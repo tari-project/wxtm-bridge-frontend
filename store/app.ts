@@ -11,7 +11,6 @@ interface State {
   bridgeAPI: string
   theme: Theme
   hideWalletBalance: boolean
-  unwrapEnabled: boolean
   isMainNet: boolean
 }
 
@@ -27,7 +26,6 @@ const initialState: State = {
   bridgeAPI: '',
   theme: 'light',
   hideWalletBalance: false,
-  unwrapEnabled: false,
   isMainNet: true,
 }
 
@@ -88,11 +86,6 @@ export const setLanguage = async (languageCode: string) => {
   } catch (e) {
     console.error('Could not set language:', e)
   }
-}
-
-export const setUnwrapEnabled = (unwrapEnabled: boolean) => {
-  console.info(`Unwrap enabled: ${unwrapEnabled}`)
-  useAppStore.setState({ unwrapEnabled })
 }
 
 export const setTheme = (theme: string) => {

@@ -44,7 +44,6 @@ export default function Home() {
   const amount = useWatch({ control, name: 'amount' })
 
   const [hasFetchedParams, setHasFetchedParams] = useState(false)
-
   const [isUnwrappingFailed, setIsUnwrappingFailed] = useState(false)
   const [remainingDailyLimit, setRemainingDailyLimit] = useState<number | undefined>(undefined)
 

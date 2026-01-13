@@ -8,7 +8,7 @@ import { setTariAccount } from '@/store/account'
 import { TariL1SignerParameters } from '@/types/tapplet'
 import TariL1Signer from '@/clients/tari-l1-signer'
 import { IframeMessage, MessageType } from '@/utils/useIframeMessage'
-import useAppStore, { setAppConfig, setLanguage, setTheme, setUnwrapEnabled } from '@/store/app'
+import useAppStore, { setAppConfig, setLanguage, setTheme } from '@/store/app'
 import useTariSignerStore, { setSigner } from '@/store/signer'
 import { getInitConfig } from '@/utils/universe'
 import { queryClient } from './queryClient'
@@ -60,11 +60,6 @@ export const Providers = ({ children }: { children: ReactNode }) => {
       case MessageType.SET_LANGUAGE:
         const language = parsedData?.payload?.language
         void setLanguage(language)
-        break
-      case MessageType.SET_FEATURES:
-        const unwrapEnabled = !!parsedData?.payload?.unwrapEnabled
-        console.info('Received features | unwrap enabled:', unwrapEnabled)
-        setUnwrapEnabled(unwrapEnabled)
         break
     }
   })

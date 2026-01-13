@@ -3,11 +3,8 @@ import Image from 'next/image'
 import { IoIosArrowUp, IoIosArrowDown } from 'react-icons/io'
 
 import { NetworkBoxProps } from './network-box.types'
-import useAppStore from '@/store/app'
 
 export const NetworkBox: React.FC<NetworkBoxProps> = ({ type, selected, isOpen, networks, onToggle, onSelect }) => {
-  const arrowsDisabled = useAppStore((s) => !s.unwrapEnabled)
-
   const getTokenSymbol = () => {
     if (type === 'from') {
       return selected.name === 'Tari' ? 'XTM' : 'wXTM'
@@ -36,11 +33,9 @@ export const NetworkBox: React.FC<NetworkBoxProps> = ({ type, selected, isOpen, 
           <div>{selected.name}</div>
         </div>
 
-        {arrowsDisabled ? null : (
-          <div className="ml-auto cursor-pointer mr-2" onClick={onToggle}>
-            {isOpen ? <IoIosArrowUp className="text-xl" /> : <IoIosArrowDown className="text-xl" />}
-          </div>
-        )}
+        <div className="ml-auto cursor-pointer mr-2" onClick={onToggle}>
+          {isOpen ? <IoIosArrowUp className="text-xl" /> : <IoIosArrowDown className="text-xl" />}
+        </div>
       </div>
 
       {isOpen && (
