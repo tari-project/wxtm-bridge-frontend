@@ -26,7 +26,7 @@ const initialState: BridgeConfigStoreState = {
   unwrapFailed: false,
 }
 
-export const useBridgeStore = create<BridgeConfigStoreState>()(() => ({
+const useBridgeStore = create<BridgeConfigStoreState>()(() => ({
   ...initialState,
 }))
 

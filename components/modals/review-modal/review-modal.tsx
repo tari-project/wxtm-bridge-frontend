@@ -30,6 +30,7 @@ export const ReviewModal = ({ closeModal, amount, tariWalletAddress, ethereumAdd
     handleBridgeToEthereum,
     handleBridgeToTari,
   )
+
   const [clicked, setClicked] = useState(false)
 
   const handleClick = useCallback(() => {

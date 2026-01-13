@@ -1,15 +1,6 @@
 import emojiRegex from 'emoji-regex'
 
-const truncateString = (str: string, num: number): string => {
-  if (str.length <= num) return str
-  return str.slice(0, num) + '...'
-}
-
-const truncateMiddle = (
-  str: string,
-  num: number,
-  separator = '...',
-): string => {
+const truncateMiddle = (str: string, num: number, separator = '...'): string => {
   if (str.length <= num) return str
   let end = str.substring(str.length - num)
   let start = str.substring(0, num)
@@ -25,4 +16,4 @@ const truncateMiddle = (
   return start + separator + end
 }
 
-export { truncateMiddle, truncateString }
+export { truncateMiddle }

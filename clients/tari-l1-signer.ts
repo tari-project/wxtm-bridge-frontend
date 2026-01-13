@@ -34,7 +34,7 @@ export interface BridgeTxDetails {
   paymentId: string
 }
 
-export class TariL1Signer {
+class TariL1Signer {
   public signerName = 'TariL1Signer'
   private __id = 0
 

@@ -37,7 +37,7 @@ export const SuccessModal = ({
   const fromNetwork = useBridgeStore((s) => s.fromNetwork)
 
   const { fromToken, toToken } = useBridgeInfo(fromNetwork, ethereumAddress!, tariWalletAddress!)
-  const { addXtmToWallet } = useWalletUtils()
+  const { addXtmToWalletAction } = useWalletUtils()
   const [copied, setCopied] = useState(false)
 
   const handleCopyAddress = useCallback(async () => {
@@ -46,9 +46,9 @@ export const SuccessModal = ({
     setTimeout(() => setCopied(false), 1500)
   }, [])
 
-  const handleAddWxtmToWallet = useCallback(() => {
+  const handleAddWxtmToWalletAction = useCallback(() => {
     console.info('[ TAPPLET-BRIDGE ] Adding WXTM token to the wallet initiated')
-    addXtmToWallet()
+    addXtmToWalletAction()
       .then(() => {
         console.info('[ TAPPLET-BRIDGE ] Adding WXTM token to the wallet successful')
       })
@@ -56,7 +56,7 @@ export const SuccessModal = ({
         sendErrorMessage(`Request failed. Feature not supported by your wallet app.`)
         console.error('[ TAPPLET-BRIDGE ] Fail to add WXTM token to the wallet: ', error)
       })
-  }, [addXtmToWallet])
+  }, [addXtmToWalletAction])
   const handleOnClick = useCallback(async () => {
     closeModal()
     removeOngoingTransaction()
@@ -117,7 +117,7 @@ export const SuccessModal = ({
             {t('how_to_view_wxtm_step1_middle')}
             <span className="strong">{t('ethereum_mainnet')}</span>
             {t('how_to_view_wxtm_step1_network')}
-            <span className="btn" onClick={handleAddWxtmToWallet}>
+            <span className="btn" onClick={handleAddWxtmToWalletAction}>
               {t('click_here')}
             </span>
             {t('how_to_view_wxtm_step2')}

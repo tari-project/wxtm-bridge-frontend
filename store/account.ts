@@ -31,13 +31,13 @@ const initialState: State = {
   exceededDailyLimit: false,
 }
 
-export const useTariAccountStore = create<TariL1WalletStoreState>()(() => ({
+const useTariAccountStore = create<TariL1WalletStoreState>()(() => ({
   ...initialState,
 }))
 
 export const setTariAccount = async () => {
   const signer = useTariSigner.getState().signer
-  if (process.env.NODE_ENV === 'development') return
+  // if (process.env.NODE_ENV === 'development') return
   try {
     if (!signer) {
       console.error('[ TAPPLET-BRIDGE ] signer undefined')

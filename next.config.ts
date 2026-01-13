@@ -8,6 +8,9 @@ const nextConfig: NextConfig = {
     path: process.env.NEXT_PUBLIC_PATH,
   },
   output: 'export',
+  devIndicators: {
+    position: 'bottom-right',
+  },
 }
 
 export default nextConfig

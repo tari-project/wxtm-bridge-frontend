@@ -45,7 +45,6 @@ export default function Home() {
   const amount = useWatch({ control, name: 'amount' })
 
   const [hasFetchedParams, setHasFetchedParams] = useState(false)
-
   const [remainingDailyLimit, setRemainingDailyLimit] = useState<number | undefined>(undefined)
 
   // Prevent main modal from showing when transaction details modal is active
@@ -78,10 +77,11 @@ export default function Home() {
       }
     }
 
-    fetchBridgeTxParams().then(() => {
+    fetchBridgeTxParams().then(async () => {
+      await fetchUserTransactions() // initial fetch
       setHasFetchedParams(true)
     })
-  }, [getBridgeTxParams, hasFetchedParams, tariAccount])
+  }, [fetchUserTransactions, getBridgeTxParams, hasFetchedParams, tariAccount])
 
   useEffect(() => {
     const hasFetched = Boolean(!!tariColdWalletAddress?.length || !!wrapTokenFeePercentageBps)

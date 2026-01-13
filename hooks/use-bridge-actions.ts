@@ -25,7 +25,7 @@ export function useBridgeActions({ amount, feesData, closeCallback }: UseBridgeA
   const { bridgeToEthereum } = useBridgeToEthereum()
 
   const chainId = (chain?.id ?? 1) as DeployedChains
-  const { bridgeToTari, isSuccess, isError, error } = useBridgeToTari(ethAddress || '0x', chainId)
+  const { bridgeToTari, isSuccess, isError, error, isPending } = useBridgeToTari(ethAddress || '0x', chainId)
 
   const { amountAfterFee } = feesData
 
@@ -68,17 +68,15 @@ export function useBridgeActions({ amount, feesData, closeCallback }: UseBridgeA
   }, [amount, bridgeToTari, ethAddress, tariAccount])
 
   useEffect(() => {
+    if (isPending) return
     if (isSuccess) {
       console.debug(`[ TAPPLET-BRIDGE ] Unwrap transaction success!`)
       setModalStep(2)
-      return
-    }
-
-    if (isError) {
+    } else if (isError) {
       console.error(`[ TAPPLET-BRIDGE ] Unwrap transaction failed:`, error)
       setUnwrapFailed(true)
     }
-  }, [error, isError, isSuccess])
+  }, [error, isError, isPending, isSuccess])
 
   return {
     handleBridgeToEthereum,

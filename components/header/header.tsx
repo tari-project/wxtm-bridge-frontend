@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { IoIosCloseCircleOutline } from 'react-icons/io'
+
 import Image from 'next/image'
 import { useConnection, useChainId, useDisconnect } from 'wagmi'
 import { truncateAddress } from '@/utils/truncate'
@@ -12,6 +12,7 @@ import useTariAccountStore, { setDetailedTx } from '@/store/account'
 import { useBridgeStatus } from '@/hooks/use-bridge-status'
 import useAppStore from '@/store/app'
 import { setIsModalOpen, setModalStep } from '@/store/modal'
+import { FiLogOut } from 'react-icons/fi'
 
 export const Header = () => {
   const bridgeTxs = useTariAccountStore((s) => s.combinedBridgeTxs)
@@ -71,7 +72,7 @@ export const Header = () => {
           </button>
         ) : (
           <div
-            className={`flex px-2 py-1 gap-2 rounded-3xl justify-center items-center ${isNetworkSupported ? 'bg-white/25' : 'bg-red-400/25'}`}
+            className={`flex px-3 py-1 gap-2 h-[48px] rounded-3xl justify-center items-center ${isNetworkSupported ? 'bg-white/25' : 'bg-red-400/25'}`}
             onClick={networkClick}
           >
             <div className="w-[24px] h-[24px] rounded-full overflow-hidden relative">
@@ -92,7 +93,7 @@ export const Header = () => {
               className="overflow-hidden opacity-35 hover:opacity-55 hover:cursor-pointer"
               onClick={() => disconnect.mutate()}
             >
-              <IoIosCloseCircleOutline size={18} />
+              <FiLogOut size={18} />
             </div>
           </div>
         )}

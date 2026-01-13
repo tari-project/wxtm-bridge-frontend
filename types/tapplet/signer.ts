@@ -1,13 +1,8 @@
-import { TariL1Signer } from '../../clients/tari-l1-signer'
+import TariL1Signer from '../../clients/tari-l1-signer'
 
 export type TariL1SignerParameters = {
   name?: string
   onConnection?: () => void
-}
-
-export type WindowSize = {
-  width: number
-  height: number
 }
 
 export type PickMatching<T, V> = {

@@ -20,7 +20,7 @@ import { useTranslation } from 'react-i18next'
 import { MainComponentProps } from '../main'
 import { setIsModalOpen, setModalStep } from '@/store/modal'
 import { useFormContext } from 'react-hook-form'
-import { setFromNetwork, setToNetwork, useBridgeStore } from '@/store/bridge'
+import useBridgeStore, { setFromNetwork, setToNetwork } from '@/store/bridge'
 
 export const BridgeForm = ({ remainingDailyLimit }: MainComponentProps) => {
   const { t } = useTranslation('main', { useSuspense: false })
