@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
     path: process.env.NEXT_PUBLIC_PATH,
   },
   output: 'export',
+  productionBrowserSourceMaps: true,
+  enablePrerenderSourceMaps: true,
   devIndicators: {
     position: 'bottom-right',
   },

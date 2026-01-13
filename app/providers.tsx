@@ -73,16 +73,19 @@ export const Providers = ({ children }: { children: ReactNode }) => {
   })
 
   useEffect(() => {
-    if (!walletConnectProjectId || configRef.current) return
-    configRef.current = getConfig(walletConnectProjectId)
-    // Get initial state only once
-    const cookieHeader = document.cookie
-    const state = cookieToInitialState(configRef.current, cookieHeader)
-    if (state) {
-      stateRef.current = state
+    if (!walletConnectProjectId || !!config) return
+    const cfg = getConfig(walletConnectProjectId)
+    if (cfg) {
+      configRef.current = cfg
+      // Get initial state only once
+      const cookieHeader = document?.cookie
+      const state = cookieToInitialState(cfg, cookieHeader)
+      if (state) {
+        stateRef.current = state
+      }
     }
     onInitialized()
-  }, [walletConnectProjectId])
+  }, [walletConnectProjectId, config])
 
   useEffect(() => {
     // listen for messages from the parent window

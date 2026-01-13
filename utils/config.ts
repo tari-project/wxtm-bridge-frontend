@@ -5,15 +5,11 @@ import useAppStore from '@/store/app'
 
 export function getConfig(id?: string) {
   const projectId = id || useAppStore.getState().walletConnectProjectId
-  const wcConnector = walletConnect({
-    projectId,
-    customStoragePrefix: 'wagmi-wc',
-  })
-  return createConfig({
+  if (!projectId.length) return
+  const config = createConfig({
     chains: [mainnet, baseSepolia, sepolia],
-    connectors: [wcConnector],
-    multiInjectedProviderDiscovery: false,
-    storage: createStorage({ key: 'tari-bridge', storage: cookieStorage }),
+    connectors: [walletConnect({ projectId })],
+    storage: createStorage({ storage: cookieStorage }),
     ssr: true,
     transports: {
       [mainnet.id]: http(),
@@ -21,4 +17,7 @@ export function getConfig(id?: string) {
       [baseSepolia.id]: http(),
     },
   })
+  if (config) {
+    return config
+  }
 }
