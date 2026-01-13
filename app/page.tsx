@@ -9,7 +9,6 @@ import { Header } from '@/components/header'
 import { MainComponent } from '@/components/main'
 import { MainModal } from '@/components/modals/main-modal'
 import { TransactionDetailsModal } from '@/components/modals/transaction-details-modal'
-import { Network } from '@/components/network-box'
 import { useBridgeFees } from '@/hooks/use-bridge-fees'
 import { useBridgeToEthereum } from '@/hooks/use-bridge-to-ethereum'
 
@@ -24,52 +23,50 @@ import { setIsModalOpen, setModalStep, useModalStore } from '@/store/modal'
 const REFETCH_LIMIT_INTERVAL = 30 * 1000 // 30 sec
 
 export default function Home() {
-  const { isConnected, address: ethAddress } = useConnection()
   const modalStep = useModalStore((s) => s.step)
   const isModalOpen = useModalStore((s) => s.isModalOpen)
-
-  const [hasFetchedParams, setHasFetchedParams] = useState(false)
-  const [fromNetwork, setFromNetwork] = useState<Network>({
-    name: 'Tari',
-    icon: '/icons/tari.png',
-  })
-  const [toNetwork, setToNetwork] = useState<Network>({
-    name: 'Ethereum',
-    icon: '/icons/eth.png',
-  })
-  const [isUnwrappingFailed, setIsUnwrappingFailed] = useState(false)
-  const [remainingDailyLimit, setRemainingDailyLimit] = useState<number | undefined>(undefined)
-
-  const fetchDailyLimit = useFetchDailyLimit()
-
-  const { getBridgeTxParams } = useBridgeToEthereum()
-  const { getUserBackendBridgeTxs } = useBridgeTransaction()
-  const tariAccount = useTariAccountStore((s) => s.tariAccount)
-
   const detailedTx = useTariAccountStore((s) => s.detailedTx)
+  const tariAccount = useTariAccountStore((s) => s.tariAccount)
   const ongoingBridgeTx = useTariAccountStore((s) => s.ongoingBridgeTx)
-
   const tariColdWalletAddress = useBridgeStore((s) => s.tariColdWalletAddress)
   const wrapTokenFeePercentageBps = useBridgeStore((s) => s.wrapTokenFeePercentageBps)
+  const fromNetwork = useBridgeStore((s) => s.fromNetwork)
 
-  // Prevent main modal from showing when transaction details modal is active
-  const showModalDetailedTx = !!detailedTx
-  const showModalOngoingTx = ongoingBridgeTx && ongoingBridgeTx.showModal
-
-  const isFailed = ongoingBridgeTx?.status === UserTransactionDTO.status.TIMEOUT || isUnwrappingFailed
-  const isWrapSuccess = ongoingBridgeTx?.status === UserTransactionDTO.status.SUCCESS
-
+  const fetchDailyLimit = useFetchDailyLimit()
+  const { isConnected, address: ethAddress } = useConnection()
+  const { getUserBackendBridgeTxs } = useBridgeTransaction()
+  const { getBridgeTxParams } = useBridgeToEthereum()
   const methods = useForm<BridgeFormValues>({
     defaultValues: { amount: '' },
     mode: 'onChange',
   })
-
   const { control, resetField } = methods
-
   const amount = useWatch({ control, name: 'amount' })
+
+  const [hasFetchedParams, setHasFetchedParams] = useState(false)
+
+  const [isUnwrappingFailed, setIsUnwrappingFailed] = useState(false)
+  const [remainingDailyLimit, setRemainingDailyLimit] = useState<number | undefined>(undefined)
+
+  // Prevent main modal from showing when transaction details modal is active
+  const showModalDetailedTx = !!detailedTx
+  const showModalOngoingTx = ongoingBridgeTx && ongoingBridgeTx.showModal
+  const isFailed = ongoingBridgeTx?.status === UserTransactionDTO.status.TIMEOUT || isUnwrappingFailed
+  const isWrapSuccess = ongoingBridgeTx?.status === UserTransactionDTO.status.SUCCESS
 
   const decimals = fromNetwork.name === 'Tari' ? 6 : 18
   const feesData = useBridgeFees(amount, decimals)
+
+  const fetchUserTransactions = useCallback(async () => {
+    try {
+      await getUserBackendBridgeTxs()
+      await setTariAccount()
+    } catch (error) {
+      console.error('[ TAPPLET-BRIDGE ] Failed to get user transactions:', error)
+    }
+  }, [getUserBackendBridgeTxs])
+  const onNetworkChange = useEffectEvent(() => setRemainingDailyLimit(undefined))
+  const onFetchedParams = useEffectEvent((hasFetched: boolean) => setHasFetchedParams(hasFetched))
 
   useEffect(() => {
     if (!tariAccount || hasFetchedParams) return
@@ -86,20 +83,10 @@ export default function Home() {
     })
   }, [getBridgeTxParams, hasFetchedParams, tariAccount])
 
-  const onFetchedParams = useEffectEvent((hasFetched: boolean) => setHasFetchedParams(hasFetched))
   useEffect(() => {
     const hasFetched = Boolean(!!tariColdWalletAddress?.length || !!wrapTokenFeePercentageBps)
     onFetchedParams(hasFetched)
   }, [tariColdWalletAddress?.length, wrapTokenFeePercentageBps])
-
-  const fetchUserTransactions = useCallback(async () => {
-    try {
-      await getUserBackendBridgeTxs()
-      await setTariAccount()
-    } catch (error) {
-      console.error('[ TAPPLET-BRIDGE ] Failed to get user transactions:', error)
-    }
-  }, [getUserBackendBridgeTxs])
 
   useEffect(() => {
     if (!tariAccount) return
@@ -129,8 +116,6 @@ export default function Home() {
     }
   }, [isModalOpen, ongoingBridgeTx, showModalDetailedTx, showModalOngoingTx])
 
-  const onNetworkChange = useEffectEvent(() => setRemainingDailyLimit(undefined))
-
   useEffect(() => {
     if (fromNetwork.name === 'Tari') {
       onNetworkChange()
@@ -155,13 +140,7 @@ export default function Home() {
     <main className="relative min-h-screen w-full flex flex-col pl-(--tu-padding-left) pr-8 items-center justify-center">
       <Header />
       <FormProvider {...methods}>
-        <MainComponent
-          fromNetwork={fromNetwork}
-          setFromNetwork={setFromNetwork}
-          toNetwork={toNetwork}
-          setToNetwork={setToNetwork}
-          remainingDailyLimit={remainingDailyLimit}
-        />
+        <MainComponent remainingDailyLimit={remainingDailyLimit} />
         {isModalOpen && !showModalDetailedTx && (
           <MainModal
             success={isWrapSuccess}
@@ -170,8 +149,6 @@ export default function Home() {
             amount={amount}
             ethereumAddress={ethAddress}
             tariWalletAddress={tariAccount?.address}
-            fromNetwork={fromNetwork}
-            toNetwork={toNetwork}
             feesData={feesData}
             closeModal={handleCloseModal}
             type={ongoingBridgeTx?.type || 'wrap'}

@@ -18,8 +18,6 @@ export const MainModal = ({
   amount,
   tariWalletAddress,
   ethereumAddress,
-  fromNetwork,
-  toNetwork,
   feesData,
   closeModal,
   type,
@@ -37,12 +35,11 @@ export const MainModal = ({
           amount={amount}
           tariWalletAddress={tariWalletAddress}
           ethereumAddress={ethereumAddress}
-          fromNetwork={fromNetwork}
           type={type}
         />
       )
 
-    if (failed) return <FailedModal closeModal={closeModal} paymentId={undefined} fromNetwork={fromNetwork.name} />
+    if (failed) return <FailedModal closeModal={closeModal} paymentId={undefined} />
 
     if (!isConnected && step === 0) return <ConnectionModal closeModal={closeModal} />
     if (step === 1)
@@ -52,8 +49,6 @@ export const MainModal = ({
           closeModal={closeModal}
           ethereumAddress={ethereumAddress}
           tariWalletAddress={tariWalletAddress}
-          fromNetwork={fromNetwork}
-          toNetwork={toNetwork}
           feesData={feesData}
         />
       )
@@ -63,7 +58,6 @@ export const MainModal = ({
           closeModal={closeModal}
           tariWalletAddress={tariWalletAddress}
           ethereumAddress={ethereumAddress}
-          fromNetwork={fromNetwork}
           feesData={feesData}
           type={type}
         />

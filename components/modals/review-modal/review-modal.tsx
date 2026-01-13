@@ -9,18 +9,13 @@ import { config } from '@/config'
 import { truncateAddress } from '@/utils/truncate'
 import { useTranslation } from 'react-i18next'
 import { useBridgeActions } from '@/hooks/use-bridge-actions'
+import useBridgeStore from '@/store/bridge'
 
-export const ReviewModal = ({
-  closeModal,
-  amount,
-  tariWalletAddress,
-  ethereumAddress,
-  fromNetwork,
-  toNetwork,
-  feesData,
-}: ReviewModalProps) => {
+export const ReviewModal = ({ closeModal, amount, tariWalletAddress, ethereumAddress, feesData }: ReviewModalProps) => {
   const { t } = useTranslation('main', { useSuspense: false })
   const { amountAfterFee, feeAmount, feePercentage, isOverHighBridgeThreshold } = feesData
+  const fromNetwork = useBridgeStore((s) => s.fromNetwork)
+  const toNetwork = useBridgeStore((s) => s.toNetwork)
 
   const { handleBridgeToEthereum, handleBridgeToTari } = useBridgeActions({
     amount,

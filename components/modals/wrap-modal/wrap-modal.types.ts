@@ -9,7 +9,4 @@ export type WrapModalProps = {
   destinationAddress?: string
   transactionStatus?: CombinedBridgeTransaction
   type: 'wrap' | 'unwrap'
-} & Pick<
-  MainModalProps,
-  'tariWalletAddress' | 'ethereumAddress' | 'fromNetwork'
->
+} & Pick<MainModalProps, 'tariWalletAddress' | 'ethereumAddress'>

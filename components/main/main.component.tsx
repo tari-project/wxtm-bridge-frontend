@@ -13,13 +13,7 @@ import { useBridgeStatus } from '@/hooks/use-bridge-status'
 
 // TODO - add translation keys
 
-export const MainComponent = ({
-  fromNetwork,
-  setFromNetwork,
-  toNetwork,
-  setToNetwork,
-  remainingDailyLimit,
-}: MainComponentProps) => {
+export const MainComponent = ({ remainingDailyLimit }: MainComponentProps) => {
   const { t } = useTranslation('main', { useSuspense: false })
   const [showHistory, setShowHistory] = useState(false)
   const exceededDailyLimit = useTariAccountStore((s) => s.exceededDailyLimit)
@@ -40,15 +34,7 @@ export const MainComponent = ({
     </div>
   ) : null
 
-  const bridgingMarkup = (
-    <BridgeForm
-      fromNetwork={fromNetwork}
-      setFromNetwork={setFromNetwork}
-      toNetwork={toNetwork}
-      setToNetwork={setToNetwork}
-      remainingDailyLimit={remainingDailyLimit}
-    />
-  )
+  const bridgingMarkup = <BridgeForm remainingDailyLimit={remainingDailyLimit} />
 
   const mainMarkup = !isOffline ? (
     <div className="mt-6">

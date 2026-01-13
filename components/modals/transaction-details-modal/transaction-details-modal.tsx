@@ -1,7 +1,6 @@
 import { FailedModal } from '@/components/modals/failed-modal'
 import { SuccessModal } from '@/components/modals/success-modal'
 import { WrapModal } from '@/components/modals/wrap-modal'
-import { Network } from '@/components/network-box'
 import { getStatusInfo } from '@/components/transactions/helpers'
 import { BridgeFees } from '@/hooks/use-bridge-fees'
 import { getTransactionAmount } from '@/utils/transaction'
@@ -15,16 +14,6 @@ const TransactionDetailsModal = memo(function TransactionDetailsModal({
   const modalRef = useRef<HTMLDivElement>(null)
   const statusInfo = getStatusInfo(transaction.status)
   const { amount: tokenAmount } = getTransactionAmount(transaction)
-
-  const tariNetwork: Network = {
-    name: 'Tari',
-    icon: '/icons/tari.png',
-  }
-
-  const ethereumNetwork: Network = {
-    name: 'Ethereum',
-    icon: '/icons/eth.png',
-  }
 
   const feesData: BridgeFees = {
     feeAmount: transaction.feeAmount,
@@ -42,9 +31,6 @@ const TransactionDetailsModal = memo(function TransactionDetailsModal({
             feesData={feesData}
             tariWalletAddress={transaction.sourceAddress}
             ethereumAddress={transaction.destinationAddress}
-            fromNetwork={
-              transaction.type === 'wrap' ? tariNetwork : ethereumNetwork
-            }
             amountAfterFee={transaction.amountAfterFee}
             destinationAddress={transaction.destinationAddress}
             transactionStatus={transaction}
@@ -59,21 +45,13 @@ const TransactionDetailsModal = memo(function TransactionDetailsModal({
             amount={tokenAmount}
             tariWalletAddress={transaction.sourceAddress}
             ethereumAddress={transaction.destinationAddress}
-            fromNetwork={
-              transaction.type === 'wrap' ? tariNetwork : ethereumNetwork
-            }
             detailedTx={transaction}
             type={transaction.type}
           />
         )
 
       case 'timeout':
-        return (
-          <FailedModal
-            closeModal={closeModal}
-            paymentId={transaction.paymentId}
-          />
-        )
+        return <FailedModal closeModal={closeModal} paymentId={transaction.paymentId} />
 
       default:
         return <></>

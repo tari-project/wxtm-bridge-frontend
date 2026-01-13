@@ -5,7 +5,4 @@ export type SuccessModalProps = {
   closeModal: () => void
   detailedTx?: CombinedBridgeTransaction
   type: 'wrap' | 'unwrap'
-} & Pick<
-  MainModalProps,
-  'amount' | 'tariWalletAddress' | 'ethereumAddress' | 'fromNetwork'
->
+} & Pick<MainModalProps, 'amount' | 'tariWalletAddress' | 'ethereumAddress'>

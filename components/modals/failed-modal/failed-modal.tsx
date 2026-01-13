@@ -6,9 +6,11 @@ import { ModalButton } from '@/components/modals/modal-button'
 import useTariAccountStore, { removeOngoingTransaction } from '@/store/account'
 import useTariSigner from '@/store/signer'
 import { useTranslation } from 'react-i18next'
+import useBridgeStore from '@/store/bridge'
 
-export const FailedModal = ({ closeModal, paymentId: paymentIdProp, fromNetwork }: FailedModalProps) => {
+export const FailedModal = ({ closeModal, paymentId: paymentIdProp }: FailedModalProps) => {
   const signer = useTariSigner((s) => s.signer)
+  const fromNetwork = useBridgeStore((s) => s.fromNetwork)
   const ongoingBridgeTx = useTariAccountStore((s) => s.ongoingBridgeTx)
   const { t } = useTranslation('main', { useSuspense: false })
 
@@ -28,13 +30,13 @@ export const FailedModal = ({ closeModal, paymentId: paymentIdProp, fromNetwork 
           </div>
           <div className="font-semibold text-lg mt-2">{t('something_went_wrong')}</div>
           <div className="font-normal text-xs mt-2 text-center px-3">
-            {fromNetwork === 'Tari' ? t('wrap_failed_message') : t('unwrap_failed_message')}
+            {fromNetwork.name === 'Tari' ? t('wrap_failed_message') : t('unwrap_failed_message')}
           </div>
         </div>
 
         {/* Section 1 */}
         <div className="flex flex-col my-4">
-          {fromNetwork === 'Tari' ? (
+          {fromNetwork.name === 'Tari' ? (
             <div className="font-medium">
               <div className="text-xs text-gray-500">{t('transaction_id')}</div>
               <div className="text-sm">{paymentIdProp || ongoingBridgeTx?.paymentId}</div>

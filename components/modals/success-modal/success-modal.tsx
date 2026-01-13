@@ -21,26 +21,27 @@ import {
   OfficialContractAddressWrapper,
 } from './success-modal.styles'
 import { SuccessModalProps } from './success-modal.types'
+import useBridgeStore from '@/store/bridge'
 
-export const SuccessModal: React.FC<SuccessModalProps> = ({
+export const SuccessModal = ({
   closeModal,
   amount: _amountProp,
   tariWalletAddress,
   ethereumAddress,
-  fromNetwork,
   detailedTx,
   type,
-}) => {
+}: SuccessModalProps) => {
   const { t } = useTranslation('main', { useSuspense: false })
   const signer = useTariSigner((s) => s.signer)
   const ongoingBridgeTx = useTariAccountStore((s) => s.ongoingBridgeTx)
+  const fromNetwork = useBridgeStore((s) => s.fromNetwork)
 
   const { fromToken, toToken } = useBridgeInfo(fromNetwork, ethereumAddress!, tariWalletAddress!)
   const { addXtmToWallet } = useWalletUtils()
   const [copied, setCopied] = useState(false)
 
-  const handleCopyAddress = useCallback(() => {
-    navigator.clipboard.writeText(config.WXTM_CONTRACT_ADDRESS)
+  const handleCopyAddress = useCallback(async () => {
+    await navigator.clipboard.writeText(config.WXTM_CONTRACT_ADDRESS)
     setCopied(true)
     setTimeout(() => setCopied(false), 1500)
   }, [])

@@ -11,12 +11,12 @@ import { useTranslation } from 'react-i18next'
 import { IoCloseOutline } from 'react-icons/io5'
 import { ModalButton } from '../modal-button'
 import { WrapModalProps } from './wrap-modal.types'
+import useBridgeStore from '@/store/bridge'
 
 /** @TODO Refactor and get rid of conditional display here create unwrap-modal and use it for unwrap txs */
 export const WrapModal = ({
   tariWalletAddress,
   ethereumAddress,
-  fromNetwork,
   feesData,
   closeModal,
   amountAfterFee: amountAfterFeeProp,
@@ -26,6 +26,8 @@ export const WrapModal = ({
 }: WrapModalProps) => {
   const { i18n, t } = useTranslation('main', { useSuspense: false })
   const ongoingBridgeTx = useTariAccountStore((s) => s.ongoingBridgeTx)
+  const fromNetwork = useBridgeStore((s) => s.fromNetwork)
+
   const bridgeInfo = useBridgeInfo(fromNetwork, ethereumAddress!, tariWalletAddress!)
   const amountAfterFeePending = amountAfterFeeProp
     ? parseFloat(utils.formatUnits(amountAfterFeeProp, type === 'wrap' ? 6 : 18)).toPrecision()
@@ -34,9 +36,7 @@ export const WrapModal = ({
       : feesData.amountAfterFee
 
   const destAddressRaw = destAddressProp || ongoingBridgeTx?.destinationAddress || bridgeInfo.destAddress
-
-  const destAddressPending =
-    fromNetwork.name === 'Ethereum' ? truncateAddress(destAddressRaw || '', 15) : destAddressRaw
+  const destAddressPending = type === 'unwrap' ? truncateAddress(destAddressRaw || '', 15) : destAddressRaw
 
   // Pass the current language to getModalTitle
   const { title, subtext } = getWrapModalTitle(

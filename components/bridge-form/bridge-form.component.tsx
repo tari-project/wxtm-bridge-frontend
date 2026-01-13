@@ -20,16 +20,12 @@ import { useTranslation } from 'react-i18next'
 import { MainComponentProps } from '../main'
 import { setIsModalOpen, setModalStep } from '@/store/modal'
 import { useFormContext } from 'react-hook-form'
+import { setFromNetwork, setToNetwork, useBridgeStore } from '@/store/bridge'
 
-export const BridgeForm = ({
-  fromNetwork,
-  setFromNetwork,
-  toNetwork,
-  setToNetwork,
-  remainingDailyLimit,
-}: MainComponentProps) => {
+export const BridgeForm = ({ remainingDailyLimit }: MainComponentProps) => {
   const { t } = useTranslation('main', { useSuspense: false })
-
+  const fromNetwork = useBridgeStore((s) => s.fromNetwork)
+  const toNetwork = useBridgeStore((s) => s.toNetwork)
   const {
     setValue,
     formState: { isValid },
@@ -76,11 +72,11 @@ export const BridgeForm = ({
         const otherNetwork = fromNetworks.find((n) => n.name !== network.name)
 
         if (otherNetwork) {
-          setFromNetwork(network)
-          setToNetwork(otherNetwork)
+          setFromNetwork(network.name)
+          setToNetwork(otherNetwork.name)
         }
       } else {
-        setFromNetwork(network)
+        setFromNetwork(network.name)
       }
     } else {
       // If selecting same network that's already in "From", swap them
@@ -88,11 +84,11 @@ export const BridgeForm = ({
         const otherNetwork = fromNetworks.find((n) => n.name !== network.name)
 
         if (otherNetwork) {
-          setToNetwork(network)
-          setFromNetwork(otherNetwork)
+          setToNetwork(network.name)
+          setFromNetwork(otherNetwork.name)
         }
       } else {
-        setToNetwork(network)
+        setToNetwork(network.name)
       }
     }
     setOpenDropdown(null)

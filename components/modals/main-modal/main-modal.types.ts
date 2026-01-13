@@ -1,4 +1,3 @@
-import { Network } from '@/components/network-box'
 import { BridgeFees } from '@/hooks/use-bridge-fees'
 
 export type MainModalProps = {
@@ -8,8 +7,6 @@ export type MainModalProps = {
   amount: string
   ethereumAddress?: string
   tariWalletAddress?: string
-  fromNetwork: Network
-  toNetwork: Network
   feesData: BridgeFees
   closeModal: () => void
   type: 'wrap' | 'unwrap'
