@@ -4,7 +4,4 @@ import { BridgeFees } from '@/hooks/use-bridge-fees'
 export type ReviewModalProps = {
   closeModal: () => void
   feesData: BridgeFees
-} & Pick<
-  MainModalProps,
-  'handleBridgeToTari' | 'amount' | 'tariWalletAddress' | 'ethereumAddress' | 'fromNetwork' | 'toNetwork'
->
+} & Pick<MainModalProps, 'amount' | 'tariWalletAddress' | 'ethereumAddress' | 'fromNetwork' | 'toNetwork'>

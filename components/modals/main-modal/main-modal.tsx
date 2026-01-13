@@ -15,7 +15,6 @@ export const MainModal = ({
   success,
   failed,
   step,
-  handleBridgeToTari,
   amount,
   tariWalletAddress,
   ethereumAddress,
@@ -51,7 +50,6 @@ export const MainModal = ({
         <ReviewModal
           amount={amount}
           closeModal={closeModal}
-          handleBridgeToTari={handleBridgeToTari}
           ethereumAddress={ethereumAddress}
           tariWalletAddress={tariWalletAddress}
           fromNetwork={fromNetwork}

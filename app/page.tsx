@@ -20,14 +20,15 @@ import { type DeployedChains } from '@/types/contracts'
 import { FooterText } from '@/components/main/footer-text'
 import useBridgeStore from '@/store/bridge'
 import { useFetchDailyLimit } from '@/hooks/use-fetch-daily-limit'
+import { setIsModalOpen, setModalStep, useModalStore } from '@/store/modal'
 
 const REFETCH_LIMIT_INTERVAL = 30 * 1000 // 30 sec
 
 export default function Home() {
   const { isConnected, chain, address: ethAddress } = useConnection()
   const [hasFetchedParams, setHasFetchedParams] = useState(false)
-  const [modalOpen, setModalOpen] = useState(false)
-  const [modalStep, setModalStep] = useState<number>(1)
+  const modalStep = useModalStore((s) => s.step)
+  const isModalOpen = useModalStore((s) => s.isModalOpen)
   const [fromNetwork, setFromNetwork] = useState<Network>({
     name: 'Tari',
     icon: '/icons/tari.png',
@@ -36,7 +37,6 @@ export default function Home() {
     name: 'Ethereum',
     icon: '/icons/eth.png',
   })
-  const [isUnwrapping, setIsUnwrapping] = useState(false)
   const [isUnwrappingFailed, setIsUnwrappingFailed] = useState(false)
   const [remainingDailyLimit, setRemainingDailyLimit] = useState<number | undefined>(undefined)
 
@@ -45,7 +45,7 @@ export default function Home() {
   const chainId = (chain?.id ?? 1) as DeployedChains
 
   const { getBridgeTxParams } = useBridgeToEthereum()
-  const { bridgeToTari, isPending, isSuccess, isError, error } = useBridgeToTari(ethAddress || '0x', chainId)
+  const { isSuccess } = useBridgeToTari(ethAddress || '0x', chainId)
   const { getUserBackendBridgeTxs } = useBridgeTransaction()
   const tariAccount = useTariAccountStore((s) => s.tariAccount)
 
@@ -117,48 +117,30 @@ export default function Home() {
   }, [fetchUserTransactions, tariAccount])
 
   const onModalStateChange = useEffectEvent((open: boolean, step?: number) => {
-    setModalOpen(open)
+    setIsModalOpen(open)
     if (step) {
       setModalStep(step)
     }
   })
 
   useEffect(() => {
-    if (modalOpen && modalStep === 0 && isConnected) {
-      onModalStateChange(false, 1)
-    } else if (!showModalDetailedTx && showModalOngoingTx && (isSuccess || ongoingBridgeTx.type === 'wrap')) {
-      onModalStateChange(true, 2)
-    } else if (showModalDetailedTx && modalOpen) {
+    if (isModalOpen && modalStep === 0 && isConnected) {
+      setIsModalOpen(false)
+      setModalStep(1)
+      return
+    }
+  }, [isConnected, isModalOpen, modalStep])
+
+  useEffect(() => {
+    if (!showModalDetailedTx) {
+      if (showModalOngoingTx && ongoingBridgeTx.type === 'wrap') {
+        setIsModalOpen(true)
+        setModalStep(2)
+      }
+    } else if (showModalDetailedTx && isModalOpen) {
       onModalStateChange(false)
     }
-  }, [isConnected, isSuccess, modalOpen, modalStep, ongoingBridgeTx?.type, showModalDetailedTx, showModalOngoingTx])
-
-  useEffect(() => {
-    if (isUnwrapping) {
-      console.debug(`[ TAPPLET-BRIDGE ] Initiating transaction...`)
-      onModalStateChange(true, 3)
-    }
-  }, [isUnwrapping])
-
-  const onWrapResult = useEffectEvent((isSuccess: boolean) => {
-    if (isSuccess) {
-      console.debug(`[ TAPPLET-BRIDGE ] Unwrap transaction success!`)
-      setIsUnwrapping(false)
-      setModalStep(2)
-    } else {
-      console.error(`[ TAPPLET-BRIDGE ] Unwrap transaction failed:`, error)
-      setIsUnwrapping(false)
-      setIsUnwrappingFailed(true)
-    }
-  })
-
-  useEffect(() => {
-    if (!isPending && isSuccess) onWrapResult(true)
-  }, [isPending, isSuccess])
-
-  useEffect(() => {
-    if (!isPending && isError) onWrapResult(false)
-  }, [isError, isPending])
+  }, [isModalOpen, isSuccess, ongoingBridgeTx, showModalDetailedTx, showModalOngoingTx])
 
   const onNetworkChange = useEffectEvent(() => setRemainingDailyLimit(undefined))
   useEffect(() => {
@@ -173,29 +155,16 @@ export default function Home() {
   const handleConnectClick = () => {
     if (!isConnected) {
       setModalStep(0)
-      setModalOpen(true)
+      setIsModalOpen(true)
     }
   }
   const handleContinueClick = () => {
     setModalStep(1)
-    setModalOpen(true)
+    setIsModalOpen(true)
   }
   const handleSetOngoingModalOpen = (open: boolean) => {
-    setModalOpen(open)
+    setIsModalOpen(open)
     if (ongoingBridgeTx) setLastOngoingBridgeTx({ ...ongoingBridgeTx, showModal: false })
-  }
-  const handleBridgeToTari = async () => {
-    if (!amount || !ethAddress || !tariAccount?.address) {
-      return
-    }
-    setIsUnwrapping(true)
-    const success = await bridgeToTari(amount, ethAddress, tariAccount.address)
-    if (success) {
-      setIsUnwrapping(false)
-    } else {
-      setIsUnwrapping(false)
-      setIsUnwrappingFailed(true)
-    }
   }
   const handleCloseModal = () => {
     resetField('amount', { defaultValue: '' })
@@ -224,12 +193,11 @@ export default function Home() {
 
       {detailedTx && <TransactionDetailsModal transaction={detailedTx} closeModal={() => setDetailedTx(null)} />}
 
-      {modalOpen && !showModalDetailedTx && (
+      {isModalOpen && !showModalDetailedTx && (
         <MainModal
           success={isWrapSuccess}
           failed={isFailed}
           step={modalStep}
-          handleBridgeToTari={handleBridgeToTari}
           amount={amount}
           ethereumAddress={ethAddress}
           tariWalletAddress={tariAccount?.address}

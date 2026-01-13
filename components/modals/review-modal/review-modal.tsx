@@ -8,54 +8,25 @@ import { useBridgeInfo } from '@/hooks/use-bridge-info'
 import { config } from '@/config'
 import { truncateAddress } from '@/utils/truncate'
 import { useTranslation } from 'react-i18next'
-import { setExceededDailyLimit } from '@/store/account'
-import { useConnection } from 'wagmi'
-import { useBridgeToEthereum } from '@/hooks/use-bridge-to-ethereum'
-import { useBridgeTransaction } from '@/hooks/use-bridge-transaction'
-
-const DAILY_LIMIT_ERROR = 'Daily wrap limit exceeded'
-const DAILY_LIMIT_ERROR_TYPE = 'Forbidden'
+import { useBridgeActions } from '@/hooks/use-bridge-actions'
 
 export const ReviewModal = ({
   closeModal,
-  handleBridgeToTari,
   amount,
   tariWalletAddress,
   ethereumAddress,
   fromNetwork,
   toNetwork,
-  feesData: { amountAfterFee, feeAmount, feePercentage, isOverHighBridgeThreshold },
+  feesData,
 }: ReviewModalProps) => {
   const { t } = useTranslation('main', { useSuspense: false })
-  const { address: ethAddress } = useConnection()
-  const { getUserBackendBridgeTxs } = useBridgeTransaction()
-  const { bridgeToEthereum } = useBridgeToEthereum()
+  const { amountAfterFee, feeAmount, feePercentage, isOverHighBridgeThreshold } = feesData
 
-  const handleBridgeToEthereum = useCallback(() => {
-    if (!amount || !ethAddress) {
-      return
-    }
-
-    bridgeToEthereum({
-      amount,
-      ethAddress: ethAddress,
-      amountAfterFee,
-    })
-      .then(async () => {
-        await getUserBackendBridgeTxs()
-        setExceededDailyLimit(false)
-      })
-      .catch((e) => {
-        console.error('[ TAPPLET-BRIDGE ] Bridge operation failed:', e)
-        const error = e as Error
-        const isLimitError =
-          error?.message?.includes(DAILY_LIMIT_ERROR_TYPE) || error?.message?.includes(DAILY_LIMIT_ERROR)
-        setExceededDailyLimit(isLimitError)
-        if (isLimitError) {
-          closeModal()
-        }
-      })
-  }, [amount, amountAfterFee, bridgeToEthereum, closeModal, ethAddress, getUserBackendBridgeTxs])
+  const { handleBridgeToEthereum, handleBridgeToTari } = useBridgeActions({
+    amount,
+    feesData,
+    closeCallback: closeModal,
+  })
 
   const { fromToken, toToken, destAddress, bridgeHandler } = useBridgeInfo(
     fromNetwork,
