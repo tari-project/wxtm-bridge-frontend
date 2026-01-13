@@ -7,37 +7,44 @@ import { useConnection, useChainId, useDisconnect } from 'wagmi'
 import { truncateAddress } from '@/utils/truncate'
 import { NetworkSwitchModal } from '@/components/modals/network-switch-modal'
 import { chainsMap } from '@/utils/networksConfig'
-import { HeaderProps } from './header.types'
 import { BridgeHistoryListItem } from '../transactions/BridgeListItem'
 import useTariAccountStore, { setDetailedTx } from '@/store/account'
 import { useBridgeStatus } from '@/hooks/use-bridge-status'
 import useAppStore from '@/store/app'
+import { setIsModalOpen, setModalStep } from '@/store/modal'
 
-export const Header = ({ onConnectClickAction }: HeaderProps) => {
-  const { address, isConnected, chain } = useConnection()
-  const { getSupportedChains } = useAppStore()
-  const disconnect = useDisconnect()
-  const chainId = useChainId()
-  const [showNetworkModal, setShowNetworkModal] = useState(false)
+export const Header = () => {
   const bridgeTxs = useTariAccountStore((s) => s.combinedBridgeTxs)
-  const exampleItem = bridgeTxs.find((tx) => tx.paymentId !== '')
-  const supportedChains = getSupportedChains()
+  const { getSupportedChains } = useAppStore()
 
   const { isOffline } = useBridgeStatus()
+  const { address, isConnected, chain } = useConnection()
+  const supportedChains = getSupportedChains()
+  const disconnect = useDisconnect()
+  const chainId = useChainId()
 
+  const [showNetworkModal, setShowNetworkModal] = useState(false)
+
+  const exampleItem = bridgeTxs.find((tx) => tx.paymentId !== '')
   const isNetworkSupported = chain !== undefined && supportedChains.some((c) => c.id === chain.id)
+  const shouldShowNetworkModal = useMemo(() => isConnected && !isNetworkSupported, [isConnected, isNetworkSupported])
+
   const handleDisplayTransaction = () => {
     if (exampleItem) {
       setDetailedTx(exampleItem)
     }
   }
 
-  const shouldShowNetworkModal = useMemo(() => isConnected && !isNetworkSupported, [isConnected, isNetworkSupported])
-
   function networkClick() {
     if (!isNetworkSupported) {
       setShowNetworkModal(true)
       return
+    }
+  }
+  const handleConnectClick = () => {
+    if (!isConnected) {
+      setModalStep(0)
+      setIsModalOpen(true)
     }
   }
 
@@ -58,7 +65,7 @@ export const Header = ({ onConnectClickAction }: HeaderProps) => {
         {!isConnected ? (
           <button
             className="w-auto min-w-[150px] max-w-[180px] h-[51px] rounded-[100px] bg-[#090719] text-white font-semibold text-[12px] hover:bg-gray-800 hover:cursor-pointer transition"
-            onClick={onConnectClickAction}
+            onClick={handleConnectClick}
           >
             Connect Wallet
           </button>

@@ -13,19 +13,13 @@ import { useBridgeStatus } from '@/hooks/use-bridge-status'
 
 // TODO - add translation keys
 
-export const MainComponent: React.FC<MainComponentProps> = ({
-  onConnectClick,
-  onContinueClick,
-  control,
-  errors,
-  setValue,
-  isValid,
+export const MainComponent = ({
   fromNetwork,
   setFromNetwork,
   toNetwork,
   setToNetwork,
   remainingDailyLimit,
-}) => {
+}: MainComponentProps) => {
   const { t } = useTranslation('main', { useSuspense: false })
   const [showHistory, setShowHistory] = useState(false)
   const exceededDailyLimit = useTariAccountStore((s) => s.exceededDailyLimit)
@@ -48,12 +42,6 @@ export const MainComponent: React.FC<MainComponentProps> = ({
 
   const bridgingMarkup = (
     <BridgeForm
-      onConnectClick={onConnectClick}
-      onContinueClick={onContinueClick}
-      control={control}
-      errors={errors}
-      setValue={setValue}
-      isValid={isValid}
       fromNetwork={fromNetwork}
       setFromNetwork={setFromNetwork}
       toNetwork={toNetwork}

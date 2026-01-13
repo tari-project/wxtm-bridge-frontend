@@ -1,6 +1,6 @@
 'use client'
 import React, { useCallback, useEffect, useEffectEvent, useState } from 'react'
-import { useForm, useWatch } from 'react-hook-form'
+import { FormProvider, useForm, useWatch } from 'react-hook-form'
 import { useConnection } from 'wagmi'
 import './i18initializer'
 
@@ -12,11 +12,10 @@ import { TransactionDetailsModal } from '@/components/modals/transaction-details
 import { Network } from '@/components/network-box'
 import { useBridgeFees } from '@/hooks/use-bridge-fees'
 import { useBridgeToEthereum } from '@/hooks/use-bridge-to-ethereum'
-import { useBridgeToTari } from '@/hooks/use-bridge-to-tari'
+
 import { useBridgeTransaction } from '@/hooks/use-bridge-transaction'
 import useTariAccountStore, { setDetailedTx, setLastOngoingBridgeTx, setTariAccount } from '@/store/account'
 import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
-import { type DeployedChains } from '@/types/contracts'
 import { FooterText } from '@/components/main/footer-text'
 import useBridgeStore from '@/store/bridge'
 import { useFetchDailyLimit } from '@/hooks/use-fetch-daily-limit'
@@ -25,10 +24,11 @@ import { setIsModalOpen, setModalStep, useModalStore } from '@/store/modal'
 const REFETCH_LIMIT_INTERVAL = 30 * 1000 // 30 sec
 
 export default function Home() {
-  const { isConnected, chain, address: ethAddress } = useConnection()
-  const [hasFetchedParams, setHasFetchedParams] = useState(false)
+  const { isConnected, address: ethAddress } = useConnection()
   const modalStep = useModalStore((s) => s.step)
   const isModalOpen = useModalStore((s) => s.isModalOpen)
+
+  const [hasFetchedParams, setHasFetchedParams] = useState(false)
   const [fromNetwork, setFromNetwork] = useState<Network>({
     name: 'Tari',
     icon: '/icons/tari.png',
@@ -42,10 +42,7 @@ export default function Home() {
 
   const fetchDailyLimit = useFetchDailyLimit()
 
-  const chainId = (chain?.id ?? 1) as DeployedChains
-
   const { getBridgeTxParams } = useBridgeToEthereum()
-  const { isSuccess } = useBridgeToTari(ethAddress || '0x', chainId)
   const { getUserBackendBridgeTxs } = useBridgeTransaction()
   const tariAccount = useTariAccountStore((s) => s.tariAccount)
 
@@ -62,15 +59,12 @@ export default function Home() {
   const isFailed = ongoingBridgeTx?.status === UserTransactionDTO.status.TIMEOUT || isUnwrappingFailed
   const isWrapSuccess = ongoingBridgeTx?.status === UserTransactionDTO.status.SUCCESS
 
-  const {
-    control,
-    setValue,
-    formState: { errors, isValid },
-    resetField,
-  } = useForm<BridgeFormValues>({
+  const methods = useForm<BridgeFormValues>({
     defaultValues: { amount: '' },
     mode: 'onChange',
   })
+
+  const { control, resetField } = methods
 
   const amount = useWatch({ control, name: 'amount' })
 
@@ -116,13 +110,6 @@ export default function Home() {
     }
   }, [fetchUserTransactions, tariAccount])
 
-  const onModalStateChange = useEffectEvent((open: boolean, step?: number) => {
-    setIsModalOpen(open)
-    if (step) {
-      setModalStep(step)
-    }
-  })
-
   useEffect(() => {
     if (isModalOpen && modalStep === 0 && isConnected) {
       setIsModalOpen(false)
@@ -138,11 +125,12 @@ export default function Home() {
         setModalStep(2)
       }
     } else if (showModalDetailedTx && isModalOpen) {
-      onModalStateChange(false)
+      setIsModalOpen(false)
     }
-  }, [isModalOpen, isSuccess, ongoingBridgeTx, showModalDetailedTx, showModalOngoingTx])
+  }, [isModalOpen, ongoingBridgeTx, showModalDetailedTx, showModalOngoingTx])
 
   const onNetworkChange = useEffectEvent(() => setRemainingDailyLimit(undefined))
+
   useEffect(() => {
     if (fromNetwork.name === 'Tari') {
       onNetworkChange()
@@ -152,16 +140,6 @@ export default function Home() {
     return () => clearInterval(interval)
   }, [fetchDailyLimit, fromNetwork.name])
 
-  const handleConnectClick = () => {
-    if (!isConnected) {
-      setModalStep(0)
-      setIsModalOpen(true)
-    }
-  }
-  const handleContinueClick = () => {
-    setModalStep(1)
-    setIsModalOpen(true)
-  }
   const handleSetOngoingModalOpen = (open: boolean) => {
     setIsModalOpen(open)
     if (ongoingBridgeTx) setLastOngoingBridgeTx({ ...ongoingBridgeTx, showModal: false })
@@ -175,39 +153,32 @@ export default function Home() {
 
   return (
     <main className="relative min-h-screen w-full flex flex-col pl-(--tu-padding-left) pr-8 items-center justify-center">
-      <Header onConnectClickAction={handleConnectClick} />
-
-      <MainComponent
-        onConnectClick={handleConnectClick}
-        onContinueClick={handleContinueClick}
-        control={control}
-        errors={errors}
-        setValue={setValue}
-        isValid={isValid}
-        fromNetwork={fromNetwork}
-        setFromNetwork={setFromNetwork}
-        toNetwork={toNetwork}
-        setToNetwork={setToNetwork}
-        remainingDailyLimit={remainingDailyLimit}
-      />
-
-      {detailedTx && <TransactionDetailsModal transaction={detailedTx} closeModal={() => setDetailedTx(null)} />}
-
-      {isModalOpen && !showModalDetailedTx && (
-        <MainModal
-          success={isWrapSuccess}
-          failed={isFailed}
-          step={modalStep}
-          amount={amount}
-          ethereumAddress={ethAddress}
-          tariWalletAddress={tariAccount?.address}
+      <Header />
+      <FormProvider {...methods}>
+        <MainComponent
           fromNetwork={fromNetwork}
+          setFromNetwork={setFromNetwork}
           toNetwork={toNetwork}
-          feesData={feesData}
-          closeModal={handleCloseModal}
-          type={ongoingBridgeTx?.type || 'wrap'}
+          setToNetwork={setToNetwork}
+          remainingDailyLimit={remainingDailyLimit}
         />
-      )}
+        {isModalOpen && !showModalDetailedTx && (
+          <MainModal
+            success={isWrapSuccess}
+            failed={isFailed}
+            step={modalStep}
+            amount={amount}
+            ethereumAddress={ethAddress}
+            tariWalletAddress={tariAccount?.address}
+            fromNetwork={fromNetwork}
+            toNetwork={toNetwork}
+            feesData={feesData}
+            closeModal={handleCloseModal}
+            type={ongoingBridgeTx?.type || 'wrap'}
+          />
+        )}
+      </FormProvider>
+      {detailedTx && <TransactionDetailsModal transaction={detailedTx} closeModal={() => setDetailedTx(null)} />}
       <FooterText />
     </main>
   )

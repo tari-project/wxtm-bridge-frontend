@@ -1,20 +1,18 @@
 import React, { useState } from 'react'
-import { Controller } from 'react-hook-form'
+import { Controller, useFormContext } from 'react-hook-form'
 import { TextField } from '@mui/material'
 
 import { BridgeInputProps } from './bridge-input.types'
 import { useBridgeInfo } from '@/hooks/use-bridge-info'
 import { config } from '@/config'
 
-export const BridgeInput: React.FC<BridgeInputProps> = ({
-  fromNetwork,
-  control,
-  errors,
-  availableBalance,
-  remainingDailyLimit,
-}) => {
+export const BridgeInput = ({ fromNetwork, availableBalance, remainingDailyLimit }: BridgeInputProps) => {
   const [valueLength, setValueLength] = useState(5)
   const { fromToken } = useBridgeInfo(fromNetwork)
+  const {
+    control,
+    formState: { errors },
+  } = useFormContext()
 
   // Helper to block invalid keys
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -29,10 +27,7 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
       '.', // Allow decimal point
     ]
     // Allow Ctrl/Cmd + A,C,V,X for copy/paste/select all
-    if (
-      (e.ctrlKey || e.metaKey) &&
-      ['a', 'c', 'v', 'x'].includes(e.key.toLowerCase())
-    ) {
+    if ((e.ctrlKey || e.metaKey) && ['a', 'c', 'v', 'x'].includes(e.key.toLowerCase())) {
       return
     }
     // Allow digits and allowed keys only
@@ -41,29 +36,27 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
     }
   }
 
-  const handleChange =
-    (onChange: (value: string) => void) =>
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      let value = e.target.value
+  const handleChange = (onChange: (value: string) => void) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value
 
-      // Remove non-digit characters except decimal point
-      const parts = value.split('.')
-      const integerPart = parts[0].replace(/\D/g, '') // digits only
-      const decimalPart = parts[1] ? parts[1].replace(/\D/g, '') : ''
+    // Remove non-digit characters except decimal point
+    const parts = value.split('.')
+    const integerPart = parts[0].replace(/\D/g, '') // digits only
+    const decimalPart = parts[1] ? parts[1].replace(/\D/g, '') : ''
 
-      // Limit integer part to max 10 digits
-      const limitedInteger = integerPart.slice(0, 10)
+    // Limit integer part to max 10 digits
+    const limitedInteger = integerPart.slice(0, 10)
 
-      // Reconstruct value with decimal part if any
-      if (parts.length > 1) {
-        value = limitedInteger + '.' + decimalPart
-      } else {
-        value = limitedInteger
-      }
-
-      setValueLength(value.length)
-      onChange(value)
+    // Reconstruct value with decimal part if any
+    if (parts.length > 1) {
+      value = limitedInteger + '.' + decimalPart
+    } else {
+      value = limitedInteger
     }
+
+    setValueLength(value.length)
+    onChange(value)
+  }
 
   const getFontSize = (length: number) => {
     if (length < 10) return '22px'
@@ -71,6 +64,8 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
     if (length < 18) return '14px'
     return '10px'
   }
+
+  const helperText = errors.amount?.message
 
   return (
     <Controller
@@ -116,7 +111,7 @@ export const BridgeInput: React.FC<BridgeInputProps> = ({
           variant="standard"
           placeholder="0"
           error={Boolean(errors.amount)}
-          helperText={errors.amount?.message}
+          helperText={helperText as React.ReactNode}
           onKeyDown={handleKeyDown}
           onChange={handleChange(field.onChange)}
           slotProps={{

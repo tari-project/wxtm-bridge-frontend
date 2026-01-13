@@ -18,21 +18,23 @@ import { parseToMaxAllowed } from '@/utils/parse-wxtm-token-amount'
 import { formatNumber, FormatPreset } from '@/utils/formatters'
 import { useTranslation } from 'react-i18next'
 import { MainComponentProps } from '../main'
+import { setIsModalOpen, setModalStep } from '@/store/modal'
+import { useFormContext } from 'react-hook-form'
 
-export const BridgeForm: React.FC<MainComponentProps> = ({
-  onConnectClick,
-  onContinueClick,
-  control,
-  errors,
-  setValue,
-  isValid,
+export const BridgeForm = ({
   fromNetwork,
   setFromNetwork,
   toNetwork,
   setToNetwork,
   remainingDailyLimit,
-}) => {
+}: MainComponentProps) => {
   const { t } = useTranslation('main', { useSuspense: false })
+
+  const {
+    setValue,
+    formState: { isValid },
+  } = useFormContext()
+
   const [openDropdown, setOpenDropdown] = useState<'from' | 'to' | null>(null)
 
   const { isConnected, chain, address } = useConnection()
@@ -51,6 +53,17 @@ export const BridgeForm: React.FC<MainComponentProps> = ({
     account: address,
   })
 
+  const handleConnectClick = () => {
+    if (!isConnected) {
+      setModalStep(0)
+      setIsModalOpen(true)
+    }
+  }
+
+  const handleContinueClick = () => {
+    setModalStep(1)
+    setIsModalOpen(true)
+  }
   const evm_balance = balanceRes ? formatNumber(Number(balanceRes), FormatPreset.WXTM_LONG) : '0'
   const isDisabled = chain === undefined
 
@@ -157,8 +170,6 @@ export const BridgeForm: React.FC<MainComponentProps> = ({
                       <div className="font-medium text-xs text-gray-500">{t('amount_to_bridge')}</div>
                       <BridgeInput
                         fromNetwork={fromNetwork}
-                        control={control}
-                        errors={errors}
                         availableBalance={inputAvailableBalance()}
                         remainingDailyLimit={remainingDailyLimit}
                       />
@@ -205,11 +216,11 @@ export const BridgeForm: React.FC<MainComponentProps> = ({
 
               <div className="flex items-center justify-center">
                 {!isConnected ? (
-                  <MainButton onClick={onConnectClick} subText={t('eth_mainnet')}>
+                  <MainButton onClick={handleConnectClick} subText={t('eth_mainnet')}>
                     {t('connect_wallet')}
                   </MainButton>
                 ) : (
-                  <MainButton onClick={onContinueClick} disabled={!isValid || isDisabled}>
+                  <MainButton onClick={handleContinueClick} disabled={!isValid || isDisabled}>
                     <div className="flex">
                       {t('continue')}
                       <FaArrowRight className="ml-2" />
