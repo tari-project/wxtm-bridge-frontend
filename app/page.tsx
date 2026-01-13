@@ -58,8 +58,8 @@ export default function Home() {
 
   const fetchUserTransactions = useCallback(async () => {
     try {
-      await getUserBackendBridgeTxs()
       await setTariAccount()
+      await getUserBackendBridgeTxs()
     } catch (error) {
       console.error('[ TAPPLET-BRIDGE ] Failed to get user transactions:', error)
     }
