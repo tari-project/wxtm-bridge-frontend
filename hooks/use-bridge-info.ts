@@ -13,7 +13,7 @@ export const useBridgeInfo = (
   fromNetwork: Network,
   ethereumAddress?: string,
   tariWalletAddress?: string,
-  handleBridgeToEthereum?: () => void,
+  handleBridgeToEthereumAction?: () => void,
   handleBridgeToTari?: () => void,
 ): BridgeInfo => {
   return useMemo(() => {
@@ -23,7 +23,7 @@ export const useBridgeInfo = (
     const toToken = isWrapping ? 'wXTM' : 'XTM'
     const destAddress = isWrapping ? ethereumAddress : tariWalletAddress
     const bridgeHandler = isWrapping
-      ? handleBridgeToEthereum
+      ? handleBridgeToEthereumAction
       : handleBridgeToTari
 
     return { fromToken, toToken, isWrapping, destAddress, bridgeHandler }
@@ -31,7 +31,7 @@ export const useBridgeInfo = (
     fromNetwork.name,
     ethereumAddress,
     tariWalletAddress,
-    handleBridgeToEthereum,
+    handleBridgeToEthereumAction,
     handleBridgeToTari,
   ])
 }

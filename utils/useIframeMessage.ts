@@ -1,5 +1,3 @@
-import { useEffect } from 'react'
-
 export enum MessageType {
   SIGNER_CALL = 'signer-call',
   RESIZE = 'resize',
@@ -12,8 +10,7 @@ interface SignerCallMessage {
   type: MessageType.SIGNER_CALL
   payload: {
     methodName: string
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    args: any[]
+    args: unknown
   }
 }
 
@@ -25,23 +22,17 @@ interface ResizeMessage {
 
 interface SetLanguageMessage {
   type: MessageType.SET_LANGUAGE
-  payload: {
-    language: string
-  }
+  payload: { language: string }
 }
 
 interface SetFeaturesMessage {
   type: MessageType.SET_FEATURES
-  payload: {
-    unwrapEnabled: boolean
-  }
+  payload: { unwrapEnabled: boolean }
 }
 
 interface SetThemeMessage {
   type: MessageType.SET_THEME
-  payload: {
-    theme: string
-  }
+  payload: { theme: string }
 }
 
 export type IframeMessage =
@@ -50,17 +41,3 @@ export type IframeMessage =
   | SetLanguageMessage
   | SetThemeMessage
   | SetFeaturesMessage
-
-// Hook to listen for messages from the parent window
-export function useIframeMessage(onMessage: (event: MessageEvent<IframeMessage>) => void) {
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent<IframeMessage>) => {
-      // Optionally, add origin checks here for security
-      onMessage?.(event)
-    }
-    window.addEventListener('message', handleMessage)
-    return () => {
-      window.removeEventListener('message', handleMessage)
-    }
-  }, [onMessage])
-}

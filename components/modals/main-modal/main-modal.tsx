@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useRef } from 'react'
-import { useAccount } from 'wagmi'
+import { useConnection } from 'wagmi'
 
 import ConnectionModal from '@/components/modals/connection-modal/connection-modal'
 import { InfoModal } from '@/components/modals/info-modal'
@@ -11,11 +11,10 @@ import { WrapModal } from '@/components/modals/wrap-modal'
 import { FailedModal } from '../failed-modal'
 import { MainModalProps } from './main-modal.types'
 
-export const MainModal: React.FC<MainModalProps> = ({
+export const MainModal = ({
   success,
   failed,
   step,
-  handleBridgeToEthereum,
   handleBridgeToTari,
   amount,
   tariWalletAddress,
@@ -25,8 +24,8 @@ export const MainModal: React.FC<MainModalProps> = ({
   feesData,
   closeModal,
   type,
-}) => {
-  const { isConnected } = useAccount()
+}: MainModalProps) => {
+  const { isConnected } = useConnection()
   const modalRef = useRef<HTMLDivElement>(null)
 
   if (step === 0 && isConnected) return null
@@ -52,7 +51,6 @@ export const MainModal: React.FC<MainModalProps> = ({
         <ReviewModal
           amount={amount}
           closeModal={closeModal}
-          handleBridgeToEthereum={handleBridgeToEthereum}
           handleBridgeToTari={handleBridgeToTari}
           ethereumAddress={ethereumAddress}
           tariWalletAddress={tariWalletAddress}

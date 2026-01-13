@@ -12,11 +12,7 @@ export function parseWxtmTokenAmount(amount: string): string {
   return parsed.toString()
 }
 
-export function parseToMaxAllowed(
-  input: string,
-  maxValue = config.MAX_BRIDGE_AMOUNT,
-  maxDecimals: number = 6,
-): number {
+export function parseToMaxAllowed(input: string, maxValue = config.MAX_BRIDGE_AMOUNT, maxDecimals: number = 6): number {
   const cleaned = input.replace(/,/g, '')
   let num = Number(cleaned)
 

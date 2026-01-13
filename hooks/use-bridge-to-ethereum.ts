@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 
 import { UpdateToTokensSentReqDTO, UserTransactionDTO, WrapTokenService } from '@tari-project/wxtm-bridge-backend-api'
 
-import useTariAccountStore from '@/store/account'
+import useTariAccountStore, { setLastOngoingBridgeTx } from '@/store/account'
 import useBridgeStore from '@/store/bridge'
 import useTariSigner from '@/store/signer'
 import { parseWxtmTokenAmount } from '@/utils/parse-wxtm-token-amount'
@@ -26,7 +26,6 @@ export const useBridgeToEthereum = () => {
   const tariColdWalletAddress = useBridgeStore((s) => s.tariColdWalletAddress)
   const setTariColdWalletAddress = useBridgeStore((s) => s.setTariColdWalletAddress)
   const setWrapTokenFeePercentageBps = useBridgeStore((s) => s.setWrapTokenFeePercentageBps)
-  const setLastOngoingBridgeTx = useTariAccountStore((s) => s.setLastOngoingBridgeTx)
 
   const bridgeToEthereum = async ({
     amount,

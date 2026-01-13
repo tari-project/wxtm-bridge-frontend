@@ -4,9 +4,7 @@ import { WrapTokenService, GetWrapTokenServiceStatusRespDTO } from '@tari-projec
 
 export const useBridgeStatus = () => {
   const [status, setStatus] = useState<GetWrapTokenServiceStatusRespDTO['status'] | undefined>()
-  const { mutateAsync } = useMutation({
-    mutationFn: WrapTokenService.getServiceStatus,
-  })
+  const { mutateAsync } = useMutation({ mutationFn: WrapTokenService.getServiceStatus })
 
   useEffect(() => {
     function getStatus() {

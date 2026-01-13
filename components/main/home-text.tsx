@@ -8,7 +8,7 @@ export const HomeText: React.FC = ({}) => {
   return (
     <div className="flex flex-col gap-5 gap-small w-[clamp(480px,46vw,730px)]">
       <div className="relative w-[116px] h-[126px]">
-        <Image src="/icons/coin.png" fill alt="coin icon" className="object-cover" />
+        <Image src="/icons/coin.png" fill alt="coin icon" className="object-cover" sizes={'116'} />
       </div>
       <div className="font-normal leading-[0.8] text-5xl tracking-tight lg:text-[54px] xl:text-[70px] whitespace-pre-line text-pretty">
         {t('bridge_title_prefix')} <span className="font-semibold">{t('xtm_token')}</span>{' '}

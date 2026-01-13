@@ -40,18 +40,10 @@ export function getWrapModalTitle(
       subtext: ``,
     }
 
-  const {
-    amount: tokenAmount,
-    decimals,
-    amountAfterFee,
-  } = getTransactionAmount(tx)
-  const amountWithFee = parseFloat(
-    utils.formatUnits(amountAfterFee, decimals).toString(),
-  ).toPrecision()
+  const { amount: tokenAmount, decimals, amountAfterFee } = getTransactionAmount(tx)
+  const amountWithFee = parseFloat(utils.formatUnits(amountAfterFee, decimals).toString()).toPrecision()
 
-  const amount = parseFloat(
-    utils.formatUnits(tokenAmount, decimals).toString(),
-  ).toPrecision()
+  const amount = parseFloat(utils.formatUnits(tokenAmount, decimals).toString()).toPrecision()
 
   const bridgingTime = feeData.isOverHighBridgeThreshold ? '24-72h' : '12h'
   const fromToken = bridgeInfo.fromToken

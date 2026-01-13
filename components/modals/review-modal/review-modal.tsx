@@ -8,24 +8,55 @@ import { useBridgeInfo } from '@/hooks/use-bridge-info'
 import { config } from '@/config'
 import { truncateAddress } from '@/utils/truncate'
 import { useTranslation } from 'react-i18next'
+import { setExceededDailyLimit } from '@/store/account'
+import { useConnection } from 'wagmi'
+import { useBridgeToEthereum } from '@/hooks/use-bridge-to-ethereum'
+import { useBridgeTransaction } from '@/hooks/use-bridge-transaction'
 
-export const ReviewModal: React.FC<ReviewModalProps> = ({
+const DAILY_LIMIT_ERROR = 'Daily wrap limit exceeded'
+const DAILY_LIMIT_ERROR_TYPE = 'Forbidden'
+
+export const ReviewModal = ({
   closeModal,
-  handleBridgeToEthereum,
   handleBridgeToTari,
   amount,
   tariWalletAddress,
   ethereumAddress,
   fromNetwork,
   toNetwork,
-  feesData: {
-    amountAfterFee,
-    feeAmount,
-    feePercentage,
-    isOverHighBridgeThreshold,
-  },
-}) => {
+  feesData: { amountAfterFee, feeAmount, feePercentage, isOverHighBridgeThreshold },
+}: ReviewModalProps) => {
   const { t } = useTranslation('main', { useSuspense: false })
+  const { address: ethAddress } = useConnection()
+  const { getUserBackendBridgeTxs } = useBridgeTransaction()
+  const { bridgeToEthereum } = useBridgeToEthereum()
+
+  const handleBridgeToEthereum = useCallback(() => {
+    if (!amount || !ethAddress) {
+      return
+    }
+
+    bridgeToEthereum({
+      amount,
+      ethAddress: ethAddress,
+      amountAfterFee,
+    })
+      .then(async () => {
+        await getUserBackendBridgeTxs()
+        setExceededDailyLimit(false)
+      })
+      .catch((e) => {
+        console.error('[ TAPPLET-BRIDGE ] Bridge operation failed:', e)
+        const error = e as Error
+        const isLimitError =
+          error?.message?.includes(DAILY_LIMIT_ERROR_TYPE) || error?.message?.includes(DAILY_LIMIT_ERROR)
+        setExceededDailyLimit(isLimitError)
+        if (isLimitError) {
+          closeModal()
+        }
+      })
+  }, [amount, amountAfterFee, bridgeToEthereum, closeModal, ethAddress, getUserBackendBridgeTxs])
+
   const { fromToken, toToken, destAddress, bridgeHandler } = useBridgeInfo(
     fromNetwork,
     ethereumAddress!,
@@ -76,9 +107,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
               </div>
               <div className="flex items-center font-semibold text-3xl">
                 {parseFloat(amount).toPrecision()}
-                <div className="text-gray-500 text-xs font-medium ml-1">
-                  {fromToken}
-                </div>
+                <div className="text-gray-500 text-xs font-medium ml-1">{fromToken}</div>
               </div>
             </div>
           </div>
@@ -95,11 +124,8 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
           >
             <div className="space-y-[-10px]">
               <div className="font-medium text-sm" style={{ color: '#B35400' }}>
-                Bridging over{' '}
-                <span className="font-bold">
-                  {config.HIGH_BRIDGE_THRESHOLD} XTM
-                </span>{' '}
-                may take up to 24-48h to complete due to extra verification.
+                Bridging over <span className="font-bold">{config.HIGH_BRIDGE_THRESHOLD} XTM</span> may take up to
+                24-48h to complete due to extra verification.
               </div>
             </div>
           </div>
@@ -113,9 +139,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
             </div>
 
             <div className="text-sm">
-              {destAddress === ethereumAddress
-                ? truncateAddress(tariWalletAddress!, 15)
-                : ethereumAddress}
+              {destAddress === ethereumAddress ? truncateAddress(tariWalletAddress!, 15) : ethereumAddress}
             </div>
           </div>
 
@@ -127,9 +151,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
             </div>
 
             <div className="text-sm">
-              {destAddress === tariWalletAddress
-                ? truncateAddress(tariWalletAddress!, 15)
-                : ethereumAddress}
+              {destAddress === tariWalletAddress ? truncateAddress(tariWalletAddress!, 15) : ethereumAddress}
             </div>
           </div>
 
@@ -154,9 +176,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
               </div>
             </div>
 
-            <div className="text-gray-500 text-[10px] text-right self-end">
-              Fees {feePercentage.toPrecision()}%
-            </div>
+            <div className="text-gray-500 text-[10px] text-right self-end">Fees {feePercentage.toPrecision()}%</div>
           </div>
 
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
@@ -174,11 +194,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
           </div> */}
         </div>
 
-        <ModalButton
-          label={t('confirm_and_bridge')}
-          onClick={handleClick}
-          disabled={clicked}
-        />
+        <ModalButton label={t('confirm_and_bridge')} onClick={handleClick} disabled={clicked} />
       </div>
     </div>
   )

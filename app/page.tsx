@@ -1,7 +1,7 @@
 'use client'
-import React, { useCallback, useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { useAccount } from 'wagmi'
+import React, { useCallback, useEffect, useEffectEvent, useState } from 'react'
+import { useForm, useWatch } from 'react-hook-form'
+import { useConnection } from 'wagmi'
 import './i18initializer'
 
 import { BridgeFormValues } from '@/components/bridge-input'
@@ -14,19 +14,17 @@ import { useBridgeFees } from '@/hooks/use-bridge-fees'
 import { useBridgeToEthereum } from '@/hooks/use-bridge-to-ethereum'
 import { useBridgeToTari } from '@/hooks/use-bridge-to-tari'
 import { useBridgeTransaction } from '@/hooks/use-bridge-transaction'
-import useTariAccountStore from '@/store/account'
-import { TokensUnwrappedService, UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
-import { DeployedChains } from '@tari-project/wxtm-bridge-contracts/deployments'
+import useTariAccountStore, { setDetailedTx, setLastOngoingBridgeTx, setTariAccount } from '@/store/account'
+import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
+import { type DeployedChains } from '@/types/contracts'
 import { FooterText } from '@/components/main/footer-text'
 import useBridgeStore from '@/store/bridge'
-import { microXtmToXtm } from '@/utils/parse-wxtm-token-amount'
+import { useFetchDailyLimit } from '@/hooks/use-fetch-daily-limit'
 
-const DAILY_LIMIT_ERROR = 'Daily wrap limit exceeded'
-const DAILY_LIMIT_ERROR_TYPE = 'Forbidden'
-const REFETCH_LIMIT_INTERVAL = 30000
+const REFETCH_LIMIT_INTERVAL = 30 * 1000 // 30 sec
 
 export default function Home() {
-  const { isConnected, chain, address: ethAddress } = useAccount()
+  const { isConnected, chain, address: ethAddress } = useConnection()
   const [hasFetchedParams, setHasFetchedParams] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
   const [modalStep, setModalStep] = useState<number>(1)
@@ -42,18 +40,18 @@ export default function Home() {
   const [isUnwrappingFailed, setIsUnwrappingFailed] = useState(false)
   const [remainingDailyLimit, setRemainingDailyLimit] = useState<number | undefined>(undefined)
 
+  const fetchDailyLimit = useFetchDailyLimit()
+
   const chainId = (chain?.id ?? 1) as DeployedChains
 
-  const { bridgeToEthereum, getBridgeTxParams } = useBridgeToEthereum()
+  const { getBridgeTxParams } = useBridgeToEthereum()
   const { bridgeToTari, isPending, isSuccess, isError, error } = useBridgeToTari(ethAddress || '0x', chainId)
   const { getUserBackendBridgeTxs } = useBridgeTransaction()
   const tariAccount = useTariAccountStore((s) => s.tariAccount)
-  const setExceededDailyLimit = useTariAccountStore((s) => s.setExceededDailyLimit)
-  const setTariAccount = useTariAccountStore((s) => s.setTariAccount)
+
   const detailedTx = useTariAccountStore((s) => s.detailedTx)
-  const setDetailedTx = useTariAccountStore((s) => s.setDetailedTx)
   const ongoingBridgeTx = useTariAccountStore((s) => s.ongoingBridgeTx)
-  const setLastOngoingBridgeTx = useTariAccountStore((s) => s.setLastOngoingBridgeTx)
+
   const tariColdWalletAddress = useBridgeStore((s) => s.tariColdWalletAddress)
   const wrapTokenFeePercentageBps = useBridgeStore((s) => s.wrapTokenFeePercentageBps)
 
@@ -65,7 +63,6 @@ export default function Home() {
   const isWrapSuccess = ongoingBridgeTx?.status === UserTransactionDTO.status.SUCCESS
 
   const {
-    watch,
     control,
     setValue,
     formState: { errors, isValid },
@@ -75,7 +72,8 @@ export default function Home() {
     mode: 'onChange',
   })
 
-  const amount = watch('amount')
+  const amount = useWatch({ control, name: 'amount' })
+
   const decimals = fromNetwork.name === 'Tari' ? 6 : 18
   const feesData = useBridgeFees(amount, decimals)
 
@@ -94,84 +92,83 @@ export default function Home() {
     })
   }, [getBridgeTxParams, hasFetchedParams, tariAccount])
 
+  const onFetchedParams = useEffectEvent((hasFetched: boolean) => setHasFetchedParams(hasFetched))
   useEffect(() => {
-    setHasFetchedParams(!!tariColdWalletAddress?.length || !!wrapTokenFeePercentageBps)
+    const hasFetched = Boolean(!!tariColdWalletAddress?.length || !!wrapTokenFeePercentageBps)
+    onFetchedParams(hasFetched)
   }, [tariColdWalletAddress?.length, wrapTokenFeePercentageBps])
+
+  const fetchUserTransactions = useCallback(async () => {
+    try {
+      await getUserBackendBridgeTxs()
+      await setTariAccount()
+    } catch (error) {
+      console.error('[ TAPPLET-BRIDGE ] Failed to get user transactions:', error)
+    }
+  }, [getUserBackendBridgeTxs])
 
   useEffect(() => {
     if (!tariAccount) return
-
-    const fetchUserTransactions = async () => {
-      try {
-        await getUserBackendBridgeTxs()
-        await setTariAccount()
-      } catch (error) {
-        console.error('[ TAPPLET-BRIDGE ] Failed to get user transactions:', error)
-      }
-    }
-
-    fetchUserTransactions()
-    // Poll every 30 sec
-    const intervalId = setInterval(fetchUserTransactions, 30000)
-
+    // Poll every 5 min
+    const intervalId = setInterval(fetchUserTransactions, 1000 * 60 * 5)
     return () => {
       clearInterval(intervalId)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tariAccount?.address])
+  }, [fetchUserTransactions, tariAccount])
+
+  const onModalStateChange = useEffectEvent((open: boolean, step?: number) => {
+    setModalOpen(open)
+    if (step) {
+      setModalStep(step)
+    }
+  })
 
   useEffect(() => {
     if (modalOpen && modalStep === 0 && isConnected) {
-      setModalOpen(false)
-      setModalStep(1)
+      onModalStateChange(false, 1)
     } else if (!showModalDetailedTx && showModalOngoingTx && (isSuccess || ongoingBridgeTx.type === 'wrap')) {
-      setModalStep(2)
-      setModalOpen(true)
+      onModalStateChange(true, 2)
     } else if (showModalDetailedTx && modalOpen) {
-      setModalOpen(false)
+      onModalStateChange(false)
     }
-  }, [isConnected, modalOpen, modalStep, isSuccess, ongoingBridgeTx, showModalDetailedTx, showModalOngoingTx])
+  }, [isConnected, isSuccess, modalOpen, modalStep, ongoingBridgeTx?.type, showModalDetailedTx, showModalOngoingTx])
 
   useEffect(() => {
     if (isUnwrapping) {
       console.debug(`[ TAPPLET-BRIDGE ] Initiating transaction...`)
-      setModalStep(3)
+      onModalStateChange(true, 3)
     }
   }, [isUnwrapping])
 
-  useEffect(() => {
+  const onWrapResult = useEffectEvent((isSuccess: boolean) => {
     if (isSuccess) {
       console.debug(`[ TAPPLET-BRIDGE ] Unwrap transaction success!`)
       setIsUnwrapping(false)
       setModalStep(2)
-    } else if (isError) {
+    } else {
       console.error(`[ TAPPLET-BRIDGE ] Unwrap transaction failed:`, error)
       setIsUnwrapping(false)
       setIsUnwrappingFailed(true)
     }
-  }, [isPending, isSuccess, isError, error])
+  })
 
   useEffect(() => {
+    if (!isPending && isSuccess) onWrapResult(true)
+  }, [isPending, isSuccess])
+
+  useEffect(() => {
+    if (!isPending && isError) onWrapResult(false)
+  }, [isError, isPending])
+
+  const onNetworkChange = useEffectEvent(() => setRemainingDailyLimit(undefined))
+  useEffect(() => {
     if (fromNetwork.name === 'Tari') {
-      setRemainingDailyLimit(undefined)
+      onNetworkChange()
       return
     }
-
-    const fetchDailyLimit = async () => {
-      try {
-        const limitMicro = await TokensUnwrappedService.getRemainingDailyLimit()
-        const limitXtm = microXtmToXtm(limitMicro)
-        setRemainingDailyLimit(limitXtm)
-      } catch (error) {
-        console.error('[ TAPPLET-BRIDGE ] Failed to fetch daily limit:', error)
-      }
-    }
-
-    fetchDailyLimit()
-
     const interval = setInterval(fetchDailyLimit, REFETCH_LIMIT_INTERVAL)
     return () => clearInterval(interval)
-  }, [fromNetwork.name])
+  }, [fetchDailyLimit, fromNetwork.name])
 
   const handleConnectClick = () => {
     if (!isConnected) {
@@ -179,7 +176,6 @@ export default function Home() {
       setModalOpen(true)
     }
   }
-
   const handleContinueClick = () => {
     setModalStep(1)
     setModalOpen(true)
@@ -188,38 +184,10 @@ export default function Home() {
     setModalOpen(open)
     if (ongoingBridgeTx) setLastOngoingBridgeTx({ ...ongoingBridgeTx, showModal: false })
   }
-
-  const handleBridgeToEthereum = useCallback(() => {
-    if (!amount || !ethAddress) {
-      return
-    }
-
-    bridgeToEthereum({
-      amount,
-      ethAddress: ethAddress,
-      amountAfterFee: feesData.amountAfterFee,
-    })
-      .then(async () => {
-        await getUserBackendBridgeTxs()
-        setExceededDailyLimit(false)
-      })
-      .catch((e) => {
-        console.error('[ TAPPLET-BRIDGE ] Bridge operation failed:', e)
-        const error = e as Error
-        const isLimitError =
-          error?.message?.includes(DAILY_LIMIT_ERROR_TYPE) || error?.message?.includes(DAILY_LIMIT_ERROR)
-        setExceededDailyLimit(isLimitError)
-        if (isLimitError) {
-          setModalOpen(false)
-        }
-      })
-  }, [amount, ethAddress, bridgeToEthereum, feesData.amountAfterFee, getUserBackendBridgeTxs, setExceededDailyLimit])
-
-  const handleBridgeToTari = useCallback(async () => {
+  const handleBridgeToTari = async () => {
     if (!amount || !ethAddress || !tariAccount?.address) {
       return
     }
-
     setIsUnwrapping(true)
     const success = await bridgeToTari(amount, ethAddress, tariAccount.address)
     if (success) {
@@ -228,14 +196,14 @@ export default function Home() {
       setIsUnwrapping(false)
       setIsUnwrappingFailed(true)
     }
-  }, [amount, ethAddress, tariAccount?.address, bridgeToTari])
-
+  }
   const handleCloseModal = () => {
     resetField('amount', { defaultValue: '' })
     setIsUnwrappingFailed(false)
     handleSetOngoingModalOpen(false)
     setModalStep(1)
   }
+
   return (
     <main className="relative min-h-screen w-full flex flex-col pl-(--tu-padding-left) pr-8 items-center justify-center">
       <Header onConnectClickAction={handleConnectClick} />
@@ -261,7 +229,6 @@ export default function Home() {
           success={isWrapSuccess}
           failed={isFailed}
           step={modalStep}
-          handleBridgeToEthereum={handleBridgeToEthereum}
           handleBridgeToTari={handleBridgeToTari}
           amount={amount}
           ethereumAddress={ethAddress}

@@ -5,7 +5,7 @@ import { ModalButton } from '@/components/modals/modal-button'
 import { config } from '@/config'
 import { useBridgeInfo } from '@/hooks/use-bridge-info'
 import { useWalletUtils } from '@/hooks/use-wallet'
-import useTariAccountStore from '@/store/account'
+import useTariAccountStore, { removeOngoingTransaction } from '@/store/account'
 import useTariSigner from '@/store/signer'
 import { CopyIcon } from '@/styles/copyIcon'
 import { getTransactionAmount } from '@/utils/transaction'
@@ -34,14 +34,8 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
   const { t } = useTranslation('main', { useSuspense: false })
   const signer = useTariSigner((s) => s.signer)
   const ongoingBridgeTx = useTariAccountStore((s) => s.ongoingBridgeTx)
-  const removeOngoingTransaction = useTariAccountStore(
-    (s) => s.removeOngoingTransaction,
-  )
-  const { fromToken, toToken } = useBridgeInfo(
-    fromNetwork,
-    ethereumAddress!,
-    tariWalletAddress!,
-  )
+
+  const { fromToken, toToken } = useBridgeInfo(fromNetwork, ethereumAddress!, tariWalletAddress!)
   const { addXtmToWallet } = useWalletUtils()
   const [copied, setCopied] = useState(false)
 
@@ -55,58 +49,36 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
     console.info('[ TAPPLET-BRIDGE ] Adding WXTM token to the wallet initiated')
     addXtmToWallet()
       .then(() => {
-        console.info(
-          '[ TAPPLET-BRIDGE ] Adding WXTM token to the wallet successful',
-        )
+        console.info('[ TAPPLET-BRIDGE ] Adding WXTM token to the wallet successful')
       })
       .catch((error) => {
-        sendErrorMessage(
-          `Request failed. Feature not supported by your wallet app.`,
-        )
-        console.error(
-          '[ TAPPLET-BRIDGE ] Fail to add WXTM token to the wallet: ',
-          error,
-        )
+        sendErrorMessage(`Request failed. Feature not supported by your wallet app.`)
+        console.error('[ TAPPLET-BRIDGE ] Fail to add WXTM token to the wallet: ', error)
       })
   }, [addXtmToWallet])
   const handleOnClick = useCallback(async () => {
     closeModal()
     removeOngoingTransaction()
-    if (signer) await signer.removeOngoingBridgeTx()
-  }, [closeModal, removeOngoingTransaction, signer])
+    await signer?.removeOngoingBridgeTx()
+  }, [closeModal, signer])
 
   const transaction = detailedTx || ongoingBridgeTx
-  const { amount: txAmount, decimals } = transaction
-    ? getTransactionAmount(transaction)
-    : { amount: '0', decimals: 6 }
+  const { amount: txAmount, decimals } = transaction ? getTransactionAmount(transaction) : { amount: '0', decimals: 6 }
   const amount = parseFloat(utils.formatUnits(txAmount, decimals)).toPrecision()
 
   const txAmountToReceive = transaction?.amountAfterFee ?? '0'
-  const amountToReceive = parseFloat(
-    utils.formatUnits(txAmountToReceive, decimals),
-  ).toPrecision()
+  const amountToReceive = parseFloat(utils.formatUnits(txAmountToReceive, decimals)).toPrecision()
 
-  const destAddressRaw = detailedTx
-    ? detailedTx.destinationAddress
-    : ongoingBridgeTx?.destinationAddress ?? ''
+  const destAddressRaw = detailedTx ? detailedTx.destinationAddress : (ongoingBridgeTx?.destinationAddress ?? '')
 
-  const destAddress =
-    type === 'unwrap'
-      ? truncateAddress(destAddressRaw || '', 15)
-      : destAddressRaw
+  const destAddress = type === 'unwrap' ? truncateAddress(destAddressRaw || '', 15) : destAddressRaw
   return (
     <div className="w-full flex flex-col p-6">
       <div className="mt-2">
         {/* Top Section */}
         <div className="flex flex-col items-center justify-center">
           <div className="w-[49px] h-[49px] rounded-full overflow-hidden mr-1 relative">
-            <Image
-              src="/icons/tick.png"
-              fill
-              sizes="49px"
-              alt="Tick"
-              className="rounded-full object-cover"
-            />
+            <Image src="/icons/tick.png" fill sizes="49px" alt="Tick" className="rounded-full object-cover" />
           </div>
           <div className="font-semibold text-lg mt-2">
             {t(type === 'unwrap' ? 'success_unwrapped' : 'success_wrapped', {
@@ -114,9 +86,7 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
               fromToken,
             })}
           </div>
-          <div className="font-normal text-xs mt-2 text-center px-3">
-            {t('conversion_complete', { toToken })}
-          </div>
+          <div className="font-normal text-xs mt-2 text-center px-3">{t('conversion_complete', { toToken })}</div>
         </div>
         <div style={{ height: 20 }} />
         <OfficialContractAddressConainer>
@@ -155,9 +125,7 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
         {/* Section 1 */}
         <div className="flex flex-col my-4">
           <div className="font-medium">
-            <div className="text-xs text-gray-500">
-              {t('amount_to_receive')}
-            </div>
+            <div className="text-xs text-gray-500">{t('amount_to_receive')}</div>
             <div className="text-sm">
               {amountToReceive} {toToken}
             </div>
@@ -166,37 +134,10 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
 
           <div className="font-medium">
-            <div className="text-xs text-gray-500">
-              {t('destination_address')}
-            </div>
+            <div className="text-xs text-gray-500">{t('destination_address')}</div>
             <div className="text-sm">{destAddress}</div>
           </div>
-
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
-
-          {/* <div className="font-medium">
-            <div className="text-xs text-gray-500">{t('transaction_details')}</div>
-            <a
-              href="https://sepolia.etherscan.io/tx/0x0bec7941a37c07ec7cd408b3478c66ac7a26c4e48c2fd22577bb2c9c44cb4ae8"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center text-sm underline"
-            >
-              {`${txhash.slice(0, 6)}..${txhash.slice(-5)}`}
-              <HiArrowRightOnRectangle className="text-xs stroke-[0.7] ml-1" />
-            </a>
-          </div>
-
-          <div className="py-[0.5px] w-full bg-gray-300 my-2"></div> */}
-
-          {/* <div className="font-medium">
-            <div className="text-xs text-gray-500">{t('transaction_id')}</div>
-            <div className="text-sm">GH7SLK9087</div>
-          </div>
-
-          <div className="py-[0.5px] w-full bg-gray-300 mt-2 mb-4"></div> */}
-
-          {/* Section 1 */}
           <ModalButton label="Close" onClick={handleOnClick} disabled={false} />
         </div>
       </div>

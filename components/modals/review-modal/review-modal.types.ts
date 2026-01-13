@@ -6,11 +6,5 @@ export type ReviewModalProps = {
   feesData: BridgeFees
 } & Pick<
   MainModalProps,
-  | 'handleBridgeToEthereum'
-  | 'handleBridgeToTari'
-  | 'amount'
-  | 'tariWalletAddress'
-  | 'ethereumAddress'
-  | 'fromNetwork'
-  | 'toNetwork'
+  'handleBridgeToTari' | 'amount' | 'tariWalletAddress' | 'ethereumAddress' | 'fromNetwork' | 'toNetwork'
 >

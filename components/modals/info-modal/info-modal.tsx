@@ -3,7 +3,7 @@ import Image from 'next/image'
 
 import { Trans, useTranslation } from 'react-i18next'
 
-export const InfoModal: React.FC = ({}) => {
+export const InfoModal = () => {
   const { t } = useTranslation('main', { useSuspense: false })
 
   return (
@@ -11,20 +11,11 @@ export const InfoModal: React.FC = ({}) => {
       <div className="mt-2">
         <div className="flex flex-col items-center justify-center">
           <div className="w-[49px] h-[49px] rounded-full overflow-hidden mr-1 relative">
-            <Image
-              src="/icons/clock.png"
-              fill
-              sizes="49px"
-              alt="Clock"
-              className="rounded-full object-cover"
-            />
+            <Image src="/icons/clock.png" fill sizes="49px" alt="Clock" className="rounded-full object-cover" />
           </div>
           <div className="font-semibold text-lg mt-2">{t('unwrap_info')}</div>
           <div className="font-normal text-xs mt-2 text-center px-3">
-            <Trans
-              i18nKey="unwrap_info_message"
-              components={{ bold: <span className="font-bold" /> }}
-            />
+            <Trans i18nKey="unwrap_info_message" components={{ bold: <span className="font-bold" /> }} />
           </div>
         </div>
 

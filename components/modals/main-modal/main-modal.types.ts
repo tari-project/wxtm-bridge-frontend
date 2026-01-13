@@ -5,7 +5,6 @@ export type MainModalProps = {
   success: boolean
   failed: boolean
   step: number
-  handleBridgeToEthereum: () => void
   handleBridgeToTari: () => void
   amount: string
   ethereumAddress?: string

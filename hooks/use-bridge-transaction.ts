@@ -7,7 +7,14 @@ import {
   WrapTokenService,
 } from '@tari-project/wxtm-bridge-backend-api'
 
-import useTariAccountStore from '@/store/account'
+import useTariAccountStore, {
+  getBackendBridgeTxsFromTU,
+  removeOngoingTransaction,
+  setBackendBridgeTxs,
+  setBackendUnwrapTxs,
+  setCombinedBridgeTxs,
+  setLastOngoingBridgeTx,
+} from '@/store/account'
 import { OngoingUserTransaction } from '@/types/tapplet'
 import { BackendBridgeTransaction, BackendUnwrapTransaction, CombinedBridgeTransaction } from '@/types/transactions'
 
@@ -19,21 +26,14 @@ export const useBridgeTransaction = () => {
     mutationFn: TokensUnwrappedService.getUserTransactions,
   })
 
-  const setLastOngoingBridgeTx = useTariAccountStore.getState().setLastOngoingBridgeTx
-  const removeOngoingTransaction = useTariAccountStore.getState().removeOngoingTransaction
-
   /**
    * Fetch user bridge transactions and update the store's ongoing transaction state.
    * Returns the updated ongoing transaction or null if none.
    */
   const getUserBackendBridgeTxs = async (getFromTU = false): Promise<OngoingUserTransaction | null> => {
     const ongoingBridgeTx = useTariAccountStore.getState().ongoingBridgeTx
-    const setBackendBridgeTxs = useTariAccountStore.getState().setBackendBridgeTxs
-    const setBackendUnwrapTxs = useTariAccountStore.getState().setBackendUnwrapTxs
-    const setCombinedBridgeTxs = useTariAccountStore.getState().setCombinedBridgeTxs
     const lastOngoingPaymentIdFromTU = useTariAccountStore.getState().lastOngoingPaymentIdFromTU
     const tariAccount = useTariAccountStore.getState().tariAccount
-    const getBackendBridgeTxsFromTU = useTariAccountStore.getState().getBackendBridgeTxsFromTU
 
     console.debug(`[ TAPPLET-BRIDGE ]  tariAccount =`, tariAccount)
 
@@ -43,9 +43,9 @@ export const useBridgeTransaction = () => {
 
     console.debug(`[ TAPPLET-BRIDGE ] get txs from ${getFromTU ? 'TU' : 'backend'}`)
 
-    let wrapTransactions: BackendBridgeTransaction[] = []
+    let wrapTransactions: BackendBridgeTransaction[]
     let unwrapTransactions: BackendUnwrapTransaction[] = []
-    let combinedTransactions: CombinedBridgeTransaction[] = []
+    let combinedTransactions: CombinedBridgeTransaction[]
 
     if (getFromTU) {
       /** @TODO We would need to add getter for unwraps in TU and add those in below combinedTransactions */

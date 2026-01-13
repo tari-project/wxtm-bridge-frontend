@@ -3,9 +3,9 @@
 // Copyright 2022 The Tari Project
 // SPDX-License-Identifier: BSD-3-Clauses
 
-const fs = require('fs')
-const path = require('path')
-const process = require('process')
+import fs from 'fs'
+import path from 'path'
+import process from 'process'
 
 const BASE_PATH = path.join(__dirname, '..', 'public', 'locales')
 
@@ -73,11 +73,7 @@ async function getLocalesFilePaths(scopeFileName) {
 
     localesDirs.forEach((dir) => {
       if (dir.isDirectory()) {
-        const fileNamePath = path.join(
-          BASE_PATH,
-          dir.name,
-          `${scopeFileName}.json`,
-        )
+        const fileNamePath = path.join(BASE_PATH, dir.name, `${scopeFileName}.json`)
         fileNames.push(fileNamePath)
       }
     })
@@ -162,10 +158,7 @@ async function main() {
       const file = await fs.promises.readFile(filePath, 'utf8')
 
       const translations = JSON.parse(file)
-      const translationsWithDefaults = mergeDeep(
-        JSON.parse(enTranslations),
-        translations,
-      )
+      const translationsWithDefaults = mergeDeep(JSON.parse(enTranslations), translations)
       if (args.length > 1) {
         const translation = args[1].split('=')
         setNestedValue(translationsWithDefaults, translation[0], translation[1])
@@ -173,10 +166,7 @@ async function main() {
 
       const sortedTranslations = sortObjectKeys(translationsWithDefaults)
 
-      await fs.promises.writeFile(
-        filePath,
-        JSON.stringify(sortedTranslations, null, 2),
-      )
+      await fs.promises.writeFile(filePath, JSON.stringify(sortedTranslations, null, 2))
     } catch (err) {
       console.error('Error processing file:', filePath, err)
     }
