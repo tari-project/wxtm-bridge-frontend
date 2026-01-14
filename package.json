@@ -38,6 +38,7 @@
     "@types/node": "^25.0.8",
     "@types/react": "^19.2.8",
     "@types/react-dom": "^19.2.3",
+    "@walletconnect/ethereum-provider": "^2.23.2",
     "eslint": "^9.39.2",
     "eslint-config-next": "^16.1.1",
     "eslint-plugin-i18next": "^6.1.3",
