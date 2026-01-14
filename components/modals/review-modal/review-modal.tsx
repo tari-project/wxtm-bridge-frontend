@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import Image from 'next/image'
 import { IoCloseOutline } from 'react-icons/io5'
 
@@ -8,71 +8,22 @@ import { useBridgeInfo } from '@/hooks/use-bridge-info'
 import { config } from '@/config'
 import { truncateAddress } from '@/utils/truncate'
 import { useTranslation } from 'react-i18next'
-import { setIsModalOpen, setModalStep } from '@/store/modal'
-import { useTariAccountStore } from '@/store/account'
-import { useBridgeToEthereum } from '@/hooks/use-bridge-to-ethereum'
-import { setExceededDailyLimit, setUnwrapFailed, setUnwrapSuccess, useBridgeStore } from '@/store/bridge'
+import { useBridgeStore } from '@/store/bridge'
 import { useConnection } from 'wagmi'
-import { useBridgeToTari } from '@/hooks/use-bridge-to-tari'
-import { useBridgeTransaction } from '@/hooks/use-bridge-transaction'
-import { DeployedChains } from '@tari-project/wxtm-bridge-contracts/deployments'
 
-const DAILY_LIMIT_ERROR = 'Daily wrap limit exceeded'
-const DAILY_LIMIT_ERROR_TYPE = 'Forbidden'
-
-export const ReviewModal = ({ closeModalAction, amount, tariWalletAddress, feesData }: ReviewModalProps) => {
+export const ReviewModal = ({
+  closeModalAction,
+  amount,
+  tariWalletAddress,
+  feesData,
+  handleBridgeToEthereum,
+  handleBridgeToTari,
+}: ReviewModalProps) => {
   const { t } = useTranslation('main', { useSuspense: false })
-  const tariAccount = useTariAccountStore((s) => s.tariAccount)
-  const { address: ethAddress, chain } = useConnection()
+  const { address: ethAddress } = useConnection()
   const { amountAfterFee, feeAmount, feePercentage, isOverHighBridgeThreshold } = feesData
   const fromNetwork = useBridgeStore((s) => s.fromNetwork)
   const toNetwork = useBridgeStore((s) => s.toNetwork)
-
-  const { getUserBackendBridgeTxs } = useBridgeTransaction()
-  const { bridgeToEthereum } = useBridgeToEthereum()
-
-  const chainId = (chain?.id ?? 1) as DeployedChains
-  const { bridgeToTari, isSuccess, isError, error, isPending } = useBridgeToTari(ethAddress || '0x', chainId)
-
-  const handleBridgeToEthereum = useCallback(() => {
-    if (!amount || !ethAddress) {
-      return
-    }
-
-    bridgeToEthereum({
-      amount,
-      ethAddress: ethAddress,
-      amountAfterFee: feesData.amountAfterFee,
-    })
-      .then(async () => {
-        await getUserBackendBridgeTxs()
-        setExceededDailyLimit(false)
-      })
-      .catch((e) => {
-        console.error('[ TAPPLET-BRIDGE ] Bridge operation failed:', e)
-        const error = e as Error
-        const isLimitError =
-          error?.message?.includes(DAILY_LIMIT_ERROR_TYPE) || error?.message?.includes(DAILY_LIMIT_ERROR)
-        setExceededDailyLimit(isLimitError)
-        if (isLimitError) {
-          setIsModalOpen(false)
-        }
-      })
-  }, [amount, bridgeToEthereum, ethAddress, feesData.amountAfterFee, getUserBackendBridgeTxs])
-
-  const handleBridgeToTari = async () => {
-    if (!amount || !ethAddress || !tariAccount?.address) {
-      return
-    }
-    console.debug(`[ TAPPLET-BRIDGE ] Initiating transaction...`)
-    setModalStep(3)
-    const success = await bridgeToTari(amount, ethAddress, tariAccount.address)
-    if (success) {
-      setUnwrapFailed(false)
-    } else {
-      setUnwrapFailed(true)
-    }
-  }
 
   const { fromToken, toToken, destAddress, bridgeHandler } = useBridgeInfo(
     fromNetwork,
@@ -82,17 +33,6 @@ export const ReviewModal = ({ closeModalAction, amount, tariWalletAddress, feesD
     handleBridgeToTari,
   )
   const [clicked, setClicked] = useState(false)
-
-  useEffect(() => {
-    if (isSuccess) {
-      console.debug(`[ TAPPLET-BRIDGE ] Unwrap transaction success!`)
-      setModalStep(2)
-      setUnwrapSuccess(true)
-    } else if (isError) {
-      console.error(`[ TAPPLET-BRIDGE ] Unwrap transaction failed:`, error)
-      setUnwrapFailed(true)
-    }
-  }, [isPending, isSuccess, isError, error])
 
   const handleClick = useCallback(() => {
     if (clicked || !bridgeHandler) return

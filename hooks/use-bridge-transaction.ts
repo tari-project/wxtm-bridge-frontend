@@ -35,10 +35,8 @@ export const useBridgeTransaction = () => {
    * Returns the updated ongoing transaction or null if none.
    */
   const getUserBackendBridgeTxs = async (getFromTU = false): Promise<OngoingUserTransaction | null> => {
-    console.debug(`[ TAPPLET-BRIDGE ]  tariAccount =`, tariAccount)
-
     const walletAddress = tariAccount?.address
-
+    console.debug(`[ TAPPLET-BRIDGE ]  tariAccount address =`, walletAddress)
     if (!tariAccount || !walletAddress?.length) return null
 
     console.debug(`[ TAPPLET-BRIDGE ] get txs from ${getFromTU ? 'TU' : 'backend'}`)

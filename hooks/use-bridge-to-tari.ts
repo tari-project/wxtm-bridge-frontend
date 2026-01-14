@@ -20,7 +20,7 @@ export const useBridgeToTari = (ethAddress: `0x${string}`, chain: DeployedChains
     args: [],
   })
 
-  const { mutate: writeContract, isPending, isSuccess, isError, error } = useWriteContract()
+  const { mutateAsync: writeContract, isPending, isSuccess, isError, error } = useWriteContract()
 
   const { data: signer } = useWalletClient({
     account: ethAddress,
@@ -111,39 +111,44 @@ export const useBridgeToTari = (ethAddress: `0x${string}`, chain: DeployedChains
 
       console.debug(`[ TAPPLET-BRIDGE ] Processing bridge to Tari...`)
 
-      const txHash = writeContract({
-        address: wXTMBridgeAddress,
-        abi: wXTMBridgeAbi,
-        functionName: 'bridgeToTariWithAuthorization',
-        args: [
-          tariAddress,
-          value,
-          BigInt(validAfter),
-          BigInt(validBefore),
-          authNonce as `0x${string}`, // bytes32
-          v,
-          r as `0x${string}`,
-          s as `0x${string}`,
-        ],
-      })
+      try {
+        const txHash = await writeContract({
+          address: wXTMBridgeAddress,
+          abi: wXTMBridgeAbi,
+          functionName: 'bridgeToTariWithAuthorization',
+          args: [
+            tariAddress,
+            value,
+            BigInt(validAfter),
+            BigInt(validBefore),
+            authNonce as `0x${string}`, // bytes32
+            v,
+            r as `0x${string}`,
+            s as `0x${string}`,
+          ],
+        })
 
-      console.debug(`[ TAPPLET-BRIDGE ] Bridge transaction executed with txHash: ${txHash}, amount: ${value}`)
+        console.debug(`[ TAPPLET-BRIDGE ] Bridge transaction executed with txHash: ${txHash}, amount: ${value}`)
 
-      const amountAfterFee = (value * ethers.utils.parseUnits('0.995', 18).toBigInt()) / BigInt(1e18)
+        const amountAfterFee = (value * ethers.utils.parseUnits('0.995', 18).toBigInt()) / BigInt(1e18)
 
-      // set ongoing to immediately display wrap modal
-      setLastOngoingBridgeTx({
-        destinationAddress: tariAddress,
-        tokenAmount: parseWxtmTokenAmount(amount),
-        amountAfterFee: parseWxtmTokenAmount(ethers.utils.formatEther(amountAfterFee.toString())),
-        status: UserTransactionDTO.status.PENDING,
-        createdAt: new Date().toISOString(),
-        paymentId: '',
-        showModal: true,
-        type: 'unwrap',
-      })
+        // set ongoing to immediately display wrap modal
+        setLastOngoingBridgeTx({
+          destinationAddress: tariAddress,
+          tokenAmount: parseWxtmTokenAmount(amount),
+          amountAfterFee: parseWxtmTokenAmount(ethers.utils.formatEther(amountAfterFee.toString())),
+          status: UserTransactionDTO.status.PENDING,
+          createdAt: new Date().toISOString(),
+          paymentId: '',
+          showModal: true,
+          type: 'unwrap',
+        })
 
-      return true
+        return true
+      } catch (e) {
+        console.error(`[ TAPPLET-BRIDGE ] Error in bridge writeContract: ${e}`)
+        return false
+      }
     } catch (err) {
       console.error(`[ TAPPLET-BRIDGE ] Error in bridge process: ${err}`)
       return false

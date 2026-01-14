@@ -74,16 +74,14 @@ export default function Home() {
     const fetchBridgeTxParams = async () => {
       try {
         await getBridgeTxParams()
+        setHasFetchedParams(true)
       } catch (error) {
         console.error('[ TAPPLET-BRIDGE ] Failed to get bridge transaction params:', error)
       }
     }
 
-    fetchBridgeTxParams().then(async () => {
-      await fetchUserTransactions() // initial fetch
-      setHasFetchedParams(true)
-    })
-  }, [fetchUserTransactions, getBridgeTxParams, hasFetchedParams, tariAccount])
+    fetchBridgeTxParams()
+  }, [getBridgeTxParams, hasFetchedParams, tariAccount])
 
   useEffect(() => {
     const hasFetched = Boolean(!!tariColdWalletAddress?.length || !!wrapTokenFeePercentageBps)
@@ -94,6 +92,7 @@ export default function Home() {
     if (!tariAccount) return
     // Poll every 5 min
     const intervalId = setInterval(fetchUserTransactions, 1000 * 60 * 5)
+    fetchUserTransactions() //initial
     return () => {
       clearInterval(intervalId)
     }
@@ -116,9 +115,6 @@ export default function Home() {
       onNetworkChange()
       return
     }
-
-    void fetchDailyLimit()
-
     const interval = setInterval(fetchDailyLimit, REFETCH_LIMIT_INTERVAL)
     return () => clearInterval(interval)
   }, [fetchDailyLimit, fromNetwork.name])
