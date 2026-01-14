@@ -2,6 +2,7 @@ import { AccountData, OngoingUserTransaction } from '@/types/tapplet'
 import { create } from 'zustand'
 import useTariSigner from './signer'
 import { BackendBridgeTransaction, BackendUnwrapTransaction, CombinedBridgeTransaction } from '@/types/transactions'
+import TariL1Signer from '@/clients/tari-l1-signer'
 
 interface TariL1WalletStoreState {
   tariAccount?: AccountData
@@ -34,13 +35,16 @@ export const useTariAccountStore = create<TariL1WalletStoreState>()(() => ({
 }))
 
 export const setTariAccount = async () => {
-  const signer = useTariSigner.getState().signer
   if (process.env.NODE_ENV === 'development') return
+
+  const signer = useTariSigner.getState().signer
+
+  if (!signer) {
+    console.error('[ TAPPLET-BRIDGE ] signer undefined')
+    return
+  }
+
   try {
-    if (!signer) {
-      console.error('[ TAPPLET-BRIDGE ] signer undefined')
-      return
-    }
     const account = await signer.getAccount()
     const balance = await signer.getTariBalance()
     const ongoingBridgeTx = await signer.getOngoingBridgeTx()

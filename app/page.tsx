@@ -13,7 +13,7 @@ import { useBridgeFees } from '@/hooks/use-bridge-fees'
 import { useBridgeToEthereum } from '@/hooks/use-bridge-to-ethereum'
 
 import { useBridgeTransaction } from '@/hooks/use-bridge-transaction'
-import { setDetailedTx, setLastOngoingBridgeTx, setTariAccount, useTariAccountStore } from '@/store/account'
+import { setDetailedTx, setLastOngoingBridgeTx, useTariAccountStore } from '@/store/account'
 import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
 import { FooterText } from '@/components/main/footer-text'
 import { setUnwrapFailed, useBridgeStore } from '@/store/bridge'
@@ -58,13 +58,14 @@ export default function Home() {
   const feesData = useBridgeFees(amount, decimals)
 
   const fetchUserTransactions = useCallback(async () => {
-    try {
-      await getUserBackendBridgeTxs()
-      await setTariAccount()
-    } catch (error) {
-      console.error('[ TAPPLET-BRIDGE ] Failed to get user transactions:', error)
+    if (tariAccount) {
+      try {
+        await getUserBackendBridgeTxs()
+      } catch (error) {
+        console.error('[ TAPPLET-BRIDGE ] Failed to get user transactions:', error)
+      }
     }
-  }, [getUserBackendBridgeTxs])
+  }, [getUserBackendBridgeTxs, tariAccount])
 
   const onNetworkChange = useEffectEvent(() => setRemainingDailyLimit(undefined))
   const onFetchedParams = useEffectEvent((hasFetched: boolean) => setHasFetchedParams(hasFetched))
@@ -80,8 +81,10 @@ export default function Home() {
       }
     }
 
-    fetchBridgeTxParams()
-  }, [getBridgeTxParams, hasFetchedParams, tariAccount])
+    fetchBridgeTxParams().then(
+      async () => await fetchUserTransactions(), //initial
+    )
+  }, [fetchUserTransactions, getBridgeTxParams, hasFetchedParams, tariAccount])
 
   useEffect(() => {
     const hasFetched = Boolean(!!tariColdWalletAddress?.length || !!wrapTokenFeePercentageBps)
@@ -89,14 +92,12 @@ export default function Home() {
   }, [tariColdWalletAddress?.length, wrapTokenFeePercentageBps])
 
   useEffect(() => {
-    if (!tariAccount) return
     // Poll every 5 min
     const intervalId = setInterval(fetchUserTransactions, 1000 * 60 * 5)
-    fetchUserTransactions() //initial
     return () => {
       clearInterval(intervalId)
     }
-  }, [fetchUserTransactions, tariAccount])
+  }, [fetchUserTransactions])
 
   useEffect(() => {
     if (isModalOpen && modalStep === 0 && isConnected) {

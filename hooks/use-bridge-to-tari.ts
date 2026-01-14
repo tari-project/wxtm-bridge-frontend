@@ -5,6 +5,7 @@ import { DeployedChains, getDeployments } from '@tari-project/wxtm-bridge-contra
 import { WXTM__factory, WXTMBridge__factory } from '@tari-project/wxtm-bridge-contracts/typechain/factories/contracts'
 import { useReadContract, useWalletClient, useWriteContract } from 'wagmi'
 import { setLastOngoingBridgeTx } from '@/store/account'
+import { setExceededDailyLimit } from '@/store/bridge'
 
 export const useBridgeToTari = (ethAddress: `0x${string}`, chain: DeployedChains) => {
   const deployments = getDeployments(chain)
@@ -12,16 +13,13 @@ export const useBridgeToTari = (ethAddress: `0x${string}`, chain: DeployedChains
   const wXTMBridgeAddress = deployments.wXTMBridge
   const wXTMAbi = WXTM__factory.abi
   const wXTMBridgeAbi = WXTMBridge__factory.abi
-
   const { data: domainData } = useReadContract({
     address: wXTMAddress,
     abi: wXTMAbi,
     functionName: 'eip712Domain',
     args: [],
   })
-
   const { mutateAsync: writeContract, isPending, isSuccess, isError, error } = useWriteContract()
-
   const { data: signer } = useWalletClient({
     account: ethAddress,
     chainId: chain,
@@ -85,11 +83,11 @@ export const useBridgeToTari = (ethAddress: `0x${string}`, chain: DeployedChains
     try {
       const limitMicro = await TokensUnwrappedService.getRemainingDailyLimit()
       const limitXtm = microXtmToXtm(limitMicro)
-
       const amountNum = parseFloat(amount)
 
-      if (amountNum > limitXtm) {
-        throw new Error(`[ TAPPLET-BRIDGE ] Daily limit exceeded. Limit: ${limitXtm}, Amount: ${amountNum}`)
+      if (limitXtm && amountNum > limitXtm) {
+        setExceededDailyLimit(true)
+        new Error(`[ TAPPLET-BRIDGE ] Daily limit exceeded. Limit: ${limitXtm}, Amount: ${amountNum}`)
       }
 
       const value = BigInt(ethers.utils.parseEther(amount).toString())

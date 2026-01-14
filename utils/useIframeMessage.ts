@@ -1,11 +1,11 @@
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
+import { setLanguage, setTheme } from '@/store/app'
 
 export enum MessageType {
   SIGNER_CALL = 'signer-call',
   RESIZE = 'resize',
   SET_LANGUAGE = 'SET_LANGUAGE',
   SET_THEME = 'SET_THEME',
-  SET_FEATURES = 'SET_FEATURES',
 }
 
 interface SignerCallMessage {
@@ -30,13 +30,6 @@ interface SetLanguageMessage {
   }
 }
 
-interface SetFeaturesMessage {
-  type: MessageType.SET_FEATURES
-  payload: {
-    unwrapEnabled: boolean
-  }
-}
-
 interface SetThemeMessage {
   type: MessageType.SET_THEME
   payload: {
@@ -44,23 +37,27 @@ interface SetThemeMessage {
   }
 }
 
-export type IframeMessage =
-  | SignerCallMessage
-  | ResizeMessage
-  | SetLanguageMessage
-  | SetThemeMessage
-  | SetFeaturesMessage
+export type IframeMessage = SignerCallMessage | ResizeMessage | SetLanguageMessage | SetThemeMessage
 
 // Hook to listen for messages from the parent window
-export function useIframeMessage(onMessage: (event: MessageEvent<IframeMessage>) => void) {
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent<IframeMessage>) => {
-      // Optionally, add origin checks here for security
-      onMessage?.(event)
+export function useIframeMessage() {
+  const handleMessage = useCallback((event: MessageEvent<IframeMessage>) => {
+    switch (event.data.type) {
+      case MessageType.SET_THEME:
+        const theme = event?.data?.payload?.theme
+        setTheme(theme)
+        break
+      case MessageType.SET_LANGUAGE:
+        const language = event?.data?.payload?.language
+        void setLanguage(language)
+        break
     }
+  }, [])
+
+  useEffect(() => {
     window.addEventListener('message', handleMessage)
     return () => {
       window.removeEventListener('message', handleMessage)
     }
-  }, [onMessage])
+  }, [handleMessage])
 }
