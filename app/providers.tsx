@@ -58,12 +58,11 @@ export const Providers = ({ children }: { children: ReactNode }) => {
         } catch (error) {
           console.error('[ TAPPLET-BRIDGE ] Failed to set Tari Account:', error)
         }
+        initializedSignerRef.current = true
       }
     }
 
-    initializeSignerAndAccount().then(() => {
-      initializedSignerRef.current = true
-    })
+    initializeSignerAndAccount()
     return () => {
       cancelled = true
     }

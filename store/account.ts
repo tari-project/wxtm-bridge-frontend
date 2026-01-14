@@ -2,7 +2,6 @@ import { AccountData, OngoingUserTransaction } from '@/types/tapplet'
 import { create } from 'zustand'
 import useTariSigner from './signer'
 import { BackendBridgeTransaction, BackendUnwrapTransaction, CombinedBridgeTransaction } from '@/types/transactions'
-import TariL1Signer from '@/clients/tari-l1-signer'
 
 interface TariL1WalletStoreState {
   tariAccount?: AccountData
