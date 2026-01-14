@@ -31,7 +31,7 @@ const eslintConfig = [
       'react/prop-types': 'off',
       'react/jsx-uses-react': 'off',
       'react/react-in-jsx-scope': 'off',
-      // DISABLED UNITIL APP IS REFACTORED TO USE TRANSLATIONS STRINGS
+      // DISABLED UNTIL APP IS REFACTORED TO USE TRANSLATIONS STRINGS
       // 'i18next/no-literal-string': ['error', { markupOnly: true }],
       'i18next/no-literal-string': 'off',
     },
