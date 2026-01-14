@@ -3,15 +3,10 @@ import { utils } from 'ethers'
 
 import { config } from '@/config'
 import { BridgeFees } from './use-bridge-fees.types'
-import useBridgeStore from '@/store/bridge'
+import { useBridgeStore } from '@/store/bridge'
 
-export const useBridgeFees = (
-  tokenAmount: string,
-  tokenDecimals: number,
-): BridgeFees => {
-  const wrapTokenFeePercentageBps = useBridgeStore(
-    (s) => s.wrapTokenFeePercentageBps,
-  )
+export const useBridgeFees = (tokenAmount: string, tokenDecimals: number): BridgeFees => {
+  const wrapTokenFeePercentageBps = useBridgeStore((s) => s.wrapTokenFeePercentageBps)
 
   return useMemo(() => {
     try {
@@ -24,10 +19,7 @@ export const useBridgeFees = (
         }
       }
       const amount = utils.parseUnits(tokenAmount, tokenDecimals)
-      const parsedThreshold = utils.parseUnits(
-        config.HIGH_BRIDGE_THRESHOLD.toString(),
-        tokenDecimals,
-      )
+      const parsedThreshold = utils.parseUnits(config.HIGH_BRIDGE_THRESHOLD.toString(), tokenDecimals)
 
       const isOverHighBridgeThreshold = amount.gt(parsedThreshold)
 
@@ -36,9 +28,7 @@ export const useBridgeFees = (
 
       return {
         feeAmount: utils.formatUnits(feeAmountBN, tokenDecimals).toString(),
-        amountAfterFee: utils
-          .formatUnits(amountAfterFeeBN, tokenDecimals)
-          .toString(),
+        amountAfterFee: utils.formatUnits(amountAfterFeeBN, tokenDecimals).toString(),
         feePercentage: wrapTokenFeePercentageBps / 100,
         isOverHighBridgeThreshold,
       }
@@ -52,5 +42,5 @@ export const useBridgeFees = (
         isOverHighBridgeThreshold: false,
       }
     }
-  }, [tokenAmount, wrapTokenFeePercentageBps])
+  }, [tokenAmount, tokenDecimals, wrapTokenFeePercentageBps])
 }

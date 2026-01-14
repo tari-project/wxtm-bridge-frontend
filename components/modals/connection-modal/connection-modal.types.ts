@@ -1,3 +1,3 @@
 export type ConnectionModalProps = {
-  closeModal: () => void
+  closeModalAction: () => void
 }

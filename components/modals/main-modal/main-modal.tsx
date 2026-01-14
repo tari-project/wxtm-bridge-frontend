@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useRef } from 'react'
-import { useAccount } from 'wagmi'
+import { useConnection } from 'wagmi'
 
 import ConnectionModal from '@/components/modals/connection-modal/connection-modal'
 import { InfoModal } from '@/components/modals/info-modal'
@@ -11,22 +11,18 @@ import { WrapModal } from '@/components/modals/wrap-modal'
 import { FailedModal } from '../failed-modal'
 import { MainModalProps } from './main-modal.types'
 
-export const MainModal: React.FC<MainModalProps> = ({
+export const MainModal = ({
   success,
   failed,
   step,
-  handleBridgeToEthereum,
-  handleBridgeToTari,
   amount,
   tariWalletAddress,
   ethereumAddress,
-  fromNetwork,
-  toNetwork,
   feesData,
-  closeModal,
+  closeModalAction,
   type,
-}) => {
-  const { isConnected } = useAccount()
+}: MainModalProps) => {
+  const { isConnected } = useConnection()
   const modalRef = useRef<HTMLDivElement>(null)
 
   if (step === 0 && isConnected) return null
@@ -35,39 +31,33 @@ export const MainModal: React.FC<MainModalProps> = ({
     if (success)
       return (
         <SuccessModal
-          closeModal={closeModal}
+          closeModalAction={closeModalAction}
           amount={amount}
           tariWalletAddress={tariWalletAddress}
           ethereumAddress={ethereumAddress}
-          fromNetwork={fromNetwork}
           type={type}
         />
       )
 
-    if (failed) return <FailedModal closeModal={closeModal} paymentId={undefined} fromNetwork={fromNetwork.name} />
+    if (failed) return <FailedModal closeModalAction={closeModalAction} paymentId={undefined} />
 
-    if (!isConnected && step === 0) return <ConnectionModal closeModal={closeModal} />
+    if (!isConnected && step === 0) return <ConnectionModal closeModalAction={closeModalAction} />
     if (step === 1)
       return (
         <ReviewModal
           amount={amount}
-          closeModal={closeModal}
-          handleBridgeToEthereum={handleBridgeToEthereum}
-          handleBridgeToTari={handleBridgeToTari}
+          closeModalAction={closeModalAction}
           ethereumAddress={ethereumAddress}
           tariWalletAddress={tariWalletAddress}
-          fromNetwork={fromNetwork}
-          toNetwork={toNetwork}
           feesData={feesData}
         />
       )
     if (step === 2)
       return (
         <WrapModal
-          closeModal={closeModal}
+          closeModalAction={closeModalAction}
           tariWalletAddress={tariWalletAddress}
           ethereumAddress={ethereumAddress}
-          fromNetwork={fromNetwork}
           feesData={feesData}
           type={type}
         />

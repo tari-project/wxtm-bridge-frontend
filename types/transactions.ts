@@ -1,7 +1,4 @@
-import {
-  UserTransactionDTO,
-  UserUnwrappedTransactionDTO,
-} from '@tari-project/wxtm-bridge-backend-api'
+import { UserTransactionDTO, UserUnwrappedTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
 
 export interface TransactionInfo {
   tx_id: number

@@ -1,5 +1,5 @@
 export type FailedModalProps = {
-  closeModal: () => void
+  closeModalAction: () => void
   paymentId?: string
   fromNetwork?: string
 }

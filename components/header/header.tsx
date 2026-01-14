@@ -1,43 +1,54 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useMemo, useState } from 'react'
+
 import Image from 'next/image'
-import { useAccount, useChainId } from 'wagmi'
+import { useConnection, useChainId, useDisconnect } from 'wagmi'
 import { truncateAddress } from '@/utils/truncate'
 import { NetworkSwitchModal } from '@/components/modals/network-switch-modal'
 import { chainsMap } from '@/utils/networksConfig'
-import { HeaderProps } from './header.types'
 import { BridgeHistoryListItem } from '../transactions/BridgeListItem'
-import useTariAccountStore from '@/store/account'
+
 import { useBridgeStatus } from '@/hooks/use-bridge-status'
 import useAppStore from '@/store/app'
+import { setIsModalOpen, setModalStep } from '@/store/modal'
+import { FiLogOut } from 'react-icons/fi'
+import { setDetailedTx, useTariAccountStore } from '@/store/account'
 
-export const Header = ({ onConnectClickAction }: HeaderProps) => {
-  const { getSupportedChains } = useAppStore()
-  const chainId = useChainId()
-  const { address, isConnected, chain } = useAccount()
-  const [showNetworkModal, setShowNetworkModal] = useState(false)
+export const Header = () => {
   const bridgeTxs = useTariAccountStore((s) => s.combinedBridgeTxs)
-  const exampleItem = bridgeTxs.find((tx) => tx.paymentId !== '')
-  const setDetailedTx = useTariAccountStore((s) => s.setDetailedTx)
-  const supportedChains = getSupportedChains();
+  const { getSupportedChains } = useAppStore()
 
   const { isOffline } = useBridgeStatus()
+  const { address, isConnected, chain } = useConnection()
+  const supportedChains = getSupportedChains()
+  const disconnect = useDisconnect()
+  const chainId = useChainId()
 
+  const [showNetworkModal, setShowNetworkModal] = useState(false)
+
+  const exampleItem = bridgeTxs.find((tx) => tx.paymentId !== '')
   const isNetworkSupported = chain !== undefined && supportedChains.some((c) => c.id === chain.id)
+  const shouldShowNetworkModal = useMemo(() => isConnected && !isNetworkSupported, [isConnected, isNetworkSupported])
+
   const handleDisplayTransaction = () => {
     if (exampleItem) {
       setDetailedTx(exampleItem)
     }
   }
 
-  useEffect(() => {
-    if (isConnected && !isNetworkSupported) {
+  function networkClick() {
+    if (!isNetworkSupported) {
       setShowNetworkModal(true)
-    } else {
-      setShowNetworkModal(false)
+      return
     }
-  }, [isConnected, isNetworkSupported])
+  }
+  const handleConnectClick = () => {
+    if (!isConnected) {
+      setModalStep(0)
+      setIsModalOpen(true)
+    }
+  }
 
   const defaultMarkup = (
     <header className="absolute top-8 right-8 z-50 flex items-center space-x-4">
@@ -55,34 +66,35 @@ export const Header = ({ onConnectClickAction }: HeaderProps) => {
         )}
         {!isConnected ? (
           <button
-            className="w-[154.27px] min-w-[154.27px] max-w-[154.27px] h-[51px] rounded-[100px] bg-[#090719] text-white font-semibold text-[12px] hover:bg-gray-800 hover:cursor-pointer transition"
-            onClick={onConnectClickAction}
+            className="w-auto min-w-[150px] max-w-[180px] h-[51px] rounded-[100px] bg-[#090719] text-white font-semibold text-[12px] hover:bg-gray-800 hover:cursor-pointer transition"
+            onClick={handleConnectClick}
           >
             Connect Wallet
           </button>
         ) : (
           <div
-            className={
-              isNetworkSupported
-                ? 'flex p-2 rounded-lg bg-white/25 items-center'
-                : 'flex p-2 rounded-lg bg-red-400/25 items-center'
-            }
-            onClick={() => !isNetworkSupported && setShowNetworkModal(true)}
+            className={`flex px-3 py-1 gap-2 h-[48px] rounded-3xl justify-center items-center ${isNetworkSupported ? 'bg-white/25' : 'bg-red-400/25'}`}
+            onClick={networkClick}
           >
             <div className="w-[24px] h-[24px] rounded-full overflow-hidden relative">
               <Image src="/eth.png" fill sizes="24px" alt="Tari icon" className="rounded-full object-cover" />
             </div>
-
-            <div className="flex flex-col ml-2">
-              <div className="text-[13px] font-semibold">{truncateAddress(address ?? '0x', 15)}</div>
+            <div className="flex flex-col gap-1">
+              <div className="text-[12px] leading-none font-semibold">{truncateAddress(address ?? '0x', 15)}</div>
               <div
-                className={`text-[10px] mt-[-5px] ${
+                className={`text-[9px] mt-[-3px] leading-none ${
                   !isNetworkSupported ? 'text-red-600 font-medium hover:cursor-pointer' : ''
                 }`}
               >
                 {chainsMap[chainId]}
                 {!isNetworkSupported && ' (Click to switch)'}
               </div>
+            </div>
+            <div
+              className="overflow-hidden opacity-35 hover:opacity-55 hover:cursor-pointer"
+              onClick={() => disconnect.mutate()}
+            >
+              <FiLogOut size={18} />
             </div>
           </div>
         )}
@@ -95,8 +107,8 @@ export const Header = ({ onConnectClickAction }: HeaderProps) => {
       {!isOffline && defaultMarkup}
 
       {/* Network Switch Modal */}
-      {showNetworkModal && (
-        <NetworkSwitchModal closeModal={() => setShowNetworkModal(false)} supportedChains={supportedChains} />
+      {shouldShowNetworkModal && showNetworkModal && (
+        <NetworkSwitchModal closeModalAction={() => setShowNetworkModal(false)} supportedChains={supportedChains} />
       )}
     </>
   )

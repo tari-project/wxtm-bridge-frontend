@@ -1,42 +1,68 @@
 import { create } from 'zustand'
+import { Network } from '@/components/network-box'
 
-interface State {
+export type NetworkOption = 'Tari' | 'Ethereum'
+export type NetworkOptions = Record<NetworkOption, Network>
+
+export const NETWORKS: NetworkOptions = {
+  Tari: { name: 'Tari', icon: '/icons/tari.png' },
+  Ethereum: { name: 'Ethereum', icon: '/icons/eth.png' },
+}
+
+interface BridgeConfigStoreState {
+  fromNetwork: Network
+  toNetwork: Network
   wrapTokenFeePercentageBps: number
   unwrapTokenFeePercentageBps: number
   tariColdWalletAddress: string
+  unwrapFailed: boolean
+  unwrapSuccess: boolean
+  exceededDailyLimit: boolean
 }
-
-interface Actions {
-  setWrapTokenFeePercentageBps: (fee: number) => void
-  setUnwrapTokenFeePercentageBps: (fee: number) => void
-  setTariColdWalletAddress: (address: string) => void
-}
-
-type BridgeConfigStoreState = State & Actions
-
-const initialState: State = {
+const initialState: BridgeConfigStoreState = {
   wrapTokenFeePercentageBps: 50, // 0.5% fee
   unwrapTokenFeePercentageBps: 50, // 0.5% fee
   tariColdWalletAddress: '',
+  fromNetwork: NETWORKS.Tari,
+  toNetwork: NETWORKS.Ethereum,
+  unwrapFailed: false,
+  unwrapSuccess: false,
+  exceededDailyLimit: false,
 }
 
-export const useBridgeStore = create<BridgeConfigStoreState>()((set) => ({
+export const useBridgeStore = create<BridgeConfigStoreState>()(() => ({
   ...initialState,
-  setWrapTokenFeePercentageBps: (fee: number) => {
-    set({
-      wrapTokenFeePercentageBps: fee,
-    })
-  },
-  setUnwrapTokenFeePercentageBps: (fee: number) => {
-    set({
-      unwrapTokenFeePercentageBps: fee,
-    })
-  },
-  setTariColdWalletAddress: (address: string) => {
-    set({
-      tariColdWalletAddress: address,
-    })
-  },
 }))
 
-export default useBridgeStore
+export const setWrapTokenFeePercentageBps = (fee: number) =>
+  useBridgeStore.setState({
+    wrapTokenFeePercentageBps: fee,
+  })
+
+export const setUnwrapTokenFeePercentageBps = (fee: number) =>
+  useBridgeStore.setState({
+    unwrapTokenFeePercentageBps: fee,
+  })
+
+export const setTariColdWalletAddress = (address: string) =>
+  useBridgeStore.setState({
+    tariColdWalletAddress: address,
+  })
+
+export const setFromNetwork = (fromNetworkOption: string) => {
+  const fromNetwork = NETWORKS[fromNetworkOption as NetworkOption]
+  if (fromNetwork) {
+    useBridgeStore.setState({ fromNetwork })
+  }
+}
+
+export const setToNetwork = (toNetworkOption: string) => {
+  const toNetwork = NETWORKS[toNetworkOption as NetworkOption]
+  if (toNetwork) {
+    useBridgeStore.setState({ toNetwork })
+  }
+}
+
+export const setUnwrapFailed = (unwrapFailed: boolean) => useBridgeStore.setState({ unwrapFailed })
+export const setUnwrapSuccess = (unwrapSuccess: boolean) => useBridgeStore.setState({ unwrapSuccess })
+export const setExceededDailyLimit = (exceededDailyLimit: boolean) => useBridgeStore.setState({ exceededDailyLimit })

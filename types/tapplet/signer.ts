@@ -1,13 +1,8 @@
-import { TariL1Signer } from '../../clients/tari-l1-signer'
+import TariL1Signer from '../../clients/tari-l1-signer'
 
 export type TariL1SignerParameters = {
   name?: string
   onConnection?: () => void
-}
-
-export type WindowSize = {
-  width: number
-  height: number
 }
 
 export type PickMatching<T, V> = {
@@ -17,9 +12,7 @@ export type PickMatching<T, V> = {
 export type ExtractMethods<T> = PickMatching<T, Function>
 export type SignerMethods = ExtractMethods<TariL1Signer>
 export type SignerMethodNames = keyof SignerMethods
-export type SignerReturnType<T extends SignerMethodNames> = Awaited<
-  ReturnType<SignerMethods[T]>
->
+export type SignerReturnType<T extends SignerMethodNames> = Awaited<ReturnType<SignerMethods[T]>>
 
 export type SignerRequest<T extends SignerMethodNames> = {
   id: number
