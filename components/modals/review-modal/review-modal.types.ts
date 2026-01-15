@@ -2,15 +2,8 @@ import { MainModalProps } from '@/components/modals/main-modal'
 import { BridgeFees } from '@/hooks/use-bridge-fees'
 
 export type ReviewModalProps = {
-  closeModal: () => void
+  closeModalAction: () => void
+  handleBridgeToEthereum: () => void
+  handleBridgeToTari: () => void
   feesData: BridgeFees
-} & Pick<
-  MainModalProps,
-  | 'handleBridgeToEthereum'
-  | 'handleBridgeToTari'
-  | 'amount'
-  | 'tariWalletAddress'
-  | 'ethereumAddress'
-  | 'fromNetwork'
-  | 'toNetwork'
->
+} & Pick<MainModalProps, 'amount' | 'tariWalletAddress' | 'ethereumAddress'>

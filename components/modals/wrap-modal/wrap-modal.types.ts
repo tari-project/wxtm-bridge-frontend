@@ -3,13 +3,10 @@ import { BridgeFees } from '@/hooks/use-bridge-fees'
 import { CombinedBridgeTransaction } from '@/types/transactions'
 
 export type WrapModalProps = {
-  closeModal: () => void
+  closeModalAction: () => void
   feesData: BridgeFees
   amountAfterFee?: string
   destinationAddress?: string
   transactionStatus?: CombinedBridgeTransaction
   type: 'wrap' | 'unwrap'
-} & Pick<
-  MainModalProps,
-  'tariWalletAddress' | 'ethereumAddress' | 'fromNetwork'
->
+} & Pick<MainModalProps, 'tariWalletAddress' | 'ethereumAddress'>

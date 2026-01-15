@@ -2,7 +2,7 @@ import { useWalletClient } from 'wagmi'
 
 export const useWalletUtils = () => {
   const { data: walletClient } = useWalletClient()
-  const addXtmToWallet = async () => {
+  const addXtmToWalletAction = async () => {
     try {
       return walletClient?.request({
         method: 'wallet_watchAsset',
@@ -23,6 +23,6 @@ export const useWalletUtils = () => {
   }
 
   return {
-    addXtmToWallet,
+    addXtmToWalletAction,
   }
 }

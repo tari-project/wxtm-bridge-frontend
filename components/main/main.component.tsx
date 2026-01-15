@@ -7,25 +7,13 @@ import { useTranslation } from 'react-i18next'
 import { TransactionHistory } from '../history/history.component'
 import { BridgeForm } from '../bridge-form/bridge-form.component'
 import { HomeText } from './home-text'
-import useTariAccountStore from '@/store/account'
+import { useTariAccountStore } from '@/store/account'
 
 import { useBridgeStatus } from '@/hooks/use-bridge-status'
 
 // TODO - add translation keys
 
-export const MainComponent: React.FC<MainComponentProps> = ({
-  onConnectClick,
-  onContinueClick,
-  control,
-  errors,
-  setValue,
-  isValid,
-  fromNetwork,
-  setFromNetwork,
-  toNetwork,
-  setToNetwork,
-  remainingDailyLimit,
-}) => {
+export const MainComponent = ({ remainingDailyLimit }: MainComponentProps) => {
   const { t } = useTranslation('main', { useSuspense: false })
   const [showHistory, setShowHistory] = useState(false)
   const exceededDailyLimit = useTariAccountStore((s) => s.exceededDailyLimit)
@@ -46,21 +34,7 @@ export const MainComponent: React.FC<MainComponentProps> = ({
     </div>
   ) : null
 
-  const bridgingMarkup = (
-    <BridgeForm
-      onConnectClick={onConnectClick}
-      onContinueClick={onContinueClick}
-      control={control}
-      errors={errors}
-      setValue={setValue}
-      isValid={isValid}
-      fromNetwork={fromNetwork}
-      setFromNetwork={setFromNetwork}
-      toNetwork={toNetwork}
-      setToNetwork={setToNetwork}
-      remainingDailyLimit={remainingDailyLimit}
-    />
-  )
+  const bridgingMarkup = <BridgeForm remainingDailyLimit={remainingDailyLimit} />
 
   const mainMarkup = !isOffline ? (
     <div className="mt-6">

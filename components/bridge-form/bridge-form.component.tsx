@@ -2,60 +2,67 @@
 
 import React, { useState } from 'react'
 import Image from 'next/image'
-import useTariAccountStore from '@/store/account'
-
-import { useAccount, useBalance } from 'wagmi'
+import { erc20Abi } from 'viem'
+import { useConnection, useReadContract } from 'wagmi'
 import { FaArrowRight } from 'react-icons/fa6'
 import { Network, NetworkBox } from '@/components/network-box'
 import { networks } from '@/utils/networksConfig'
 import { MainButton } from '@/components/main-button'
 import { BridgeInput } from '@/components/bridge-input'
 import { useBridgeInfo } from '@/hooks/use-bridge-info'
-import {
-  DeployedChains,
-  getDeployments,
-} from '@tari-project/wxtm-bridge-contracts/deployments'
+import { getDeployments } from '@tari-project/wxtm-bridge-contracts/deployments/index'
 import { parseToMaxAllowed } from '@/utils/parse-wxtm-token-amount'
 import { formatNumber, FormatPreset } from '@/utils/formatters'
 import { useTranslation } from 'react-i18next'
 import { MainComponentProps } from '../main'
+import { setIsModalOpen, setModalStep } from '@/store/modal'
+import { useFormContext } from 'react-hook-form'
+import { useBridgeStore, setFromNetwork, setToNetwork } from '@/store/bridge'
+import { useTariAccountStore } from '@/store/account'
+import { DeployedChains } from '@tari-project/wxtm-bridge-contracts/deployments'
 
-export const BridgeForm: React.FC<MainComponentProps> = ({
-  onConnectClick,
-  onContinueClick,
-  control,
-  errors,
-  setValue,
-  isValid,
-  fromNetwork,
-  setFromNetwork,
-  toNetwork,
-  setToNetwork,
-  remainingDailyLimit,
-}) => {
+export const BridgeForm = ({ remainingDailyLimit }: MainComponentProps) => {
   const { t } = useTranslation('main', { useSuspense: false })
+  const fromNetwork = useBridgeStore((s) => s.fromNetwork)
+  const toNetwork = useBridgeStore((s) => s.toNetwork)
+  const {
+    setValue,
+    formState: { isValid },
+  } = useFormContext()
+
   const [openDropdown, setOpenDropdown] = useState<'from' | 'to' | null>(null)
 
-  const { isConnected, chain, address } = useAccount()
+  const { isConnected, chain, address } = useConnection()
   const { fromToken } = useBridgeInfo(fromNetwork)
   const availableBalance = useTariAccountStore((s) => s.availableBalance)
 
   const chainId = (chain?.id ?? 1) as DeployedChains
   const deployments = getDeployments(chainId)
-  const wXTM = deployments.wXTM
-  const { data } = useBalance({
-    address: address,
-    token: wXTM,
+  const wXTMAddress = deployments.wXTM
+
+  const { data: balanceRes } = useReadContract({
+    abi: erc20Abi,
+    address: wXTMAddress,
+    functionName: 'balanceOf',
+    args: [address || ('' as `0x${string}`)],
+    account: address,
   })
 
-  const evm_balance = data?.value
-    ? formatNumber(Number(data.value), FormatPreset.WXTM_LONG)
-    : '0'
+  const handleConnectClick = () => {
+    if (!isConnected) {
+      setModalStep(0)
+      setIsModalOpen(true)
+    }
+  }
+
+  const handleContinueClick = () => {
+    setModalStep(1)
+    setIsModalOpen(true)
+  }
+  const evm_balance = balanceRes ? formatNumber(Number(balanceRes), FormatPreset.WXTM_LONG) : '0'
   const isDisabled = chain === undefined
 
-  const fromNetworks = networks.filter(
-    (n) => n.name === 'Ethereum' || n.name === 'Tari',
-  )
+  const fromNetworks = networks.filter((n) => n.name === 'Ethereum' || n.name === 'Tari')
 
   const handleNetworkSelect = (network: Network, type: 'from' | 'to') => {
     if (type === 'from') {
@@ -64,11 +71,11 @@ export const BridgeForm: React.FC<MainComponentProps> = ({
         const otherNetwork = fromNetworks.find((n) => n.name !== network.name)
 
         if (otherNetwork) {
-          setFromNetwork(network)
-          setToNetwork(otherNetwork)
+          setFromNetwork(network.name)
+          setToNetwork(otherNetwork.name)
         }
       } else {
-        setFromNetwork(network)
+        setFromNetwork(network.name)
       }
     } else {
       // If selecting same network that's already in "From", swap them
@@ -76,11 +83,11 @@ export const BridgeForm: React.FC<MainComponentProps> = ({
         const otherNetwork = fromNetworks.find((n) => n.name !== network.name)
 
         if (otherNetwork) {
-          setToNetwork(network)
-          setFromNetwork(otherNetwork)
+          setToNetwork(network.name)
+          setFromNetwork(otherNetwork.name)
         }
       } else {
-        setToNetwork(network)
+        setToNetwork(network.name)
       }
     }
     setOpenDropdown(null)
@@ -105,12 +112,9 @@ export const BridgeForm: React.FC<MainComponentProps> = ({
         : (availableBalance / 1_000_000).toString()
       : evm_balance
   }
-  
-   
+
   const inputAvailableBalance = () =>
-    fromNetwork.name === 'Tari'
-      ? availableBalance / 1000000
-      : (Number(data?.value) ?? 0) / Math.pow(10, 18)
+    fromNetwork.name === 'Tari' ? availableBalance / 1000000 : (Number(balanceRes) ?? 0) / Math.pow(10, 18)
 
   return (
     <div className="bg-white/50 backdrop-blur-sm shadow-xl rounded-2xl p-4 mx-auto min-h-[130px] fixed-box mb-5">
@@ -128,12 +132,8 @@ export const BridgeForm: React.FC<MainComponentProps> = ({
                       selected={fromNetwork}
                       isOpen={openDropdown === 'from'}
                       networks={fromNetworks}
-                      onToggle={() =>
-                        setOpenDropdown(openDropdown === 'from' ? null : 'from')
-                      }
-                      onSelect={(network) =>
-                        handleNetworkSelect(network, 'from')
-                      }
+                      onToggle={() => setOpenDropdown(openDropdown === 'from' ? null : 'from')}
+                      onSelect={(network) => handleNetworkSelect(network, 'from')}
                     />
                   </div>
 
@@ -144,9 +144,7 @@ export const BridgeForm: React.FC<MainComponentProps> = ({
                       selected={toNetwork}
                       isOpen={openDropdown === 'to'}
                       networks={networks}
-                      onToggle={() =>
-                        setOpenDropdown(openDropdown === 'to' ? null : 'to')
-                      }
+                      onToggle={() => setOpenDropdown(openDropdown === 'to' ? null : 'to')}
                       onSelect={(network) => handleNetworkSelect(network, 'to')}
                       fromNetwork={fromNetwork}
                     />
@@ -164,13 +162,9 @@ export const BridgeForm: React.FC<MainComponentProps> = ({
                 <div className="flex-1">
                   <div className="flex justify-between items-center p-2 px-2 2xl:px-4 rounded-xl bg-white border border-gray-200 min-h-[90px] max-h-[90px]">
                     <div className="space-y-[-8px] mr-[-10px]">
-                      <div className="font-medium text-xs text-gray-500">
-                        {t('amount_to_bridge')}
-                      </div>
+                      <div className="font-medium text-xs text-gray-500">{t('amount_to_bridge')}</div>
                       <BridgeInput
                         fromNetwork={fromNetwork}
-                        control={control}
-                        errors={errors}
                         availableBalance={inputAvailableBalance()}
                         remainingDailyLimit={remainingDailyLimit}
                       />
@@ -188,9 +182,7 @@ export const BridgeForm: React.FC<MainComponentProps> = ({
                             className="rounded-full object-cover"
                           />
                         </div>
-                        <div className="font-bold text-[12.85px]">
-                          {fromToken}
-                        </div>
+                        <div className="font-bold text-[12.85px]">{fromToken}</div>
                       </div>
                       <div className="flex justify-end mt-2 gap-1 items-center">
                         <div
@@ -219,17 +211,11 @@ export const BridgeForm: React.FC<MainComponentProps> = ({
 
               <div className="flex items-center justify-center">
                 {!isConnected ? (
-                  <MainButton
-                    onClick={onConnectClick}
-                    subText={t('eth_mainnet')}
-                  >
+                  <MainButton onClick={handleConnectClick} subText={t('eth_mainnet')}>
                     {t('connect_wallet')}
                   </MainButton>
                 ) : (
-                  <MainButton
-                    onClick={onContinueClick}
-                    disabled={!isValid || isDisabled}
-                  >
+                  <MainButton onClick={handleContinueClick} disabled={!isValid || isDisabled}>
                     <div className="flex">
                       {t('continue')}
                       <FaArrowRight className="ml-2" />

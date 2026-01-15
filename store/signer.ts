@@ -3,14 +3,12 @@ import { create } from 'zustand'
 
 export interface SignerStore<TSigner extends TariL1Signer> {
   signer: TSigner | null
-  setSigner(signer: TSigner): void
 }
 
-const useTariSignerStore = create<SignerStore<TariL1Signer>>()((set) => ({
+const useTariSignerStore = create<SignerStore<TariL1Signer>>()(() => ({
   signer: null,
-  setSigner(signer) {
-    set({ signer })
-  },
 }))
+
+export const setSigner = (signer: TariL1Signer) => useTariSignerStore.setState({ signer })
 
 export default useTariSignerStore

@@ -1,8 +1,5 @@
 import { memo, useRef, useState, useEffect } from 'react'
-import {
-  BridgeBaseItemProps,
-  BridgeHistoryListItemProps,
-} from '@/types/transactions'
+import { BridgeBaseItemProps, BridgeHistoryListItemProps } from '@/types/transactions'
 import {
   BlockInfoWrapper,
   Chip,
@@ -19,11 +16,7 @@ import {
 } from './ListItem.styles'
 import { useTranslation } from 'react-i18next'
 import { formatNumber, FormatPreset } from '@/utils/formatters'
-import {
-  formatTimeStamp,
-  getTimestampFromTransaction,
-  getStatusInfo,
-} from './helpers'
+import { formatTimeStamp, getTimestampFromTransaction, getStatusInfo } from './helpers'
 import { getTransactionAmount } from '@/utils/transaction'
 
 import { truncateMiddle } from '@/utils/truncateString'
@@ -31,10 +24,7 @@ import useAppStore from '@/store/app'
 import { BsQuestionCircleFill } from 'react-icons/bs'
 import { openExternalLink } from '@/utils/universe'
 import { HiArrowRightOnRectangle } from 'react-icons/hi2'
-import {
-  UserTransactionDTO,
-  UserUnwrappedTransactionDTO,
-} from '@tari-project/wxtm-bridge-backend-api'
+import { UserTransactionDTO, UserUnwrappedTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
 import { buildEtherscanLink } from '@/utils/tariNetwork'
 
 const BaseItem = memo(function BaseItem({
@@ -78,16 +68,8 @@ const BaseItem = memo(function BaseItem({
           </div>
 
           <ValueWrapper>
-            {transactionType === 'wrap' && (
-              <ValueChangeWrapper
-                $isPositiveValue={false}
-              >{`-`}</ValueChangeWrapper>
-            )}
-            {transactionType === 'unwrap' && (
-              <ValueChangeWrapper
-                $isPositiveValue={true}
-              >{`+`}</ValueChangeWrapper>
-            )}
+            {transactionType === 'wrap' && <ValueChangeWrapper $isPositiveValue={false}>{`-`}</ValueChangeWrapper>}
+            {transactionType === 'unwrap' && <ValueChangeWrapper $isPositiveValue={true}>{`+`}</ValueChangeWrapper>}
             {value}
             <CurrencyText>{`XTM`}</CurrencyText>
           </ValueWrapper>
@@ -176,10 +158,7 @@ const HistoryBaseItem = memo(function HistoryBaseItem({
 
   return (
     <div className="w-full px-3 flex flex-row items-center h-full text-xs font-[520]">
-      <button
-        className="flex flex-[3] p-3 hover:cursor-pointer"
-        onClick={onClick}
-      >
+      <button className="flex flex-[3] p-3 hover:cursor-pointer" onClick={onClick}>
         <div className="flex-1 flex items-center">
           <TitleWrapper
             title={title}
@@ -197,24 +176,14 @@ const HistoryBaseItem = memo(function HistoryBaseItem({
 
         <div className="flex-1 flex items-center justify-center">
           <ValueWrapper>
-            {transactionType === 'wrap' && (
-              <ValueChangeWrapper
-                $isPositiveValue={false}
-              >{`-`}</ValueChangeWrapper>
-            )}
-            {transactionType === 'unwrap' && (
-              <ValueChangeWrapper
-                $isPositiveValue={true}
-              >{`+`}</ValueChangeWrapper>
-            )}
+            {transactionType === 'wrap' && <ValueChangeWrapper $isPositiveValue={false}>{`-`}</ValueChangeWrapper>}
+            {transactionType === 'unwrap' && <ValueChangeWrapper $isPositiveValue={true}>{`+`}</ValueChangeWrapper>}
             {value}
             <CurrencyText>{`XTM`}</CurrencyText>
           </ValueWrapper>
         </div>
 
-        <div className="flex-1 flex items-center justify-center">
-          {displayAddress}
-        </div>
+        <div className="flex-1 flex items-center justify-center">{displayAddress}</div>
 
         <div className="flex-1 flex items-center justify-center">
           <StatusWrapper $status={getStatusInfo(status).statusType}>
@@ -242,22 +211,20 @@ const BridgeHistoryListItem = memo(function ListItem({
   setDetailedTx,
   isHistoryList = false,
 }: BridgeHistoryListItemProps & { isHistoryList?: boolean }) {
-  const { t } = useTranslation('wallet')
+  const { t } = useTranslation()
   const hideWalletBalance = useAppStore((s) => s.hideWalletBalance)
 
   const ref = useRef<HTMLDivElement>(null)
 
   const { amount: tokenAmount, decimals } = getTransactionAmount(item)
   // Convert to XTM base units (6 decimals) for consistent formatting
-  const normalizedAmount =
-    (Number(tokenAmount) / Math.pow(10, decimals)) * Math.pow(10, 6)
+  const normalizedAmount = (Number(tokenAmount) / Math.pow(10, decimals)) * Math.pow(10, 6)
   const earningsFormatted = hideWalletBalance
     ? `***`
     : formatNumber(normalizedAmount, FormatPreset.XTM_COMPACT).toLowerCase()
   const time = formatTimeStamp(getTimestampFromTransaction(item))
 
-  const transactionTitle =
-    item.type === 'wrap' ? 'Bridge XTM to wXTM' : 'Bridge wXTM to XTM'
+  const transactionTitle = item.type === 'wrap' ? 'Bridge XTM to wXTM' : 'Bridge wXTM to XTM'
 
   const handleItemClick = () => {
     const detailedTx = { ...item, createdAt: time }

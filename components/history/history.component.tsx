@@ -2,15 +2,14 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 
-import useTariAccountStore from '@/store/account'
+import { useTariAccountStore, setDetailedTx } from '@/store/account'
 
 import { useTranslation } from 'react-i18next'
 import { BridgeHistoryListItem } from '../transactions/BridgeListItem'
 import { HistoryListWrapper, ListItemWrapper, ListWrapper } from '../transactions/ListItem.styles'
 
-export const TransactionHistory: React.FC = ({}) => {
+export const TransactionHistory = () => {
   const bridgeTxs = useTariAccountStore((s) => s.combinedBridgeTxs)
-  const setDetailedTx = useTariAccountStore((s) => s.setDetailedTx)
   const targetRef = useRef<HTMLDivElement>(null)
   const [, setIsScrolled] = useState(false)
   const { t } = useTranslation('main', { useSuspense: false })

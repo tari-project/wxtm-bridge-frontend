@@ -1,5 +1,5 @@
 export type NetworkSwitchModalProps = {
-  closeModal: () => void
+  closeModalAction: () => void
   supportedChains: {
     id: number
     name: string

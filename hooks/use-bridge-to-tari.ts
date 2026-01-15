@@ -1,41 +1,25 @@
-import useTariAccountStore from '@/store/account'
+import { ethers } from 'ethers'
 import { microXtmToXtm, parseWxtmTokenAmount } from '@/utils/parse-wxtm-token-amount'
 import { TokensUnwrappedService, UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
-import {
-  DeployedChains,
-  getDeployments,
-} from '@tari-project/wxtm-bridge-contracts/deployments'
-import {
-  WXTM__factory,
-  WXTMBridge__factory,
-} from '@tari-project/wxtm-bridge-contracts/typechain/factories/contracts'
-import { ethers } from 'ethers'
+import { DeployedChains, getDeployments } from '@tari-project/wxtm-bridge-contracts/deployments'
+import { WXTM__factory, WXTMBridge__factory } from '@tari-project/wxtm-bridge-contracts/typechain/factories/contracts'
 import { useReadContract, useWalletClient, useWriteContract } from 'wagmi'
+import { setLastOngoingBridgeTx } from '@/store/account'
+import { setExceededDailyLimit } from '@/store/bridge'
 
-export const useBridgeToTari = (
-  ethAddress: `0x${string}`,
-  chain: DeployedChains,
-) => {
+export const useBridgeToTari = (ethAddress: `0x${string}`, chain: DeployedChains) => {
   const deployments = getDeployments(chain)
   const wXTMAddress = deployments.wXTM
   const wXTMBridgeAddress = deployments.wXTMBridge
   const wXTMAbi = WXTM__factory.abi
   const wXTMBridgeAbi = WXTMBridge__factory.abi
-
   const { data: domainData } = useReadContract({
     address: wXTMAddress,
     abi: wXTMAbi,
     functionName: 'eip712Domain',
     args: [],
   })
-
-  const setLastOngoingBridgeTx = useTariAccountStore(
-    (s) => s.setLastOngoingBridgeTx,
-  )
-
-  const { writeContract, isPending, isSuccess, isError, error } =
-    useWriteContract()
-
+  const { mutateAsync: writeContract, isPending, isSuccess, isError, error } = useWriteContract()
   const { data: signer } = useWalletClient({
     account: ethAddress,
     chainId: chain,
@@ -95,19 +79,15 @@ export const useBridgeToTari = (
     return { v, r, s }
   }
 
-  const bridgeToTari = async (
-    amount: string,
-    ethAddress: `0x${string}`,
-    tariAddress: string,
-  ) => {
+  const bridgeToTari = async (amount: string, ethAddress: `0x${string}`, tariAddress: string) => {
     try {
       const limitMicro = await TokensUnwrappedService.getRemainingDailyLimit()
       const limitXtm = microXtmToXtm(limitMicro)
-      
       const amountNum = parseFloat(amount)
-      
-      if (amountNum > limitXtm) {
-        throw new Error(`[ TAPPLET-BRIDGE ] Daily limit exceeded. Limit: ${limitXtm}, Amount: ${amountNum}`);
+
+      if (limitXtm && amountNum > limitXtm) {
+        setExceededDailyLimit(true)
+        new Error(`[ TAPPLET-BRIDGE ] Daily limit exceeded. Limit: ${limitXtm}, Amount: ${amountNum}`)
       }
 
       const value = BigInt(ethers.utils.parseEther(amount).toString())
@@ -129,44 +109,44 @@ export const useBridgeToTari = (
 
       console.debug(`[ TAPPLET-BRIDGE ] Processing bridge to Tari...`)
 
-      const txHash = writeContract({
-        address: wXTMBridgeAddress,
-        abi: wXTMBridgeAbi,
-        functionName: 'bridgeToTariWithAuthorization',
-        args: [
-          tariAddress,
-          value,
-          BigInt(validAfter),
-          BigInt(validBefore),
-          authNonce as `0x${string}`, // bytes32
-          v,
-          r as `0x${string}`,
-          s as `0x${string}`,
-        ],
-      })
+      try {
+        const txHash = await writeContract({
+          address: wXTMBridgeAddress,
+          abi: wXTMBridgeAbi,
+          functionName: 'bridgeToTariWithAuthorization',
+          args: [
+            tariAddress,
+            value,
+            BigInt(validAfter),
+            BigInt(validBefore),
+            authNonce as `0x${string}`, // bytes32
+            v,
+            r as `0x${string}`,
+            s as `0x${string}`,
+          ],
+        })
 
-      console.debug(
-        `[ TAPPLET-BRIDGE ] Bridge transaction executed with txHash: ${txHash}, amount: ${value}`,
-      )
+        console.debug(`[ TAPPLET-BRIDGE ] Bridge transaction executed with txHash: ${txHash}, amount: ${value}`)
 
-      const amountAfterFee =
-        (value * ethers.utils.parseUnits('0.995', 18).toBigInt()) / BigInt(1e18)
+        const amountAfterFee = (value * ethers.utils.parseUnits('0.995', 18).toBigInt()) / BigInt(1e18)
 
-      // set ongoing to immediately display wrap modal
-      setLastOngoingBridgeTx({
-        destinationAddress: tariAddress,
-        tokenAmount: parseWxtmTokenAmount(amount),
-        amountAfterFee: parseWxtmTokenAmount(
-          ethers.utils.formatEther(amountAfterFee.toString()),
-        ),
-        status: UserTransactionDTO.status.PENDING,
-        createdAt: new Date().toISOString(),
-        paymentId: '',
-        showModal: true,
-        type: 'unwrap',
-      })
+        // set ongoing to immediately display wrap modal
+        setLastOngoingBridgeTx({
+          destinationAddress: tariAddress,
+          tokenAmount: parseWxtmTokenAmount(amount),
+          amountAfterFee: parseWxtmTokenAmount(ethers.utils.formatEther(amountAfterFee.toString())),
+          status: UserTransactionDTO.status.PENDING,
+          createdAt: new Date().toISOString(),
+          paymentId: '',
+          showModal: true,
+          type: 'unwrap',
+        })
 
-      return true
+        return true
+      } catch (e) {
+        console.error(`[ TAPPLET-BRIDGE ] Error in bridge writeContract: ${e}`)
+        return false
+      }
     } catch (err) {
       console.error(`[ TAPPLET-BRIDGE ] Error in bridge process: ${err}`)
       return false

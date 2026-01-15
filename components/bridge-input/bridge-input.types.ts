@@ -1,4 +1,3 @@
-import { Control, FieldErrors } from 'react-hook-form'
 import { Network } from '@/components/network-box'
 
 export type BridgeFormValues = {
@@ -7,8 +6,6 @@ export type BridgeFormValues = {
 
 export type BridgeInputProps = {
   fromNetwork: Network
-  control: Control<BridgeFormValues>
-  errors: FieldErrors<BridgeFormValues>
   availableBalance: number
   remainingDailyLimit?: number
 }
