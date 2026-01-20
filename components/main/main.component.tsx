@@ -10,13 +10,14 @@ import { HomeText } from './home-text'
 import { useTariAccountStore } from '@/store/account'
 
 import { useBridgeStatus } from '@/hooks/use-bridge-status'
+import { useBridgeStore } from '@/store/bridge'
 
 // TODO - add translation keys
 
 export const MainComponent = ({ remainingDailyLimit }: MainComponentProps) => {
   const { t } = useTranslation('main', { useSuspense: false })
   const [showHistory, setShowHistory] = useState(false)
-  const exceededDailyLimit = useTariAccountStore((s) => s.exceededDailyLimit)
+  const exceededDailyLimit = useBridgeStore((s) => s.exceededDailyLimit)
   const bridgeTxs = useTariAccountStore((s) => s.combinedBridgeTxs)
 
   const { isOffline } = useBridgeStatus()
@@ -39,9 +40,9 @@ export const MainComponent = ({ remainingDailyLimit }: MainComponentProps) => {
   const mainMarkup = !isOffline ? (
     <div className="mt-6">
       {exceededDailyLimit && (
-        <div className="flex items-center justify-center w-[clamp(450px,45vw,60%)]">
-          <div className="py-4 px-2 rounded-2xl bg-white/25 backdrop-blur-sm shadow-lg">
-            <div className="font-normal leading-none text-lg text-center text-balance ">
+        <div className="flex items-center justify-center w-[clamp(480px,50vw,800px)]">
+          <div className="p-4 rounded-2xl bg-white/25 backdrop-blur-sm shadow-lg">
+            <div className="font-light leading-none text-[16px] text-center text-pretty text-balance">
               We cannot process your transaction because{' '}
               <span className="font-medium">the transaction limit has been reached for the day.</span> Please try again
               tomorrow.

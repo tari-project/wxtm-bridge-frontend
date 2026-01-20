@@ -12,7 +12,6 @@ interface TariL1WalletStoreState {
   backendUnwrapTxs: BackendUnwrapTransaction[]
   combinedBridgeTxs: CombinedBridgeTransaction[]
   detailedTx?: CombinedBridgeTransaction | null
-  exceededDailyLimit: boolean
 }
 
 const initialState: TariL1WalletStoreState = {
@@ -26,7 +25,6 @@ const initialState: TariL1WalletStoreState = {
   backendBridgeTxs: [],
   backendUnwrapTxs: [],
   combinedBridgeTxs: [],
-  exceededDailyLimit: false,
 }
 
 export const useTariAccountStore = create<TariL1WalletStoreState>()(() => ({
@@ -34,7 +32,7 @@ export const useTariAccountStore = create<TariL1WalletStoreState>()(() => ({
 }))
 
 export const setTariAccount = async () => {
-  if (process.env.NODE_ENV === 'development') return
+  // if (process.env.NODE_ENV === 'development') return
 
   const signer = useTariSigner.getState().signer
 
@@ -115,5 +113,3 @@ export const setDetailedTx = (detailedTx: CombinedBridgeTransaction | null) =>
   useTariAccountStore.setState({
     detailedTx: detailedTx,
   })
-export const setExceededDailyLimit = (exceededDailyLimit: boolean) =>
-  useTariAccountStore.setState({ exceededDailyLimit })
