@@ -32,7 +32,7 @@ export const useTariAccountStore = create<TariL1WalletStoreState>()(() => ({
 }))
 
 export const setTariAccount = async () => {
-  // if (process.env.NODE_ENV === 'development') return
+  if (process.env.NODE_ENV === 'development') return
 
   const signer = useTariSigner.getState().signer
 
