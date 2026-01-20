@@ -58,12 +58,12 @@ export const MainModal = ({
         setExceededDailyLimit(false)
       })
       .catch((e) => {
-        console.error('[ TAPPLET-BRIDGE ] Bridge operation failed:', e)
         const error = e as Error
         const isLimitError =
-          error?.message?.includes(DAILY_LIMIT_ERROR_TYPE) || error?.message?.includes(DAILY_LIMIT_ERROR)
-        setExceededDailyLimit(isLimitError)
+          error?.message?.includes(DAILY_LIMIT_ERROR) || error?.message?.includes(DAILY_LIMIT_ERROR_TYPE)
         if (isLimitError) {
+          console.warn('[ TAPPLET-BRIDGE ] Bridge operation failed:', e)
+          setExceededDailyLimit(true)
           setIsModalOpen(false)
         }
       })
