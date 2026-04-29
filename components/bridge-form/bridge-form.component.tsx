@@ -17,7 +17,8 @@ import { useTranslation } from 'react-i18next'
 import { MainComponentProps } from '../main'
 import { setIsModalOpen, setModalStep } from '@/store/modal'
 import { useFormContext } from 'react-hook-form'
-import { useBridgeStore, setFromNetwork, setToNetwork } from '@/store/bridge'
+import Confetti from '@/components/confetti/confetti'
+import { useBridgeStore, setFromNetwork, setToNetwork, setTxHash } from '@/store/bridge'
 import { useTariAccountStore } from '@/store/account'
 import { DeployedChains } from '@tari-project/wxtm-bridge-contracts/deployments'
 
@@ -25,6 +26,8 @@ export const BridgeForm = ({ remainingDailyLimit }: MainComponentProps) => {
   const { t } = useTranslation('main', { useSuspense: false })
   const fromNetwork = useBridgeStore((s) => s.fromNetwork)
   const toNetwork = useBridgeStore((s) => s.toNetwork)
+  const txStatus = useBridgeStore((s) => s.txStatus)
+  const [showConfetti, setShowConfetti] = useState(false)
   const {
     setValue,
     formState: { isValid },
@@ -35,6 +38,17 @@ export const BridgeForm = ({ remainingDailyLimit }: MainComponentProps) => {
   const { isConnected, chain, address } = useConnection()
   const { fromToken } = useBridgeInfo(fromNetwork)
   const availableBalance = useTariAccountStore((s) => s.availableBalance)
+
+  useEffect(() => {
+    if (txStatus === 'success') {
+      setShowConfetti(true)
+      setTxHash(null) // Reset txHash after showing confetti
+    }
+  }, [txStatus])
+
+  const handleConfettiComplete = () => {
+    setShowConfetti(false)
+  }
 
   const chainId = (chain?.id ?? 1) as DeployedChains
   const deployments = getDeployments(chainId)
@@ -228,5 +242,6 @@ export const BridgeForm = ({ remainingDailyLimit }: MainComponentProps) => {
         </div>
       </div>
     </div>
+    <Confetti show={showConfetti} onAnimationComplete={handleConfettiComplete} />
   )
 }
