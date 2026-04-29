@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import Image from 'next/image'
 import { erc20Abi } from 'viem'
 import { useConnection, useReadContract } from 'wagmi'
-import { FaArrowRight } from 'react-icons/fa6'
+import { FaArrowRight, FaGear } from 'react-icons/fa6'
 import { Network, NetworkBox } from '@/components/network-box'
 import { networks } from '@/utils/networksConfig'
 import { MainButton } from '@/components/main-button'
@@ -31,6 +31,27 @@ export const BridgeForm = ({ remainingDailyLimit }: MainComponentProps) => {
   } = useFormContext()
 
   const [openDropdown, setOpenDropdown] = useState<'from' | 'to' | null>(null)
+  const [showSettings, setShowSettings] = useState(false)
+  const [slippage, setSlippage] = useState(0.5)
+  const [customSlippageInput, setCustomSlippageInput] = useState('0.5')
+
+  const handleSlippageChange = (value: number) => {
+    setSlippage(value)
+    setCustomSlippageInput(value.toString())
+  }
+
+  const handleCustomSlippageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCustomSlippageInput(e.target.value)
+  }
+
+  const applyCustomSlippage = () => {
+    const customValue = parseFloat(customSlippageInput)
+    if (!isNaN(customValue) && customValue >= 0) {
+      setSlippage(customValue)
+    } else {
+      setCustomSlippageInput(slippage.toString())
+    }
+  }
 
   const { isConnected, chain, address } = useConnection()
   const { fromToken } = useBridgeInfo(fromNetwork)
@@ -162,7 +183,58 @@ export const BridgeForm = ({ remainingDailyLimit }: MainComponentProps) => {
                 <div className="flex-1">
                   <div className="flex justify-between items-center p-2 px-2 2xl:px-4 rounded-xl bg-white border border-gray-200 min-h-[90px] max-h-[90px]">
                     <div className="space-y-[-8px] mr-[-10px]">
-                      <div className="font-medium text-xs text-gray-500">{t('amount_to_bridge')}</div>
+                      <div className="flex justify-between items-center">
+                        <div className="font-medium text-xs text-gray-500">{t('amount_to_bridge')}</div>
+                        <div className="relative">
+                          <button
+                            className="text-gray-500 hover:text-gray-700"
+                            onClick={() => setShowSettings(!showSettings)}
+                          >
+                            <FaGear />
+                          </button>
+                          {showSettings && (
+                            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 p-2">
+                              <div className="text-sm font-medium mb-2">Slippage Tolerance</div>
+                              <div className="flex gap-2 mb-2">
+                                <button
+                                  className={`px-3 py-1 text-sm rounded-md ${
+                                    slippage === 0.5 ? 'bg-blue-500 text-white' : 'bg-gray-200'
+                                  }`}
+                                  onClick={() => handleSlippageChange(0.5)}
+                                >
+                                  0.5%
+                                </button>
+                                <button
+                                  className={`px-3 py-1 text-sm rounded-md ${
+                                    slippage === 1.0 ? 'bg-blue-500 text-white' : 'bg-gray-200'
+                                  }`}
+                                  onClick={() => handleSlippageChange(1.0)}
+                                >
+                                  1.0%
+                                </button>
+                                <button
+                                  className={`px-3 py-1 text-sm rounded-md ${
+                                    slippage === 5.0 ? 'bg-blue-500 text-white' : 'bg-gray-200'
+                                  }`}
+                                  onClick={() => handleSlippageChange(5.0)}
+                                >
+                                  5.0%
+                                </button>
+                              </div>
+                              <input
+                                type="number"
+                                step="0.1"
+                                min="0"
+                                value={customSlippageInput}
+                                onChange={handleCustomSlippageChange}
+                                onBlur={applyCustomSlippage}
+                                className="w-full p-1 border rounded-md text-sm"
+                                placeholder="Custom"
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </div>
                       <BridgeInput
                         fromNetwork={fromNetwork}
                         availableBalance={inputAvailableBalance()}
