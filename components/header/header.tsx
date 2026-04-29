@@ -37,11 +37,8 @@ export const Header = () => {
     }
   }
 
-  function networkClick() {
-    if (!isNetworkSupported) {
-      setShowNetworkModal(true)
-      return
-    }
+  const handleNetworkClick = () => {
+    setShowNetworkModal(true)
   }
   const handleConnectClick = () => {
     if (!isConnected) {
@@ -73,22 +70,28 @@ export const Header = () => {
           </button>
         ) : (
           <div
-            className={`flex px-3 py-1 gap-2 h-[48px] rounded-3xl justify-center items-center ${isNetworkSupported ? 'bg-white/25' : 'bg-red-400/25'}`}
-            onClick={networkClick}
+            className={`flex px-3 py-1 gap-2 h-[48px] rounded-3xl justify-center items-center ${isNetworkSupported ? 'bg-white/25' : 'bg-red-400/25'} hover:cursor-pointer`}
+            onClick={handleNetworkClick}
           >
             <div className="w-[24px] h-[24px] rounded-full overflow-hidden relative">
               <Image src="/eth.png" fill sizes="24px" alt="Tari icon" className="rounded-full object-cover" />
             </div>
             <div className="flex flex-col gap-1">
-              <div className="text-[12px] leading-none font-semibold">{truncateAddress(address ?? '0x', 15)}</div>
+              <div className="text-[12px] leading-none font-semibold">{chainsMap[chainId]}</div>
               <div
                 className={`text-[9px] mt-[-3px] leading-none ${
-                  !isNetworkSupported ? 'text-red-600 font-medium hover:cursor-pointer' : ''
+                  !isNetworkSupported ? 'text-red-600 font-medium' : ''
                 }`}
               >
-                {chainsMap[chainId]}
-                {!isNetworkSupported && ' (Click to switch)'}
+                {!isNetworkSupported && ' (Unsupported Network)'}
               </div>
+            </div>
+          </div>
+          <div
+            className="flex px-3 py-1 gap-2 h-[48px] rounded-3xl justify-center items-center bg-white/25 hover:cursor-pointer"
+          >
+            <div className="flex flex-col gap-1">
+              <div className="text-[12px] leading-none font-semibold">{truncateAddress(address ?? '0x', 15)}</div>
             </div>
             <div
               className="overflow-hidden opacity-35 hover:opacity-55 hover:cursor-pointer"
