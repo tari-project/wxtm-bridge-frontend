@@ -1,26 +1,21 @@
 'use client'
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useRef } from 'react'
 
 import { useTariAccountStore, setDetailedTx } from '@/store/account'
 
-import { useTranslation } from 'react-i18next'
+
 import { BridgeHistoryListItem } from '../transactions/BridgeListItem'
+import FolderIcon from './FolderIcon';
 import { HistoryListWrapper, ListItemWrapper, ListWrapper } from '../transactions/ListItem.styles'
 
 export const TransactionHistory = () => {
   const bridgeTxs = useTariAccountStore((s) => s.combinedBridgeTxs)
   const targetRef = useRef<HTMLDivElement>(null)
-  const [, setIsScrolled] = useState(false)
-  const { t } = useTranslation('main', { useSuspense: false })
 
-  useEffect(() => {
-    const el = targetRef.current
-    if (!el) return
-    const onScroll = () => setIsScrolled(el.scrollTop > 1)
-    el.addEventListener('scroll', onScroll)
-    return () => el.removeEventListener('scroll', onScroll)
-  }, [])
+
+
+
 
   const listMarkup = (
     <ListItemWrapper>
@@ -40,9 +35,8 @@ export const TransactionHistory = () => {
   )
 
   const emptyState = (
-    <div className="flex flex-col items-center justify-center h-full min-h-[40px] text-center leading-[150%] tracking-[-2%]">
-      <h3 className="text-sm font-medium text-black">{t('no_transactions_found_yet')}!</h3>
-      <p className="text-sm font-medium text-[#797979] mt-2">{t('start_bridging_to_view')}.</p>
+    <div className="flex flex-col items-center justify-center h-full min-h-[40px] text-center leading-[150%] tracking-[-2%]">      <FolderIcon />      <h3 className="text-sm font-medium text-black mt-4">No transactions yet.</h3>
+      <p className="text-sm font-medium text-[#797979] mt-2">Bridge some tokens to get started!</p>
     </div>
   )
 
