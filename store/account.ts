@@ -1,115 +1,131 @@
-import { AccountData, OngoingUserTransaction } from '@/types/tapplet'
+import { AccountData, PendingUserTransaction } from '@/types/tapplet'
 import { create } from 'zustand'
 import useTariSigner from './signer'
-import { BackendBridgeTransaction, BackendUnwrapTransaction, CombinedBridgeTransaction } from '@/types/transactions'
+import { BridgeTxDetails } from '@/clients/tari-l1-signer'
+import { OpenAPI } from '@tari-project/wxtm-bridge-backend-api'
 
-interface TariL1WalletStoreState {
+interface State {
   tariAccount?: AccountData
-  availableBalance: number
-  ongoingBridgeTx?: OngoingUserTransaction
-  lastOngoingPaymentIdFromTU: string
-  backendBridgeTxs: BackendBridgeTransaction[]
-  backendUnwrapTxs: BackendUnwrapTransaction[]
-  combinedBridgeTxs: CombinedBridgeTransaction[]
-  detailedTx?: CombinedBridgeTransaction | null
+  available_balance: number
+  isProcessingTransaction: boolean
+  pendingBridgeTx?: PendingUserTransaction
+  pendingBridgeTxFromTU?: BridgeTxDetails
+  language: string
+  walletconnect_id: string
+  walletconnect_state?: State
+  bridge_api: string
+  wrapTokenFeePercentageBps: number
+  tariColdWalletAddress: string
+  walletConnected: boolean
 }
 
-const initialState: TariL1WalletStoreState = {
+interface Actions {
+  setTariAccount: () => Promise<string | undefined>
+  setPendingTransaction: (tx: PendingUserTransaction) => void
+  removePendingTransaction: () => void
+  setWrapTokenFeePercentageBps: (fee: number) => void
+  setTariColdWalletAddress: (address: string) => void
+  setWalletConnected: (connected: boolean) => void
+  disconnect: () => void
+}
+
+type OotleWalletStoreState = State & Actions
+
+const initialState: State = {
   tariAccount: {
     account_id: 0,
     address: '',
   },
-  availableBalance: 0,
-  ongoingBridgeTx: undefined,
-  lastOngoingPaymentIdFromTU: '',
-  backendBridgeTxs: [],
-  backendUnwrapTxs: [],
-  combinedBridgeTxs: [],
+  available_balance: 0,
+  pendingBridgeTx: undefined,
+  isProcessingTransaction: false,
+  pendingBridgeTxFromTU: undefined,
+  language: '',
+  walletconnect_id: '',
+  walletconnect_state: undefined,
+  bridge_api: '',
+  wrapTokenFeePercentageBps: 50, // 0.5% fee
+  tariColdWalletAddress: '',
+  walletConnected: false,
 }
 
-export const useTariAccountStore = create<TariL1WalletStoreState>()(() => ({
-  ...initialState,
+export const useTariAccount = create<OotleWalletStoreState>()((set) => {
+  // Rehydrate state from localStorage on initial load
+  if (typeof window !== 'undefined') {
+    const storedWalletConnected = localStorage.getItem('walletConnected')
+    if (storedWalletConnected === 'true') {
+      initialState.walletConnected = true
+    }
+  }
+
+  return {
+    ...initialState,
+    setTariAccount: async () => {
+      const signer = useTariSigner.getState().signer
+
+    try {
+      if (!signer) {
+        console.error('[ TAPPLET-BRIDGE ] signer undefined')
+        return
+      }
+      const account = await signer.getAccount()
+      const balance = await signer.getTariBalance()
+      const language = await signer.getAppLanguage()
+      const envs = await signer.getBridgeEnvs()
+      const walletSession = await signer.getAppWalletSession()
+      console.warn('[ TAPPLET-BRIDGE ] wallet session from TU: ', walletSession)
+      const id = envs?.[0] ?? ''
+      set({
+        tariAccount: {
+          account_id: account.account_id,
+          address: account.address,
+        },
+        available_balance: balance?.available_balance ?? 0,
+        language: language,
+        walletconnect_id: envs?.[0] ?? '',
+        bridge_api: envs?.[1] ?? '',
+        walletConnected: true,
+      })
+      localStorage.setItem('walletConnected', 'true')
+      OpenAPI.BASE = envs?.[1] ?? ''
+      return id ?? ''
+    } catch (error) {
+      console.error(
+        '[ TAPPLET-BRIDGE ] error setting the Tari account: ',
+        error,
+      )
+    }
+  },
+
+  setPendingTransaction: (tx: PendingUserTransaction) => {
+    set({
+      pendingBridgeTx: tx,
+      isProcessingTransaction: true,
+    })
+  },
+  removePendingTransaction: () => {
+    set({
+      pendingBridgeTx: undefined,
+      isProcessingTransaction: false,
+    })
+  },
+  setWrapTokenFeePercentageBps: (fee: number) => {
+    set({
+      wrapTokenFeePercentageBps: fee,
+    })
+  },
+  setTariColdWalletAddress: (address: string) => {
+    set({
+      tariColdWalletAddress: address,
+    })
+  },
+  setWalletConnected: (connected: boolean) => {
+    set({ walletConnected: connected })
+  },
+  disconnect: () => {
+    set({ ...initialState })
+    localStorage.removeItem('walletConnected')
+  },
 }))
 
-export const setTariAccount = async () => {
-  if (process.env.NODE_ENV === 'development') return
-
-  const signer = useTariSigner.getState().signer
-
-  if (!signer) {
-    console.error('[ TAPPLET-BRIDGE ] signer undefined')
-    return
-  }
-
-  try {
-    const account = await signer.getAccount()
-    const balance = await signer.getTariBalance()
-    const ongoingBridgeTx = await signer.getOngoingBridgeTx()
-
-    useTariAccountStore.setState({
-      tariAccount: {
-        account_id: account.account_id,
-        address: account.address,
-      },
-      availableBalance: balance?.available_balance || 0,
-      lastOngoingPaymentIdFromTU: ongoingBridgeTx?.paymentId ?? '',
-    })
-
-    return
-  } catch (error) {
-    console.error('[ TAPPLET-BRIDGE ] error setting the Tari account: ', error)
-  }
-}
-
-export const setLastOngoingBridgeTx = (ongoingBridgeTx: OngoingUserTransaction) =>
-  useTariAccountStore.setState({ ongoingBridgeTx })
-
-export const removeOngoingTransaction = () => {
-  useTariAccountStore.setState({
-    ongoingBridgeTx: undefined,
-    lastOngoingPaymentIdFromTU: '',
-  })
-}
-
-export const getBackendBridgeTxsFromTU = async () => {
-  const signer = useTariSigner.getState().signer
-  try {
-    if (!signer) {
-      console.error('[ TAPPLET-BRIDGE ] signer undefined')
-      return []
-    }
-    const backendBridgeTxs = await signer.getBackendBridgeTxs()
-
-    useTariAccountStore.setState({
-      backendBridgeTxs: backendBridgeTxs,
-    })
-    return backendBridgeTxs
-  } catch (error) {
-    console.error('[ TAPPLET-BRIDGE ] error getting bridge transactions:', error)
-    return []
-  }
-}
-export const setBackendBridgeTxs = (txs: BackendBridgeTransaction[]) => {
-  useTariAccountStore.setState({
-    backendBridgeTxs: txs,
-  })
-}
-export const setBackendUnwrapTxs = (txs: BackendUnwrapTransaction[]) => {
-  useTariAccountStore.setState({
-    backendUnwrapTxs: txs,
-  })
-}
-export const setCombinedBridgeTxs = (wrapTxs: BackendBridgeTransaction[], unwrapTxs: BackendUnwrapTransaction[]) => {
-  const combined: CombinedBridgeTransaction[] = [
-    ...wrapTxs.map((tx) => ({ ...tx, type: 'wrap' as const })),
-    ...unwrapTxs.map((tx) => ({ ...tx, type: 'unwrap' as const })),
-  ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-
-  useTariAccountStore.setState({
-    combinedBridgeTxs: combined,
-  })
-}
-export const setDetailedTx = (detailedTx: CombinedBridgeTransaction | null) =>
-  useTariAccountStore.setState({
-    detailedTx: detailedTx,
-  })
+export default useTariAccount
