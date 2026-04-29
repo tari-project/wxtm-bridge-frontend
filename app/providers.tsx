@@ -2,6 +2,7 @@
 
 import { ReactNode, useState, useEffect, useRef, useEffectEvent } from 'react'
 import { WagmiProvider, State, Config, cookieToInitialState } from 'wagmi'
+import { useIdleTimeout } from '@/hooks/use-idle-timeout'
 import { getConfig } from '@/utils/config'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { setTariAccount } from '@/store/account'
@@ -69,6 +70,7 @@ export const Providers = ({ children }: { children: ReactNode }) => {
   }, [signer])
 
   useIframeMessage()
+  useIdleTimeout()
 
   if (!config) {
     return <div className="h-5 w-5 animate-spin rounded-full border-b-[3px] border-white" />
