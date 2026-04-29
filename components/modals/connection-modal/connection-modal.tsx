@@ -1,14 +1,13 @@
 'use client'
 import Image from 'next/image'
-import { useTranslation } from 'react-i18next'
-import { Connector, useConnect, useConnectors } from 'wagmi'
+import { useTranslation } from 'react-i182'
+import { Connector, useConnect } from 'wagmi'
 import { IoCloseOutline } from 'react-icons/io5'
 import { ConnectionModalProps } from './connection-modal.types'
 
 const ConnectionModal = ({ closeModalAction }: ConnectionModalProps) => {
-  const connectors = useConnectors()
-  const { mutateAsync: connect, status } = useConnect()
-  const { t } = useTranslation('main', { useSuspense: false })
+  const { connectors, connect, status } = useConnect()
+  const { t } = useTranslation()
 
   const loader = status === 'pending' && (
     <div className="flex space-x-1 animate-pulse">
@@ -26,40 +25,63 @@ const ConnectionModal = ({ closeModalAction }: ConnectionModalProps) => {
     }
   }
 
-  const connectorMarkup = connectors?.length ? (
+  const injectedConnector = connectors.find(
+    (connector) => connector.id === 'injected'
+  )
+  const otherConnectors = connectors.filter(
+    (connector) => connector.id !== 'injected'
+  )
+
+  const connectorMarkup = (
     <div className="py-4">
       <div className="rounded-3xl bg-[#F8F8F9]/80 flex flex-col justify-center overflow-hidden">
-        {connectors.slice(0, 1)?.map((connector) => {
-          return (
-            <div key={connector.uid} className="w-full">
-              <button
-                onClick={() => onConnectClick(connector)}
-                className="hover:bg-gray-200/40 hover:cursor-pointer p-4 font-bold w-full text-left flex gap-2 items-center justify-between px-6"
-              >
-                <div className="flex items-center gap-2">
-                  {connector.name === 'WalletConnect' && (
-                    <div className="w-[42px] h-[42px] rounded-xl overflow-hidden relative">
-                      <Image
-                        src="/icons/walletconnect.png"
-                        fill
-                        sizes="42px"
-                        alt={t('wallet_icon_alt')}
-                        className="object-cover"
-                      />
-                    </div>
-                  )}
-                  {t(`connector_${connector.name.toLowerCase()}`, {
-                    defaultValue: connector.name,
-                  })}
+        {injectedConnector && (
+          <div key={injectedConnector.id} className="w-full">
+            <button
+              onClick={() => onConnectClick(injectedConnector)}
+              className="hover:bg-gray-200/40 hover:cursor-pointer p-4 font-bold w-full text-left flex gap-2 items-center justify-between px-6"
+            >
+              <div className="flex items-center gap-2">
+                <div className="w-[42px] h-[42px] rounded-xl overflow-hidden relative">
+                  <Image
+                    src="/icons/metamask.png"
+                    fill
+                    sizes="42px"
+                    alt={t('injected_wallet_icon_alt')}
+                    className="object-cover"
+                  />
                 </div>
-                {loader}
-              </button>
-            </div>
-          )
-        })}
+                {t('connector_injected')}
+              </div>
+              {loader}
+            </button>
+          </div>
+        )}
+        {otherConnectors.map((connector) => (
+          <div key={connector.id} className="w-full">
+            <button
+              onClick={() => onConnectClick(connector)}
+              className="hover:bg-gray-200/40 hover:cursor-pointer p-4 font-bold w-full text-left flex gap-2 items-center justify-between px-6"
+            >
+              <div className="flex items-center gap-2">
+                <div className="w-[42px] h-[42px] rounded-xl overflow-hidden relative">
+                  <Image
+                    src="/icons/walletconnect.png"
+                    fill
+                    sizes="42px"
+                    alt={t('wallet_icon_alt')}
+                    className="object-cover"
+                  />
+                </div>
+                {t(`connector_${connector.name.toLowerCase()}`)}
+              </div>
+              {loader}
+            </button>
+          </div>
+        ))}
       </div>
     </div>
-  ) : null
+  )
 
   return (
     <div className="w-full flex flex-col relative">
@@ -73,7 +95,9 @@ const ConnectionModal = ({ closeModalAction }: ConnectionModalProps) => {
       <div className="mt-10 px-4">
         <div className="ml-1 flex flex-col">
           <h2 className="text-lg font-bold">{t('connect_wallet_title')}</h2>
-          <span className="text-sm font-bold text-gray-500 mt-1">{t('connect_wallet_subtitle')}</span>
+          <span className="text-sm font-bold text-gray-500 mt-1">
+            {t('connect_wallet_subtitle')}
+          </span>
           {connectorMarkup}
         </div>
       </div>
