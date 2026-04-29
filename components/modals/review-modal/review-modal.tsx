@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react'
 import Image from 'next/image'
 import { IoCloseOutline } from 'react-icons/io5'
+import { FaRegCopy } from 'react-icons/fa6'
 
 import { ReviewModalProps } from './review-modal.types'
 import { ModalButton } from '@/components/modals/modal-button'
@@ -33,6 +34,13 @@ export const ReviewModal = ({
     handleBridgeToTari,
   )
   const [clicked, setClicked] = useState(false)
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   const handleClick = useCallback(() => {
     if (clicked || !bridgeHandler) return
@@ -106,8 +114,14 @@ export const ReviewModal = ({
               {'Source wallet'} <span>({fromNetwork.name})</span>
             </div>
 
-            <div className="text-sm">
+            <div className="text-sm flex items-center">
               {destAddress === ethAddress ? truncateAddress(tariWalletAddress!, 15) : ethAddress}
+              <button
+                className="ml-2 text-gray-500 hover:text-gray-700"
+                onClick={() => handleCopy(destAddress === ethAddress ? tariWalletAddress! : ethAddress!)}
+              >
+                <FaRegCopy />
+              </button>
             </div>
           </div>
 
@@ -118,8 +132,15 @@ export const ReviewModal = ({
               {'Destination address'} <span>({toNetwork.name})</span>
             </div>
 
-            <div className="text-sm">
+            <div className="text-sm flex items-center">
               {destAddress === tariWalletAddress ? truncateAddress(tariWalletAddress!, 15) : ethAddress}
+              <button
+                className="ml-2 text-gray-500 hover:text-gray-700"
+                onClick={() => handleCopy(destAddress === tariWalletAddress ? tariWalletAddress! : ethAddress!)}
+              >
+                <FaRegCopy />
+              </button>
+              {copied && <div className="ml-2 text-xs text-green-500">Copied!</div>}
             </div>
           </div>
 
