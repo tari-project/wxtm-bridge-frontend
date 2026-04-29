@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import Toast from '../ui/toast'
 import Image from 'next/image'
 import { erc20Abi } from 'viem'
 import { useConnection, useReadContract } from 'wagmi'
@@ -31,6 +32,9 @@ export const BridgeForm = ({ remainingDailyLimit }: MainComponentProps) => {
   } = useFormContext()
 
   const [openDropdown, setOpenDropdown] = useState<'from' | 'to' | null>(null)
+  const [showToast, setShowToast] = useState(false)
+  const [toastMessage, setToastMessage] = useState('')
+  const [toastStatus, setToastStatus] = useState<'success' | 'error' | 'pending'>('pending')
 
   const { isConnected, chain, address } = useConnection()
   const { fromToken } = useBridgeInfo(fromNetwork)
@@ -58,6 +62,11 @@ export const BridgeForm = ({ remainingDailyLimit }: MainComponentProps) => {
   const handleContinueClick = () => {
     setModalStep(1)
     setIsModalOpen(true)
+    // Mock toast notification
+    setToastMessage('Transaction Submitted')
+    setToastStatus('pending')
+    setShowToast(true)
+    setTimeout(() => setShowToast(false), 3000)
   }
   const evm_balance = balanceRes ? formatNumber(Number(balanceRes), FormatPreset.WXTM_LONG) : '0'
   const isDisabled = chain === undefined
@@ -228,5 +237,6 @@ export const BridgeForm = ({ remainingDailyLimit }: MainComponentProps) => {
         </div>
       </div>
     </div>
+    {showToast && <Toast status={toastStatus} message={toastMessage} onClose={() => setShowToast(false)} />}
   )
 }
