@@ -11,8 +11,7 @@ interface State {
   pendingBridgeTx?: PendingUserTransaction
   pendingBridgeTxFromTU?: BridgeTxDetails
   language: string
-  walletconnect_id: string
-  walletconnect_state?: State
+  walletConnectId: string
   bridge_api: string
   wrapTokenFeePercentageBps: number
   tariColdWalletAddress: string
@@ -41,8 +40,8 @@ const initialState: State = {
   isProcessingTransaction: false,
   pendingBridgeTxFromTU: undefined,
   language: '',
-  walletconnect_id: '',
-  walletconnect_state: undefined,
+  walletConnectId: '',
+  
   bridge_api: '',
   wrapTokenFeePercentageBps: 50, // 0.5% fee
   tariColdWalletAddress: '',
@@ -51,15 +50,17 @@ const initialState: State = {
 
 export const useTariAccount = create<OotleWalletStoreState>()((set) => {
   // Rehydrate state from localStorage on initial load
+  let rehydratedConnected = false
   if (typeof window !== 'undefined') {
     const storedWalletConnected = localStorage.getItem('walletConnected')
     if (storedWalletConnected === 'true') {
-      initialState.walletConnected = true
+      rehydratedConnected = true
     }
   }
 
   return {
     ...initialState,
+    walletConnected: rehydratedConnected,
     setTariAccount: async () => {
       const signer = useTariSigner.getState().signer
 
@@ -72,8 +73,6 @@ export const useTariAccount = create<OotleWalletStoreState>()((set) => {
       const balance = await signer.getTariBalance()
       const language = await signer.getAppLanguage()
       const envs = await signer.getBridgeEnvs()
-      const walletSession = await signer.getAppWalletSession()
-      console.warn('[ TAPPLET-BRIDGE ] wallet session from TU: ', walletSession)
       const id = envs?.[0] ?? ''
       set({
         tariAccount: {
@@ -82,7 +81,7 @@ export const useTariAccount = create<OotleWalletStoreState>()((set) => {
         },
         available_balance: balance?.available_balance ?? 0,
         language: language,
-        walletconnect_id: envs?.[0] ?? '',
+        walletConnectId: envs?.[0] ?? '',
         bridge_api: envs?.[1] ?? '',
         walletConnected: true,
       })
