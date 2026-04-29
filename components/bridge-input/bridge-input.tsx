@@ -1,105 +1,48 @@
-import React, { useState } from 'react'
-import { Controller, useFormContext } from 'react-hook-form'
-import { TextField } from '@mui/material'
+import React from 'react'
+import { Controller } from 'react-hook-form'
+import { Button, TextField } from '@mui/material'
 
 import { BridgeInputProps } from './bridge-input.types'
 import { useBridgeInfo } from '@/hooks/use-bridge-info'
 import { config } from '@/config'
+import useTariAccount from '@/store/account'
 
-export const BridgeInput = ({ fromNetwork, availableBalance, remainingDailyLimit }: BridgeInputProps) => {
-  const [valueLength, setValueLength] = useState(5)
+export const BridgeInput: React.FC<BridgeInputProps> = ({
+  fromNetwork,
+  control,
+  errors,
+}) => {
   const { fromToken } = useBridgeInfo(fromNetwork)
-  const {
-    control,
-    formState: { errors },
-  } = useFormContext()
-
-  // Helper to block invalid keys
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    const allowedKeys = [
-      'Backspace',
-      'Tab',
-      'ArrowLeft',
-      'ArrowRight',
-      'Delete',
-      'Home',
-      'End',
-      '.', // Allow decimal point
-    ]
-    // Allow Ctrl/Cmd + A,C,V,X for copy/paste/select all
-    if ((e.ctrlKey || e.metaKey) && ['a', 'c', 'v', 'x'].includes(e.key.toLowerCase())) {
-      return
-    }
-    // Allow digits and allowed keys only
-    if (!allowedKeys.includes(e.key) && (e.key < '0' || e.key > '9')) {
-      e.preventDefault()
-    }
-  }
-
-  const handleChange = (onChange: (value: string) => void) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value
-
-    // Remove non-digit characters except decimal point
-    const parts = value.split('.')
-    const integerPart = parts[0].replace(/\D/g, '') // digits only
-    const decimalPart = parts[1] ? parts[1].replace(/\D/g, '') : ''
-
-    // Limit integer part to max 10 digits
-    const limitedInteger = integerPart.slice(0, 10)
-
-    // Reconstruct value with decimal part if any
-    if (parts.length > 1) {
-      value = limitedInteger + '.' + decimalPart
-    } else {
-      value = limitedInteger
-    }
-
-    setValueLength(value.length)
-    onChange(value)
-  }
-
-  const getFontSize = (length: number) => {
-    if (length < 10) return '22px'
-    if (length < 14) return '18px'
-    if (length < 18) return '14px'
-    return '10px'
-  }
-
-  const helperText = errors.amount?.message
+  const { available_balance } = useTariAccount()
 
   return (
     <Controller
       name="amount"
       control={control}
       rules={{
+        required: 'Amount is required',
         min: {
           value: config.MIN_BRIDGE_AMOUNT,
-          message: `Min amount is ${config.MIN_BRIDGE_AMOUNT.toLocaleString()} ${fromToken}`,
+          message: `You must bridge at least ${config.MIN_BRIDGE_AMOUNT.toLocaleString()} ${fromToken}`,
         },
         max: {
           value: config.MAX_BRIDGE_AMOUNT,
-          message: `Max amount is ${config.MAX_BRIDGE_AMOUNT} ${fromToken}`,
+          message: `Maximum amount is ${config.MAX_BRIDGE_AMOUNT} ${fromToken}`,
         },
         pattern: {
           value: /^\d+(\.\d{0,6})?$/,
-          message: 'Max 6 decimal places allowed',
+          message: 'Maximum 6 decimal places allowed',
         },
         validate: (value) => {
-          if (value === '' || value === undefined) {
-            return 'Amount is required'
-          }
           const amount = parseFloat(value)
           if (isNaN(amount)) {
             return 'Amount must be a valid number'
           }
           if (amount > config.MAX_BRIDGE_AMOUNT) {
-            return `Max amount is ${config.MAX_BRIDGE_AMOUNT} ${fromToken}`
+            return `Maximum amount is ${config.MAX_BRIDGE_AMOUNT} ${fromToken}`
           }
-          if (amount > availableBalance) {
-            return `Not enough ${fromToken}`
-          }
-          if (remainingDailyLimit !== undefined && amount > remainingDailyLimit) {
-            return `Daily limit exceeded. Remaining: ${remainingDailyLimit.toLocaleString()} XTM`
+          if (amount > available_balance) {
+            return `Amount exceeds your wallet balance`
           }
           return true
         },
@@ -111,19 +54,31 @@ export const BridgeInput = ({ fromNetwork, availableBalance, remainingDailyLimit
           variant="standard"
           placeholder="0"
           error={Boolean(errors.amount)}
-          helperText={helperText as React.ReactNode}
-          onKeyDown={handleKeyDown}
-          onChange={handleChange(field.onChange)}
+          helperText={errors.amount?.message}
+          InputProps={{
+            endAdornment: (
+              <Button
+                onClick={() => field.onChange(100)}
+                sx={{
+                  color: '#888',
+                  fontSize: '14px',
+                  minWidth: 'unset',
+                  padding: '0 5px',
+                  height: '30px',
+                }}
+              >
+                Max
+              </Button>
+            ),
+          }}
           slotProps={{
             input: {
               disableUnderline: true,
-              inputMode: 'decimal',
               inputProps: {
                 style: {
-                  fontSize: getFontSize(valueLength),
+                  fontSize: '30px',
                   fontWeight: 500,
-                  minWidth: '180px',
-                  width: '100%',
+                  width: '130px',
                   padding: 0,
                   appearance: 'textfield',
                 },
