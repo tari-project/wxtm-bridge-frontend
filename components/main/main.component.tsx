@@ -14,7 +14,7 @@ import { useBridgeStore } from '@/store/bridge'
 
 // TODO - add translation keys
 
-export const MainComponent = ({ remainingDailyLimit }: MainComponentProps) => {
+export const MainComponent = ({ remainingDailyLimit, children }: MainComponentProps & { children: React.ReactNode }) => {
   const { t } = useTranslation('main', { useSuspense: false })
   const [showHistory, setShowHistory] = useState(false)
   const exceededDailyLimit = useBridgeStore((s) => s.exceededDailyLimit)
@@ -75,6 +75,7 @@ export const MainComponent = ({ remainingDailyLimit }: MainComponentProps) => {
           onClick={() => setShowHistory(true)}
           type="button"
         >
+
           {t('history')} ({bridgeTxs.length})
         </button>
       </div>
@@ -88,6 +89,7 @@ export const MainComponent = ({ remainingDailyLimit }: MainComponentProps) => {
       {offlineMarkup}
       <HomeText />
       {mainMarkup}
+      {children}
     </section>
   )
 }

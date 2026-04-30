@@ -11,6 +11,9 @@ import { useTranslation } from 'react-i18next'
 import { useBridgeStore } from '@/store/bridge'
 import { useConnection } from 'wagmi'
 
+import { SlippageSettings } from '@/components/settings/settings'
+import { useFormContext } from 'react-hook-form'
+
 export const ReviewModal = ({
   closeModalAction,
   amount,
@@ -24,6 +27,9 @@ export const ReviewModal = ({
   const { amountAfterFee, feeAmount, feePercentage, isOverHighBridgeThreshold } = feesData
   const fromNetwork = useBridgeStore((s) => s.fromNetwork)
   const toNetwork = useBridgeStore((s) => s.toNetwork)
+  const {
+    formState: { isValid },
+  } = useFormContext()
 
   const { fromToken, toToken, destAddress, bridgeHandler } = useBridgeInfo(
     fromNetwork,
@@ -149,6 +155,10 @@ export const ReviewModal = ({
 
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
 
+          <SlippageSettings />
+
+          <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
+
           <div className="font-medium">
             <div className="text-xs text-gray-500">Estimated time</div>
             <div className="text-sm">24h</div>
@@ -162,7 +172,7 @@ export const ReviewModal = ({
           </div> */}
         </div>
 
-        <ModalButton label={t('confirm_and_bridge')} onClick={handleClick} disabled={clicked} />
+        <ModalButton label={t('confirm_and_bridge')} onClick={handleClick} disabled={clicked || !isValid} />
       </div>
     </div>
   )

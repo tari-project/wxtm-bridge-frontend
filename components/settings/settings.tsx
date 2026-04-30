@@ -1,0 +1,51 @@
+import React from 'react'
+import { Controller, useFormContext } from 'react-hook-form'
+import { TextField } from '@mui/material'
+
+export const SlippageSettings = () => {
+  const {
+    control,
+    formState: { errors },
+  } = useFormContext()
+
+  return (
+    <div className="flex items-center justify-between">
+      <div className="text-sm font-medium">Slippage Tolerance</div>
+      <Controller
+        name="slippage"
+        control={control}
+        defaultValue="0.5"
+        rules={{
+          min: {
+            value: 0,
+            message: 'Slippage cannot be negative',
+          },
+          max: {
+            value: 50,
+            message: 'Invalid Slippage',
+          },
+          pattern: {
+            value: /^\d+(\.\d{1,2})?$/,
+            message: 'Max 2 decimal places',
+          },
+        }}
+        render={({ field }) => (
+          <TextField
+            {...field}
+            type="number"
+            variant="outlined"
+            placeholder="0.5"
+            error={Boolean(errors.slippage)}
+            helperText={errors.slippage?.message as React.ReactNode}
+            sx={{
+              width: '100px',
+              '& .MuiInputBase-input': {
+                padding: '8px 12px',
+              },
+            }}
+          />
+        )}
+      />
+    </div>
+  )
+}

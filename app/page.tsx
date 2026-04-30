@@ -135,20 +135,21 @@ export default function Home() {
     <main className="relative min-h-screen w-full flex flex-col pl-(--tu-padding-left) pr-8 items-center justify-center">
       <Header />
       <FormProvider {...methods}>
-        <MainComponent remainingDailyLimit={remainingDailyLimit} />
-        {isModalOpen && !showModalDetailedTx && (
-          <MainModal
-            success={isWrapSuccess}
-            failed={isFailed}
-            step={modalStep}
-            amount={amount}
-            ethereumAddress={ethAddress}
-            tariWalletAddress={tariAccount?.address}
-            feesData={feesData}
-            closeModalAction={handleCloseModal}
-            type={ongoingBridgeTx?.type || 'wrap'}
-          />
-        )}
+        <MainComponent remainingDailyLimit={remainingDailyLimit}>
+  {isModalOpen && !showModalDetailedTx && (
+    <MainModal
+      success={isWrapSuccess}
+      failed={isFailed}
+      step={modalStep}
+      amount={amount}
+      ethereumAddress={ethAddress}
+      tariWalletAddress={tariAccount?.address}
+      feesData={feesData}
+      closeModalAction={handleCloseModal}
+      type={ongoingBridgeTx?.type || 'wrap'}
+    />
+  )}
+</MainComponent>
       </FormProvider>
       {detailedTx && <TransactionDetailsModal transaction={detailedTx} closeModalAction={() => setDetailedTx(null)} />}
       <FooterText />

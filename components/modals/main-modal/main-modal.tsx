@@ -22,6 +22,8 @@ import { setIsModalOpen, setModalStep } from '@/store/modal'
 const DAILY_LIMIT_ERROR = 'Daily wrap limit exceeded'
 const DAILY_LIMIT_ERROR_TYPE = 'Forbidden'
 
+import { useForm, FormProvider } from 'react-hook-form'
+
 export const MainModal = ({
   success,
   failed,
@@ -36,6 +38,9 @@ export const MainModal = ({
   const modalRef = useRef<HTMLDivElement>(null)
   const tariAccount = useTariAccountStore((s) => s.tariAccount)
   const { address: ethAddress, chain, isConnected } = useConnection()
+  const methods = useForm({
+    mode: 'onChange',
+  })
 
   const { getUserBackendBridgeTxs } = useBridgeTransaction()
   const { bridgeToEthereum } = useBridgeToEthereum()
@@ -138,14 +143,16 @@ export const MainModal = ({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <section
-        ref={modalRef}
-        className="w-full max-w-md mx-4 bg-[#E0DFDE] shadow-[0px_4px_74px_0px_rgba(0,0,0,0.15)] backdrop-blur-[54px] rounded-3xl overflow-hidden flex flex-col justify-center items-center"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {renderModal()}
-      </section>
-    </div>
+    <FormProvider {...methods}>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        <section
+          ref={modalRef}
+          className="w-full max-w-md mx-4 bg-[#E0DFDE] shadow-[0px_4px_74px_0px_rgba(0,0,0,0.15)] backdrop-blur-[54px] rounded-3xl overflow-hidden flex flex-col justify-center items-center"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {renderModal()}
+        </section>
+      </div>
+    </FormProvider>
   )
 }
