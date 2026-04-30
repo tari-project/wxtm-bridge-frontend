@@ -25,6 +25,12 @@
   "ethereum_mainnet": "Ethereum mainnet",
   "having_trouble": "Having trouble?",
   "history": "History",
+  "emptyState": {
+    "history": {
+      "title": "No transactions yet.",
+      "description": "Bridge some tokens to get started!"
+    }
+  },
   "how_to_view_wxtm_in_wallet": "How to view wXTM in your wallet?",
   "how_to_view_wxtm_step1_middle": " on the ",
   "how_to_view_wxtm_step1_network": " network. Alternatively, ",

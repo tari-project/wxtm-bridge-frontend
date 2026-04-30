@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { useTariAccountStore, setDetailedTx } from '@/store/account'
 
@@ -12,6 +13,7 @@ import { HistoryListWrapper, ListItemWrapper, ListWrapper } from '../transaction
 export const TransactionHistory = () => {
   const bridgeTxs = useTariAccountStore((s) => s.combinedBridgeTxs)
   const targetRef = useRef<HTMLDivElement>(null)
+  const { t } = useTranslation()
 
 
 
@@ -35,8 +37,8 @@ export const TransactionHistory = () => {
   )
 
   const emptyState = (
-    <div className="flex flex-col items-center justify-center h-full min-h-[40px] text-center leading-[150%] tracking-[-2%]">      <FolderIcon />      <h3 className="text-sm font-medium text-black mt-4">No transactions yet.</h3>
-      <p className="text-sm font-medium text-[#797979] mt-2">Bridge some tokens to get started!</p>
+    <div className="flex flex-col items-center justify-center h-full min-h-[40px] text-center leading-[150%] tracking-[-2%]">      <FolderIcon aria-hidden="true" />      <h3 className="text-sm font-medium text-black mt-4">{t('emptyState.history.title')}</h3>
+      <p className="text-sm font-medium text-[#797979] mt-2">{t('emptyState.history.description')}</p>
     </div>
   )
 
