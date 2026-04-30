@@ -75,6 +75,8 @@ export const Header = () => {
           <div
             className={`flex px-3 py-1 gap-2 h-[48px] rounded-3xl justify-center items-center ${isNetworkSupported ? 'bg-white/25' : 'bg-red-400/25'}`}
             onClick={networkClick}
+            title="Switch between Tari Testnet and Ethereum Sepolia"
+            aria-label="Network Switcher"
           >
             <div className="w-[24px] h-[24px] rounded-full overflow-hidden relative">
               <Image src="/eth.png" fill sizes="24px" alt="Tari icon" className="rounded-full object-cover" />
