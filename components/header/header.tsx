@@ -1,66 +1,47 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { useAccount, useDisconnect } from 'wagmi'
+import { useAccount, useChainId, useConnect } from 'wagmi'
 import { truncateAddress } from '@/utils/truncate'
 import { NetworkSwitchModal } from '@/components/modals/network-switch-modal'
-import { chainsMap } from '@/utils/networksConfig'
-import { useBridgeStatus } from '@/hooks/use-bridge-status'
-import useAppStore from '@/store/app'
-import { setIsModalOpen } from '@/store/modal'
-import { FiLogOut } from 'react-icons/fi'
-import { useTariAccountStore } from '@/store/account'
-import { ConnectWalletButton } from '../connect-wallet-button'
+import { supportedChains, chainsMap } from '@/utils/networksConfig'
+import { HeaderProps } from './header.types'
 
-export const Header = () => {
-  const bridgeTxs = useTariAccountStore((s) => s.combinedBridgeTxs)
-  const { getSupportedChains } = useAppStore()
-
-  const { isOffline } = useBridgeStatus()
+export const Header: React.FC<HeaderProps> = ({ onConnectClick }) => {
+  const chainId = useChainId()
   const { address, isConnected, chain } = useAccount()
-  const supportedChains = getSupportedChains()
-  const { disconnect } = useDisconnect()
-
+  const { isPending } = useConnect()
   const [showNetworkModal, setShowNetworkModal] = useState(false)
 
-  const exampleItem = bridgeTxs.find((tx) => tx.paymentId !== '')
-  const isNetworkSupported =
-    chain !== undefined && supportedChains.some((c) => c.id === chain.id)
-  const shouldShowNetworkModal = useMemo(
-    () => isConnected && !isNetworkSupported,
-    [isConnected, isNetworkSupported]
-  )
+  const isNetworkSupported = chain !== undefined
 
-  function networkClick() {
-    if (!isNetworkSupported) {
+  useEffect(() => {
+    if (isConnected && !isNetworkSupported) {
       setShowNetworkModal(true)
-      return
+    } else {
+      setShowNetworkModal(false)
     }
-  }
-  const handleConnectClick = () => {
-    if (!isConnected) {
-      setIsModalOpen(true)
-    }
-  }
+  }, [isConnected, isNetworkSupported])
 
-  const defaultMarkup = (
-    <header className="absolute top-8 right-8 z-50 flex items-center space-x-4">
-      <div className="flex flex-row items-center gap-4">
-        {exampleItem && (
-          <div
-            className="w-[308px] h-[48px] cursor-pointer"
-            onClick={handleDisplayTransaction}
+  return (
+    <>
+      <header className="absolute top-8 right-8 z-50">
+        {!isConnected && !isPending ? (
+          <button
+            className="px-8.5 py-4 bg-[#090719] text-white font-semibold text-[12px] rounded-full hover:bg-gray-800 hover:cursor-pointer transition"
+            onClick={onConnectClick}
           >
-          </div>
-        )}
-        <ConnectWalletButton />
-        {isConnected && (
+            Connect Wallet
+          </button>
+        ) : (
           <div
-            className={`flex px-3 py-1 gap-2 h-[48px] rounded-3xl justify-center items-center ${
-              isNetworkSupported ? 'bg-white/25' : 'bg-red-400/25'
-            }`}
-            onClick={networkClick}
+            className={
+              isNetworkSupported
+                ? 'flex p-2 rounded-lg bg-white/25 items-center'
+                : 'flex p-2 rounded-lg bg-red-400/25 items-center'
+            }
+            onClick={() => !isNetworkSupported && setShowNetworkModal(true)}
           >
             <div className="w-[24px] h-[24px] rounded-full overflow-hidden relative">
               <Image
@@ -71,41 +52,30 @@ export const Header = () => {
                 className="rounded-full object-cover"
               />
             </div>
-            <div className="flex flex-col gap-1">
-              <div className="text-[12px] leading-none font-semibold">
+
+            <div className="flex flex-col ml-2">
+              <div className="text-[13px] font-semibold">
                 {truncateAddress(address ?? '0x', 15)}
               </div>
               <div
-                className={`text-[9px] mt-[-3px] leading-none ${
+                className={`text-[10px] mt-[-5px] ${
                   !isNetworkSupported
                     ? 'text-red-600 font-medium hover:cursor-pointer'
                     : ''
                 }`}
               >
-                {chainsMap[chain?.id]}
+                {chainsMap[chainId]}
                 {!isNetworkSupported && ' (Click to switch)'}
               </div>
             </div>
-            <div
-              className="overflow-hidden opacity-35 hover:opacity-55 hover:cursor-pointer"
-              onClick={() => disconnect()}
-            >
-              <FiLogOut size={18} />
-            </div>
           </div>
         )}
-      </div>
-    </header>
-  )
-
-  return (
-    <>
-      {!isOffline && defaultMarkup}
+      </header>
 
       {/* Network Switch Modal */}
-      {shouldShowNetworkModal && showNetworkModal && (
+      {showNetworkModal && (
         <NetworkSwitchModal
-          closeModalAction={() => setShowNetworkModal(false)}
+          closeModal={() => setShowNetworkModal(false)}
           supportedChains={supportedChains}
         />
       )}
