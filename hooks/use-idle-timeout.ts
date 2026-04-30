@@ -6,14 +6,13 @@ const IDLE_TIMEOUT = 15 * 60 * 1000; // 15 minutes in milliseconds
 
 export function useIdleTimeout() {
   const { disconnect } = useDisconnect();
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const resetTimer = useCallback(() => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
     timeoutRef.current = setTimeout(() => {
-      console.log('User idle for too long, disconnecting wallet.');
       disconnect();
     }, IDLE_TIMEOUT);
   }, [disconnect]);
