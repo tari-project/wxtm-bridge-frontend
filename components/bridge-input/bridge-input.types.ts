@@ -8,4 +8,5 @@ export type BridgeInputProps = {
   fromNetwork: Network
   availableBalance: number
   remainingDailyLimit?: number
+  isTari: boolean
 }

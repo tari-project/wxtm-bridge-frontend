@@ -8,12 +8,12 @@ export enum FormatPreset {
   COMPACT = 'compact',
 }
 
-const removeDecimals = (value: number, decimals: number) => {
+export const toDecimals = (value: number, decimals: number) => {
   return value / Math.pow(10, decimals)
 }
 
 const removeCryptoDecimals = (value: number, decimals: number) => {
-  return removeDecimals(value, decimals)
+  return toDecimals(value, decimals)
 }
 
 /**
@@ -130,4 +130,4 @@ export function formatHashrate(hashrate: number, joinUnit = true): string {
   }
 }
 
-export { formatDecimalCompact, roundToTwoDecimals, removeDecimals }
+export { formatDecimalCompact, roundToTwoDecimals }

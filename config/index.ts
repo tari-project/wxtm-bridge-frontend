@@ -12,4 +12,5 @@ export const config = {
   MAINNET_EXPLORER_URL: 'https://etherscan.io',
   WXTM_CONTRACT_ADDRESS: '0xfD36fA88bb3feA8D1264fc89d70723b6a2B56958',
   MICRO_XTM_PER_XTM: 1_000_000,
+  TARI_DECIMAL_PLACES: 6,
 }
