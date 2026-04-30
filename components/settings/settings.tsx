@@ -16,17 +16,18 @@ export const SlippageSettings = () => {
         control={control}
         defaultValue="0.5"
         rules={{
+          required: 'Slippage is required',
           min: {
             value: 0,
             message: 'Slippage cannot be negative',
           },
           max: {
-            value: 50,
-            message: 'Invalid Slippage',
+            value: 10,
+            message: 'Max slippage is 10%',
           },
           pattern: {
-            value: /^\d+(\.\d{1,2})?$/,
-            message: 'Max 2 decimal places',
+            value: /^(0(\.\d{1,2})?|([1-9](\d)?(\.\d{1,2})?))$/,
+            message: 'Invalid slippage format',
           },
         }}
         render={({ field }) => (
