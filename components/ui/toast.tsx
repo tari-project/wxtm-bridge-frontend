@@ -15,7 +15,11 @@ const statusClasses = {
 
 const Toast: React.FC<ToastProps> = ({ status, message, onClose }) => {
   return (
-    <div className={`fixed bottom-4 right-4 p-4 rounded-md shadow-lg text-white ${statusClasses[status]}`}>
+    <div
+      role="alert"
+      aria-live="assertive"
+      className={`fixed bottom-4 right-4 p-4 rounded-md shadow-lg text-white ${statusClasses[status]}`}
+    >
       <div className="flex justify-between items-center">
         <span>{message}</span>
         {onClose && (
