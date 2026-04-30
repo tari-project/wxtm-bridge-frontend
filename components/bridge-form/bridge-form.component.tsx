@@ -46,9 +46,9 @@ export const BridgeForm = ({ remainingDailyLimit }: MainComponentProps) => {
     }
   }, [txStatus])
 
-  const handleConfettiComplete = () => {
+  const handleConfettiComplete = useCallback(() => {
     setShowConfetti(false)
-  }
+  }, [])
 
   const chainId = (chain?.id ?? 1) as DeployedChains
   const deployments = getDeployments(chainId)
@@ -131,117 +131,119 @@ export const BridgeForm = ({ remainingDailyLimit }: MainComponentProps) => {
     fromNetwork.name === 'Tari' ? availableBalance / 1000000 : (Number(balanceRes) ?? 0) / Math.pow(10, 18)
 
   return (
-    <div className="bg-white/50 backdrop-blur-sm shadow-xl rounded-2xl p-4 mx-auto min-h-[130px] fixed-box mb-5">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="w-full flex flex-col p-1">
-          <div className="relative">
-            <div className="flex items-center justify-center">
-              <div className="relative flex gap-[2px] w-full items-stretch">
-                {/* Wrap Box 1 and Box 2 in a relative container for precise arrow positioning */}
-                <div className="relative flex flex-[2] gap-[2px]">
-                  {/* Box 1 - From */}
-                  <div className="flex-1">
-                    <NetworkBox
-                      type="from"
-                      selected={fromNetwork}
-                      isOpen={openDropdown === 'from'}
-                      networks={fromNetworks}
-                      onToggle={() => setOpenDropdown(openDropdown === 'from' ? null : 'from')}
-                      onSelect={(network) => handleNetworkSelect(network, 'from')}
-                    />
-                  </div>
-
-                  {/* Box 2 - To */}
-                  <div className="flex-1">
-                    <NetworkBox
-                      type="to"
-                      selected={toNetwork}
-                      isOpen={openDropdown === 'to'}
-                      networks={networks}
-                      onToggle={() => setOpenDropdown(openDropdown === 'to' ? null : 'to')}
-                      onSelect={(network) => handleNetworkSelect(network, 'to')}
-                      fromNetwork={fromNetwork}
-                    />
-                  </div>
-
-                  {/* Arrow — Between Box 1 and Box 2 */}
-                  <div className="this-hide absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-                    <div className="w-8 h-8 rounded-md border-2 border-gray-300 bg-white flex items-center justify-center shadow-sm">
-                      <FaArrowRight className="text-[15px] text-[#171717]" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Box 3 - Amount */}
-                <div className="flex-1">
-                  <div className="flex justify-between items-center p-2 px-2 2xl:px-4 rounded-xl bg-white border border-gray-200 min-h-[90px] max-h-[90px]">
-                    <div className="space-y-[-8px] mr-[-10px]">
-                      <div className="font-medium text-xs text-gray-500">{t('amount_to_bridge')}</div>
-                      <BridgeInput
-                        fromNetwork={fromNetwork}
-                        availableBalance={inputAvailableBalance()}
-                        remainingDailyLimit={remainingDailyLimit}
+    <>
+      <div className="bg-white/50 backdrop-blur-sm shadow-xl rounded-2xl p-4 mx-auto min-h-[130px] fixed-box mb-5">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="w-full flex flex-col p-1">
+            <div className="relative">
+              <div className="flex items-center justify-center">
+                <div className="relative flex gap-[2px] w-full items-stretch">
+                  {/* Wrap Box 1 and Box 2 in a relative container for precise arrow positioning */}
+                  <div className="relative flex flex-[2] gap-[2px]">
+                    {/* Box 1 - From */}
+                    <div className="flex-1">
+                      <NetworkBox
+                        type="from"
+                        selected={fromNetwork}
+                        isOpen={openDropdown === 'from'}
+                        networks={fromNetworks}
+                        onToggle={() => setOpenDropdown(openDropdown === 'from' ? null : 'from')}
+                        onSelect={(network) => handleNetworkSelect(network, 'from')}
                       />
                     </div>
-                    <div className="hidden lg:flex flex-col">
-                      <div className="w-fit flex py-1 2xl:py-2 px-3 bg-gray-200 items-center rounded-3xl justify-center self-end">
-                        <div className="w-5 h-5 rounded-full overflow-hidden -ml-1 mr-2 relative">
-                          <Image
-                            src={fromNetwork.icon}
-                            fill
-                            sizes="20px"
-                            alt={t('network_icon_alt', {
-                              network: fromNetwork.name,
-                            })}
-                            className="rounded-full object-cover"
-                          />
-                        </div>
-                        <div className="font-bold text-[12.85px]">{fromToken}</div>
+
+                    {/* Box 2 - To */}
+                    <div className="flex-1">
+                      <NetworkBox
+                        type="to"
+                        selected={toNetwork}
+                        isOpen={openDropdown === 'to'}
+                        networks={networks}
+                        onToggle={() => setOpenDropdown(openDropdown === 'to' ? null : 'to')}
+                        onSelect={(network) => handleNetworkSelect(network, 'to')}
+                        fromNetwork={fromNetwork}
+                      />
+                    </div>
+
+                    {/* Arrow — Between Box 1 and Box 2 */}
+                    <div className="this-hide absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+                      <div className="w-8 h-8 rounded-md border-2 border-gray-300 bg-white flex items-center justify-center shadow-sm">
+                        <FaArrowRight className="text-[15px] text-[#171717]" />
                       </div>
-                      <div className="flex justify-end mt-2 gap-1 items-center">
-                        <div
-                          className="font-poppins font-medium text-[12px] leading-[100%] tracking-[-0.03em] text-gray-500 whitespace-nowrap flex items-center gap-1"
-                          style={{ fontFeatureSettings: '"cpsp"' }}
-                        >
-                          {fromToken === 'wXTM' && !isConnected ? (
-                            <div>{t('connect_to_view')}</div>
-                          ) : (
-                            <div>
-                              {getBalance(true)}&nbsp;{fromToken}
-                            </div>
-                          )}
+                    </div>
+                  </div>
+
+                  {/* Box 3 - Amount */}
+                  <div className="flex-1">
+                    <div className="flex justify-between items-center p-2 px-2 2xl:px-4 rounded-xl bg-white border border-gray-200 min-h-[90px] max-h-[90px]">
+                      <div className="space-y-[-8px] mr-[-10px]">
+                        <div className="font-medium text-xs text-gray-500">{t('amount_to_bridge')}</div>
+                        <BridgeInput
+                          fromNetwork={fromNetwork}
+                          availableBalance={inputAvailableBalance()}
+                          remainingDailyLimit={remainingDailyLimit}
+                        />
+                      </div>
+                      <div className="hidden lg:flex flex-col">
+                        <div className="w-fit flex py-1 2xl:py-2 px-3 bg-gray-200 items-center rounded-3xl justify-center self-end">
+                          <div className="w-5 h-5 rounded-full overflow-hidden -ml-1 mr-2 relative">
+                            <Image
+                              src={fromNetwork.icon}
+                              fill
+                              sizes="20px"
+                              alt={t('network_icon_alt', {
+                                network: fromNetwork.name,
+                              })}
+                              className="rounded-full object-cover"
+                            />
+                          </div>
+                          <div className="font-bold text-[12.85px]">{fromToken}</div>
                         </div>
-                        <button
-                          className="w-[31px] h-[13px] flex items-center justify-center gap-[7px] border border-gray-500/50 rounded-3xl px-1.5 hover:cursor-pointer font-poppins font-medium text-[8px] leading-[100%] tracking-[0em]"
-                          onClick={handleMaxAmount}
-                        >
-                          {t('max')}
-                        </button>
+                        <div className="flex justify-end mt-2 gap-1 items-center">
+                          <div
+                            className="font-poppins font-medium text-[12px] leading-[100%] tracking-[-0.03em] text-gray-500 whitespace-nowrap flex items-center gap-1"
+                            style={{ fontFeatureSettings: '"cpsp"' }}
+                          >
+                            {fromToken === 'wXTM' && !isConnected ? (
+                              <div>{t('connect_to_view')}</div>
+                            ) : (
+                              <div>
+                                {getBalance(true)}&nbsp;{fromToken}
+                              </div>
+                            )}
+                          </div>
+                          <button
+                            className="w-[31px] h-[13px] flex items-center justify-center gap-[7px] border border-gray-500/50 rounded-3xl px-1.5 hover:cursor-pointer font-poppins font-medium text-[8px] leading-[100%] tracking-[0em]"
+                            onClick={handleMaxAmount}
+                          >
+                            {t('max')}
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="flex items-center justify-center">
-                {!isConnected ? (
-                  <MainButton onClick={handleConnectClick} subText={t('eth_mainnet')}>
-                    {t('connect_wallet')}
-                  </MainButton>
-                ) : (
-                  <MainButton onClick={handleContinueClick} disabled={!isValid || isDisabled}>
-                    <div className="flex">
-                      {t('continue')}
-                      <FaArrowRight className="ml-2" />
-                    </div>
-                  </MainButton>
-                )}
+                <div className="flex items-center justify-center">
+                  {!isConnected ? (
+                    <MainButton onClick={handleConnectClick} subText={t('eth_mainnet')}>
+                      {t('connect_wallet')}
+                    </MainButton>
+                  ) : (
+                    <MainButton onClick={handleContinueClick} disabled={!isValid || isDisabled}>
+                      <div className="flex">
+                        {t('continue')}
+                        <FaArrowRight className="ml-2" />
+                      </div>
+                    </MainButton>
+                  )}
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <Confetti show={showConfetti} onAnimationComplete={handleConfettiComplete} />
+      <Confetti show={showConfetti} onAnimationComplete={handleConfettiComplete} />
+    </>
   )
 }
