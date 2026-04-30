@@ -149,10 +149,12 @@ export const ReviewModal = ({
 
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
 
-          <div className="font-medium">
-            <div className="text-xs text-gray-500">Estimated time</div>
-            <div className="text-sm">24h</div>
-          </div>
+          {parseFloat(amount) < 10000 && (
+            <div className="font-medium">
+              <div className="text-xs text-gray-500">{t('estimated_time')}</div>
+              <div className="text-sm">{t('estimated_time_duration')}</div>
+            </div>
+          )}
 
           {/* <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
 

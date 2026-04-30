@@ -75,5 +75,7 @@
   "unwrap_info_message": "To proceed and complete unwrapping your wXTM tokens, you need to <bold>sign</bold> and then <bold>approve</bold> the transaction in your MetaMask wallet."
   ,
   "from": "from",
-  "to": "to"
+  "to": "to",
+  "estimated_time": "Estimated Arrival",
+  "estimated_time_duration": "~5-10 minutes"
 }
