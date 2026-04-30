@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
-import { TextField } from '@mui/material'
+import { Button, TextField, InputAdornment } from '@mui/material'
 
 import { BridgeInputProps } from './bridge-input.types'
 import { useBridgeInfo } from '@/hooks/use-bridge-info'
@@ -105,54 +105,77 @@ export const BridgeInput = ({ fromNetwork, availableBalance, remainingDailyLimit
         },
       }}
       render={({ field }) => (
-        <TextField
-          {...field}
-          type="number"
-          variant="standard"
-          placeholder="0"
-          error={Boolean(errors.amount)}
-          helperText={helperText as React.ReactNode}
-          onKeyDown={handleKeyDown}
-          onChange={handleChange(field.onChange)}
-          slotProps={{
-            input: {
-              disableUnderline: true,
-              inputMode: 'decimal',
-              inputProps: {
+        <div style={{ position: 'relative', width: '100%' }}>
+          <TextField
+            {...field}
+            type="number"
+            variant="standard"
+            placeholder="0"
+            error={Boolean(errors.amount)}
+            helperText={helperText as React.ReactNode}
+            onKeyDown={handleKeyDown}
+            onChange={handleChange(field.onChange)}
+            slotProps={{
+              input: {
+                disableUnderline: true,
+                inputMode: 'decimal',
+                inputProps: {
+                  style: {
+                    fontSize: getFontSize(valueLength),
+                    fontWeight: 500,
+                    minWidth: '180px',
+                    width: '100%',
+                    padding: 0,
+                    appearance: 'textfield',
+                  },
+                },
                 style: {
-                  fontSize: getFontSize(valueLength),
-                  fontWeight: 500,
-                  minWidth: '180px',
-                  width: '100%',
-                  padding: 0,
-                  appearance: 'textfield',
+                  display: 'flex',
+                  alignItems: 'center',
+                  height: '35px',
+                  paddingTop: '10px',
                 },
               },
-              style: {
-                display: 'flex',
-                alignItems: 'center',
-                height: '35px',
-                paddingTop: '10px',
+            }}
+            sx={{
+              '& .MuiInputBase-input': {
+                appearance: 'textfield',
+                '&::-webkit-outer-spin-button, &::-webkit-inner-spin-button': {
+                  appearance: 'none',
+                  margin: 0,
+                },
               },
-            },
-          }}
-          sx={{
-            '& .MuiInputBase-input': {
-              appearance: 'textfield',
-              '&::-webkit-outer-spin-button, &::-webkit-inner-spin-button': {
-                appearance: 'none',
-                margin: 0,
+              '& .Mui-error': {
+                fontSize: '11px',
+                marginTop: '2px',
+                '@media (max-width:1280px)': {
+                  fontSize: '9px',
+                },
               },
-            },
-            '& .Mui-error': {
-              fontSize: '11px',
-              marginTop: '2px',
-              '@media (max-width:1280px)': {
-                fontSize: '9px',
-              },
-            },
-          }}
-        />
+            }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <Button
+                    variant="text"
+                    size="small"
+                    onClick={() => field.onChange(String(Math.floor(availableBalance * 10**6) / 10**6))}
+                    sx={{
+                      minWidth: 'unset',
+                      padding: '2px 5px',
+                      lineHeight: 1,
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      color: 'primary.main',
+                    }}
+                  >
+                    MAX
+                  </Button>
+                </InputAdornment>
+              ),
+            }}
+          />
+        </div>
       )}
     />
   )
