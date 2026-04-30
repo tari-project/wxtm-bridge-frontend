@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import Image from 'next/image'
+import { FallbackImage } from '@/components/fallback-image'
 import { erc20Abi } from 'viem'
 import { useConnection, useReadContract } from 'wagmi'
 import { FaArrowRight } from 'react-icons/fa6'
@@ -172,7 +172,7 @@ export const BridgeForm = ({ remainingDailyLimit }: MainComponentProps) => {
                     <div className="hidden lg:flex flex-col">
                       <div className="w-fit flex py-1 2xl:py-2 px-3 bg-gray-200 items-center rounded-3xl justify-center self-end">
                         <div className="w-5 h-5 rounded-full overflow-hidden -ml-1 mr-2 relative">
-                          <Image
+                          <FallbackImage
                             src={fromNetwork.icon}
                             fill
                             sizes="20px"
@@ -180,11 +180,7 @@ export const BridgeForm = ({ remainingDailyLimit }: MainComponentProps) => {
                               network: fromNetwork.name,
                             })}
                             className="rounded-full object-cover"
-                            onError={(e) => {
-                              ;(e.target as HTMLImageElement).srcset = ''
-                              ;(e.target as HTMLImageElement).src =
-                                'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"%3E%3Ccircle cx="10" cy="10" r="10" fill="%23ccc"%3E%3C/circle%3E%3Ctext x="10" y="14" font-family="Arial" font-size="12" fill="%23fff" text-anchor="middle"%3E%3F%3C/text%3E%3C/svg%3E'
-                            }}
+                            fallbackSvg='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"%3E%3Ccircle cx="10" cy="10" r="10" fill="%23ccc"%3E%3C/circle%3E%3Ctext x="10" y="14" font-family="Arial" font-size="12" fill="%23fff" text-anchor="middle"%3E%3F%3C/text%3E%3C/svg%3E'
                           />
                         </div>
                         <div className="font-bold text-[12.85px]">{fromToken}</div>

@@ -1,6 +1,6 @@
 'use client'
 
-import Image from 'next/image'
+import { FallbackImage } from '@/components/fallback-image'
 import { useSwitchChain } from 'wagmi'
 import { IoCloseOutline } from 'react-icons/io5'
 import { NetworkSwitchModalProps } from './network-switch-modal.types'
@@ -42,17 +42,13 @@ export const NetworkSwitchModal = ({ closeModalAction, supportedChains }: Networ
                 className="hover:bg-gray-200/80 hover:cursor-pointer p-4 font-medium w-full text-left flex items-center gap-3"
               >
                 <div className="w-[36px] h-[36px] rounded-full overflow-hidden relative flex-shrink-0">
-                  <Image
+                  <FallbackImage
                     src={chain.icon}
                     fill
                     sizes="36px"
                     alt={`${chain.name} icon`}
                     className="object-cover"
-                    onError={(e) => {
-                      ;(e.target as HTMLImageElement).srcset = ''
-                      ;(e.target as HTMLImageElement).src =
-                        'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36"%3E%3Ccircle cx="18" cy="18" r="18" fill="%23ccc"%3E%3C/circle%3E%3Ctext x="18" y="24" font-family="Arial" font-size="18" fill="%23fff" text-anchor="middle"%3E%3F%3C/text%3E%3C/svg%3E'
-                    }}
+                    fallbackSvg='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36"%3E%3Ccircle cx="18" cy="18" r="18" fill="%23ccc"%3E%3C/circle%3E%3Ctext x="18" y="24" font-family="Arial" font-size="18" fill="%23fff" text-anchor="middle"%3E%3F%3C/text%3E%3C/svg%3E'
                   />
                 </div>
                 <div>
