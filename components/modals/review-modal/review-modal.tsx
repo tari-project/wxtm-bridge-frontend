@@ -34,12 +34,18 @@ export const ReviewModal = ({
     handleBridgeToTari,
   )
   const [clicked, setClicked] = useState(false)
-  const [copied, setCopied] = useState(false)
+  const [sourceCopied, setSourceCopied] = useState(false)
+  const [destCopied, setDestCopied] = useState(false)
 
-  const handleCopy = (text: string) => {
+  const handleCopy = (text: string, type: 'source' | 'dest') => {
     navigator.clipboard.writeText(text)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+    if (type === 'source') {
+      setSourceCopied(true)
+      setTimeout(() => setSourceCopied(false), 2000)
+    } else {
+      setDestCopied(true)
+      setTimeout(() => setDestCopied(false), 2000)
+    }
   }
 
   const handleClick = useCallback(() => {
@@ -118,10 +124,11 @@ export const ReviewModal = ({
               {destAddress === ethAddress ? truncateAddress(tariWalletAddress!, 15) : ethAddress}
               <button
                 className="ml-2 text-gray-500 hover:text-gray-700"
-                onClick={() => handleCopy(destAddress === ethAddress ? tariWalletAddress! : ethAddress!)}
+                onClick={() => handleCopy(destAddress === ethAddress ? tariWalletAddress! : ethAddress!, 'source')}
               >
                 <FaRegCopy />
               </button>
+              {sourceCopied && <div className="ml-2 text-xs text-green-500">Copied!</div>}
             </div>
           </div>
 
@@ -136,11 +143,11 @@ export const ReviewModal = ({
               {destAddress === tariWalletAddress ? truncateAddress(tariWalletAddress!, 15) : ethAddress}
               <button
                 className="ml-2 text-gray-500 hover:text-gray-700"
-                onClick={() => handleCopy(destAddress === tariWalletAddress ? tariWalletAddress! : ethAddress!)}
+                onClick={() => handleCopy(destAddress === tariWalletAddress ? tariWalletAddress! : ethAddress!, 'dest')}
               >
                 <FaRegCopy />
               </button>
-              {copied && <div className="ml-2 text-xs text-green-500">Copied!</div>}
+              {destCopied && <div className="ml-2 text-xs text-green-500">Copied!</div>}
             </div>
           </div>
 
