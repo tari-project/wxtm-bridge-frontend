@@ -6,13 +6,13 @@ import { OpenAPI } from '@tari-project/wxtm-bridge-backend-api'
 
 interface State {
   tariAccount?: AccountData
-  available_balance: number
+  availableBalance: number
   isProcessingTransaction: boolean
   pendingBridgeTx?: PendingUserTransaction
   pendingBridgeTxFromTU?: BridgeTxDetails
   language: string
   walletConnectId: string
-  bridge_api: string
+  bridgeApi: string
   wrapTokenFeePercentageBps: number
   tariColdWalletAddress: string
   walletConnected: boolean
@@ -35,14 +35,14 @@ const initialState: State = {
     account_id: 0,
     address: '',
   },
-  available_balance: 0,
+  availableBalance: 0,
   pendingBridgeTx: undefined,
   isProcessingTransaction: false,
   pendingBridgeTxFromTU: undefined,
   language: '',
   walletConnectId: '',
   
-  bridge_api: '',
+  bridgeApi: '',
   wrapTokenFeePercentageBps: 50, // 0.5% fee
   tariColdWalletAddress: '',
   walletConnected: false,
@@ -52,10 +52,7 @@ export const useTariAccount = create<OotleWalletStoreState>()((set) => {
   // Rehydrate state from localStorage on initial load
   let rehydratedConnected = false
   if (typeof window !== 'undefined') {
-    const storedWalletConnected = localStorage.getItem('walletConnected')
-    if (storedWalletConnected === 'true') {
-      rehydratedConnected = true
-    }
+    rehydratedConnected = localStorage.getItem('walletConnected') === 'true'
   }
 
   return {
@@ -79,10 +76,10 @@ export const useTariAccount = create<OotleWalletStoreState>()((set) => {
           account_id: account.account_id,
           address: account.address,
         },
-        available_balance: balance?.available_balance ?? 0,
+        availableBalance: balance?.available_balance ?? 0,
         language: language,
         walletConnectId: envs?.[0] ?? '',
-        bridge_api: envs?.[1] ?? '',
+        bridgeApi: envs?.[1] ?? '',
         walletConnected: true,
       })
       localStorage.setItem('walletConnected', 'true')
