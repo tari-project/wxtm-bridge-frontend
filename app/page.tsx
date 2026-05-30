@@ -116,8 +116,20 @@ export default function Home() {
       onNetworkChange()
       return
     }
-    const interval = setInterval(fetchDailyLimit, REFETCH_LIMIT_INTERVAL)
-    return () => clearInterval(interval)
+
+    let active = true
+
+    const updateDailyLimit = async () => {
+      const limit = await fetchDailyLimit()
+      if (active) setRemainingDailyLimit(limit)
+    }
+
+    void updateDailyLimit()
+    const interval = setInterval(updateDailyLimit, REFETCH_LIMIT_INTERVAL)
+    return () => {
+      active = false
+      clearInterval(interval)
+    }
   }, [fetchDailyLimit, fromNetwork.name])
 
   const handleSetOngoingModalOpen = (open: boolean) => {
