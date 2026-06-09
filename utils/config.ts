@@ -7,12 +7,12 @@ export function getConfig(id?: string) {
   const { walletConnectProjectId, ethereumNodes } = useAppStore.getState()
   const projectId = id || walletConnectProjectId
 
-  const urlsByChain = new Map(ethereumNodes.map((node) => [node.chainId, node.urls]))
+  const urlsByChain = new Map(ethereumNodes.map((node) => [Number(node.chainId), node.urls]))
 
   // Prefer the backend-served public RPC nodes; fall back to viem's defaults
   // when the backend has no nodes for a chain (or the list could not be fetched).
   const transportFor = (chainId: number) => {
-    const urls = urlsByChain.get(chainId)
+    const urls = urlsByChain.get(chainId)?.filter((url) => url.trim() !== '')
     return urls?.length ? fallback(urls.map((url) => http(url))) : http()
   }
 
