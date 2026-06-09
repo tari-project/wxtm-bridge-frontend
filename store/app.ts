@@ -41,7 +41,9 @@ const fetchEthereumNodes = async (): Promise<PublicEthereumNodeRespDTO[]> => {
   let timeoutId: ReturnType<typeof setTimeout> | undefined
   const timeout = new Promise<never>((_, reject) => {
     timeoutId = setTimeout(() => {
-      request.cancel()
+      if (typeof request.cancel === 'function') {
+        request.cancel()
+      }
       reject(new Error('Timed out fetching public ethereum nodes'))
     }, ETHEREUM_NODES_FETCH_TIMEOUT_MS)
   })
