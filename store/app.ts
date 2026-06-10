@@ -49,7 +49,9 @@ const fetchEthereumNodes = async (): Promise<PublicEthereumNodeRespDTO[]> => {
   })
 
   try {
-    return await Promise.race([request, timeout])
+    const nodes = await Promise.race([request, timeout])
+    console.info('[ TAPPLET-BRIDGE ] loaded public ethereum nodes ', nodes)
+    return nodes
   } catch (error) {
     console.error('[ TAPPLET-BRIDGE ] failed to fetch public ethereum nodes ', error)
     return []
