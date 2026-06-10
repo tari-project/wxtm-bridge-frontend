@@ -1,9 +1,11 @@
 import { create } from 'zustand'
 import useTariSigner from './signer'
-import { OpenAPI } from '@tari-project/wxtm-bridge-backend-api'
+import { EthereumNodesService, OpenAPI, PublicEthereumNodeRespDTO } from '@tari-project/wxtm-bridge-backend-api'
 import i18next, { changeLanguage } from 'i18next'
 import { parseTheme, Theme } from '@/types/app'
 import { SupportedChain, supportedChains } from '@/utils/networksConfig'
+
+const ETHEREUM_NODES_FETCH_TIMEOUT_MS = 5000
 
 interface State {
   language: string
@@ -12,6 +14,7 @@ interface State {
   theme: Theme
   hideWalletBalance: boolean
   isMainNet: boolean
+  ethereumNodes: PublicEthereumNodeRespDTO[]
 }
 
 interface Actions {
@@ -27,6 +30,34 @@ const initialState: State = {
   theme: 'light',
   hideWalletBalance: false,
   isMainNet: true,
+  ethereumNodes: [],
+}
+
+// Fetch the backend-served public RPC nodes. Times out and falls back to an
+// empty list so a slow/unreachable backend never blocks app startup; viem's
+// default transports are used for any chain without configured nodes.
+const fetchEthereumNodes = async (): Promise<PublicEthereumNodeRespDTO[]> => {
+  const request = EthereumNodesService.getPublicNodes()
+  let timeoutId: ReturnType<typeof setTimeout> | undefined
+  const timeout = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => {
+      if (typeof request.cancel === 'function') {
+        request.cancel()
+      }
+      reject(new Error('Timed out fetching public ethereum nodes'))
+    }, ETHEREUM_NODES_FETCH_TIMEOUT_MS)
+  })
+
+  try {
+    const nodes = await Promise.race([request, timeout])
+    console.info('[ TAPPLET-BRIDGE ] loaded public ethereum nodes ', nodes)
+    return nodes
+  } catch (error) {
+    console.error('[ TAPPLET-BRIDGE ] failed to fetch public ethereum nodes ', error)
+    return []
+  } finally {
+    clearTimeout(timeoutId)
+  }
 }
 
 const useAppStore = create<AppStoreState>()((_, get) => ({
@@ -56,10 +87,14 @@ export const setAppConfig = async () => {
 
     const walletConnectProjectId = envs?.[0] ?? ''
     const bridgeAPI = envs?.[1] ?? ''
-    useAppStore.setState({ walletConnectProjectId, bridgeAPI, isMainNet })
 
-    // set OpenAPI configuration
+    // set OpenAPI configuration before fetching the public ethereum nodes
     OpenAPI.BASE = bridgeAPI
+
+    // Fetch nodes before exposing walletConnectProjectId: setting it triggers the
+    // wagmi config build in Providers, which reads ethereumNodes from this store.
+    const ethereumNodes = await fetchEthereumNodes()
+    useAppStore.setState({ walletConnectProjectId, bridgeAPI, isMainNet, ethereumNodes })
 
     const appLanguage = await signer.getAppLanguage()
     if (appLanguage) await setLanguage(appLanguage)
