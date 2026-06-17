@@ -189,6 +189,17 @@ export class TariL1Signer {
   }
 
   /**
+   * @description get the wallet session ID
+   * @returns wallet session ID
+   */
+  public async getAppWalletSession(): Promise<string> {
+    return this.sendRequest({
+      methodName: 'getAppWalletSession',
+      args: [],
+    })
+  }
+
+  /**
    * @description get Tari Account bridge transactions from backend
    * @returns Bridge transactions
    */
