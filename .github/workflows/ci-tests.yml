@@ -23,7 +23,7 @@ jobs:
           registry-url: 'https://npm.pkg.github.com'
 
       - name: Cache NPM dependencies
-        uses: pat-s/always-upload-cache@v2.1.5
+        uses: pat-s/always-upload-cache@v3.0.11
         with:
           path: |
             node_modules
