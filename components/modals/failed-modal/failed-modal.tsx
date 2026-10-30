@@ -6,19 +6,39 @@ import { ModalButton } from '@/components/modals/modal-button'
 import useTariSigner from '@/store/signer'
 import { useTranslation } from 'react-i18next'
 import { useBridgeStore } from '@/store/bridge'
-import { removeOngoingTransaction, useTariAccountStore } from '@/store/account'
+import { clearOotleWrapToResume, removeOngoingTransaction, useTariAccountStore } from '@/store/account'
+import { useBridgeRoute } from '@/hooks/use-bridge-route'
+import { getTransactionLabels } from '@/utils/bridge-route'
 
-export const FailedModal = ({ closeModalAction, paymentId: paymentIdProp }: FailedModalProps) => {
+export const FailedModal = ({ closeModalAction, paymentId: paymentIdProp, asset, ootleChainId }: FailedModalProps) => {
   const signer = useTariSigner((s) => s.signer)
-  const fromNetwork = useBridgeStore((s) => s.fromNetwork)
+  const bridgeError = useBridgeStore((s) => s.bridgeError)
+  const unconfirmedPaymentId = useBridgeStore((s) => s.unconfirmedPaymentId)
+  const { route } = useBridgeRoute()
+  const { isWrapping } = route
+  const labels = getTransactionLabels(asset, ootleChainId, route.asset)
   const ongoingBridgeTx = useTariAccountStore((s) => s.ongoingBridgeTx)
   const { t } = useTranslation('main', { useSuspense: false })
 
   const handleOnClick = useCallback(async () => {
     closeModalAction()
     removeOngoingTransaction()
-    await signer?.removeOngoingBridgeTx()
-  }, [closeModalAction, signer])
+    // With a bridgeError, TU may hold a deposit that is not confirmed yet (Ootle or wXTM); keep it.
+    if (!bridgeError) await signer?.removeOngoingBridgeTx()
+  }, [bridgeError, closeModalAction, signer])
+
+  // Stop waiting for an unconfirmed deposit; the backend still credits it by its paymentId/payRef.
+  const handleDismissUnconfirmed = useCallback(async () => {
+    closeModalAction()
+    removeOngoingTransaction()
+    clearOotleWrapToResume()
+    try {
+      const stored = await signer?.getOngoingBridgeTx()
+      if (stored?.paymentId === unconfirmedPaymentId) await signer?.removeOngoingBridgeTx()
+    } catch (error) {
+      console.error('[ TAPPLET-BRIDGE ] Could not dismiss the unconfirmed deposit: ', error)
+    }
+  }, [closeModalAction, signer, unconfirmedPaymentId])
 
   return (
     <div className="w-full flex flex-col p-6">
@@ -30,13 +50,16 @@ export const FailedModal = ({ closeModalAction, paymentId: paymentIdProp }: Fail
           </div>
           <div className="font-semibold text-lg mt-2">{t('something_went_wrong')}</div>
           <div className="font-normal text-xs mt-2 text-center px-3">
-            {fromNetwork.name === 'Tari' ? t('wrap_failed_message') : t('unwrap_failed_message')}
+            {bridgeError ||
+              (isWrapping
+                ? t('wrap_failed_message', { tariToken: labels.tariToken })
+                : t('unwrap_failed_message', { evmToken: labels.evmToken, chain: labels.chainName }))}
           </div>
         </div>
 
         {/* Section 1 */}
         <div className="flex flex-col my-4">
-          {fromNetwork.name === 'Tari' ? (
+          {isWrapping && (paymentIdProp || ongoingBridgeTx?.paymentId) ? (
             <div className="font-medium">
               <div className="text-xs text-gray-500">{t('transaction_id')}</div>
               <div className="text-sm">{paymentIdProp || ongoingBridgeTx?.paymentId}</div>
@@ -47,6 +70,11 @@ export const FailedModal = ({ closeModalAction, paymentId: paymentIdProp }: Fail
 
           <div className="py-[0.5px] w-full bg-gray-300 my-2"></div>
           <ModalButton label={t('close')} onClick={handleOnClick} disabled={false} />
+          {unconfirmedPaymentId !== '' && (
+            <div className="mt-2">
+              <ModalButton label={t('ootle_wrap_dismiss')} onClick={handleDismissUnconfirmed} disabled={false} />
+            </div>
+          )}
         </div>
       </div>
     </div>

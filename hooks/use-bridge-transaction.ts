@@ -1,6 +1,10 @@
 import { useMutation } from '@tanstack/react-query'
 
 import {
+  OotleTokensUnwrappedService,
+  OotleUserUnwrapTransactionDTO,
+  OotleUserWrapTransactionDTO,
+  OotleWrapTokenService,
   TokensUnwrappedService,
   UserTransactionDTO,
   UserUnwrappedTransactionDTO,
@@ -8,6 +12,7 @@ import {
 } from '@tari-project/wxtm-bridge-backend-api'
 
 import { OngoingUserTransaction } from '@/types/tapplet'
+import { isSameTransaction } from '@/utils/ootle-wrap-reference'
 import { BackendBridgeTransaction, BackendUnwrapTransaction, CombinedBridgeTransaction } from '@/types/transactions'
 import {
   getBackendBridgeTxsFromTU,
@@ -19,10 +24,75 @@ import {
   useTariAccountStore,
 } from '@/store/account'
 
+const OOTLE_PAGE_LIMIT = 100
+// Stops a misbehaving backend from keeping this loop going.
+const OOTLE_MAX_PAGES = 50
+
+export async function fetchAllPages<T>(
+  fetchPage: (limit: number, offset: number) => Promise<{ transactions: T[]; total: number }>,
+): Promise<T[]> {
+  const all: T[] = []
+  for (let i = 0; i < OOTLE_MAX_PAGES; i++) {
+    const page = await fetchPage(OOTLE_PAGE_LIMIT, all.length)
+    all.push(...page.transactions)
+    const total = Number(page.total)
+    if (page.transactions.length === 0 || !Number.isFinite(total) || all.length >= total) break
+  }
+  return all
+}
+
+// Ootle wrap listings carry a display reference instead of the paymentId; it stands in as the key.
+function fromOotleWrap(tx: OotleUserWrapTransactionDTO): BackendBridgeTransaction {
+  return {
+    paymentId: tx.reference,
+    tokenAmount: tx.tokenAmount,
+    amountAfterFee: tx.amountAfterFee,
+    feeAmount: tx.feeAmount,
+    createdAt: tx.createdAt,
+    transactionHash: tx.transactionHash,
+    destinationAddress: tx.destinationAddress,
+    // Same status strings as the wXTM listing.
+    status: tx.status as string as UserTransactionDTO.status,
+    ootleChainId: tx.toChainId,
+  }
+}
+
+function fromOotleUnwrap(tx: OotleUserUnwrapTransactionDTO): BackendUnwrapTransaction {
+  return {
+    paymentId: tx.paymentId,
+    amount: tx.amount,
+    amountAfterFee: tx.amountAfterFee,
+    feeAmount: tx.feeAmount,
+    createdAt: tx.createdAt,
+    transactionHash: tx.transactionHash,
+    blockTimestamp: tx.blockTimestamp,
+    destinationAddress: tx.destinationAddress,
+    status: tx.status as string as UserUnwrappedTransactionDTO.status,
+    ootleChainId: tx.chainId,
+  }
+}
+
+async function getOotleTransactions(
+  ootleAddress: string | undefined,
+): Promise<{ wraps: BackendBridgeTransaction[]; unwraps: BackendUnwrapTransaction[] }> {
+  if (!ootleAddress) return { wraps: [], unwraps: [] }
+  try {
+    const wraps = await fetchAllPages((limit, offset) =>
+      OotleWrapTokenService.getOotleUserWrapTransactions(ootleAddress, limit, offset),
+    )
+    const unwraps = await fetchAllPages((limit, offset) =>
+      OotleTokensUnwrappedService.getOotleUserUnwrapTransactions(ootleAddress, limit, offset),
+    )
+    return { wraps: wraps.map(fromOotleWrap), unwraps: unwraps.map(fromOotleUnwrap) }
+  } catch (error) {
+    console.error('[ TAPPLET-BRIDGE ] failed to get Ootle transactions:', error)
+    return { wraps: [], unwraps: [] }
+  }
+}
+
 export const useBridgeTransaction = () => {
-  const ongoingBridgeTx = useTariAccountStore((s) => s.ongoingBridgeTx)
-  const lastOngoingPaymentIdFromTU = useTariAccountStore((s) => s.lastOngoingPaymentIdFromTU)
   const tariAccount = useTariAccountStore((s) => s.tariAccount)
+  const ootleAccount = useTariAccountStore((s) => s.ootleAccount)
   const getUserWrapTxs = useMutation({
     mutationFn: WrapTokenService.getUserTransactions,
   })
@@ -55,9 +125,10 @@ export const useBridgeTransaction = () => {
     } else {
       const wrapResult = await getUserWrapTxs.mutateAsync(walletAddress)
       const unwrapResult = await getUserUnwrapTxs.mutateAsync(walletAddress)
+      const ootle = await getOotleTransactions(ootleAccount?.address)
 
-      wrapTransactions = wrapResult.transactions
-      unwrapTransactions = unwrapResult.transactions
+      wrapTransactions = [...wrapResult.transactions, ...ootle.wraps]
+      unwrapTransactions = [...unwrapResult.transactions, ...ootle.unwraps]
 
       setBackendBridgeTxs(wrapTransactions)
       setBackendUnwrapTxs(unwrapTransactions)
@@ -91,7 +162,25 @@ export const useBridgeTransaction = () => {
           )
         }
       })
+      // Read at call time: callers run this right after changing the ongoing tx.
+      const { ongoingBridgeTx, lastOngoingPaymentIdFromTU } = useTariAccountStore.getState()
+
       if (ongoing) {
+        // An Ootle wrap row is keyed by its reference; keep the local record (real paymentId, failed state).
+        if (
+          ongoing.type === 'wrap' &&
+          ongoing.ootleChainId !== undefined &&
+          ongoingBridgeTx?.type === 'wrap' &&
+          isSameTransaction(ongoing, ongoingBridgeTx.paymentId)
+        ) {
+          if (
+            ongoingBridgeTx.status !== UserTransactionDTO.status.TIMEOUT &&
+            ongoingBridgeTx.status !== ongoing.status
+          ) {
+            setLastOngoingBridgeTx({ ...ongoingBridgeTx, status: ongoing.status } as OngoingUserTransaction)
+          }
+          return useTariAccountStore.getState().ongoingBridgeTx ?? null
+        }
         if (
           (ongoing.paymentId !== ongoingBridgeTx?.paymentId || ongoing.status !== ongoingBridgeTx?.status) &&
           (!ongoingBridgeTx || new Date(ongoing.createdAt).getTime() > new Date(ongoingBridgeTx?.createdAt).getTime())
@@ -104,10 +193,9 @@ export const useBridgeTransaction = () => {
 
       // If no pending tx found, but previously had one, check if it succeeded/failed
       // check also with the paymentId from the TU to display modal after the bridge relaunch
-      const validPaymentIds = new Set([ongoingBridgeTx?.paymentId, lastOngoingPaymentIdFromTU])
       const ongoingCompleted = combinedTransactions.find((tx) => {
-        const paymentId = tx.paymentId
-        const hasValidPaymentId = validPaymentIds.has(paymentId)
+        const hasValidPaymentId =
+          isSameTransaction(tx, ongoingBridgeTx?.paymentId) || isSameTransaction(tx, lastOngoingPaymentIdFromTU)
 
         if (tx.type === 'wrap') {
           return (

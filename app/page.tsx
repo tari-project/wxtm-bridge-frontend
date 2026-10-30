@@ -13,12 +13,15 @@ import { useBridgeFees } from '@/hooks/use-bridge-fees'
 import { useBridgeToEthereum } from '@/hooks/use-bridge-to-ethereum'
 
 import { useBridgeTransaction } from '@/hooks/use-bridge-transaction'
-import { setDetailedTx, setLastOngoingBridgeTx, useTariAccountStore } from '@/store/account'
+import { clearOotleWrapToResume, setDetailedTx, setLastOngoingBridgeTx, useTariAccountStore } from '@/store/account'
 import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
 import { FooterText } from '@/components/main/footer-text'
-import { setUnwrapFailed, useBridgeStore } from '@/store/bridge'
+import { setBridgeError, setUnwrapFailed, useBridgeStore } from '@/store/bridge'
 import { useFetchDailyLimit } from '@/hooks/use-fetch-daily-limit'
 import { setIsModalOpen, setModalStep, useModalStore } from '@/store/modal'
+import { useBridgeRoute } from '@/hooks/use-bridge-route'
+import { useBridgeOotleToEvm } from '@/hooks/use-bridge-ootle-to-evm'
+import { errorSummary } from '@/utils/error-summary'
 
 const REFETCH_LIMIT_INTERVAL = 30 * 1000 // 30 sec
 
@@ -27,14 +30,20 @@ export default function Home() {
   const isModalOpen = useModalStore((s) => s.isModalOpen)
   const detailedTx = useTariAccountStore((s) => s.detailedTx)
   const tariAccount = useTariAccountStore((s) => s.tariAccount)
+  const ootleAccount = useTariAccountStore((s) => s.ootleAccount)
+  const ootleWrapToResume = useTariAccountStore((s) => s.ootleWrapToResume)
   const ongoingBridgeTx = useTariAccountStore((s) => s.ongoingBridgeTx)
   const tariColdWalletAddress = useBridgeStore((s) => s.tariColdWalletAddress)
   const wrapTokenFeePercentageBps = useBridgeStore((s) => s.wrapTokenFeePercentageBps)
-  const fromNetwork = useBridgeStore((s) => s.fromNetwork)
   const isUnwrappingFailed = useBridgeStore((s) => s.unwrapFailed)
   const unwrapSuccess = useBridgeStore((s) => s.unwrapSuccess)
+  const bridgeError = useBridgeStore((s) => s.bridgeError)
+  const { route } = useBridgeRoute()
+  const { asset, isWrapping } = route
+  const tariSideAddress = asset.tariNetwork === 'Ootle' ? ootleAccount?.address : tariAccount?.address
 
-  const fetchDailyLimit = useFetchDailyLimit()
+  const fetchDailyLimit = useFetchDailyLimit(asset)
+  const { finishOotleWrap } = useBridgeOotleToEvm()
   const { isConnected, address: ethAddress } = useConnection()
   const { getUserBackendBridgeTxs } = useBridgeTransaction()
   const { getBridgeTxParams } = useBridgeToEthereum()
@@ -51,11 +60,13 @@ export default function Home() {
   // Prevent main modal from showing when transaction details modal is active
   const showModalDetailedTx = !!detailedTx
   const showModalOngoingTx = ongoingBridgeTx && ongoingBridgeTx.showModal
-  const isFailed = ongoingBridgeTx?.status === UserTransactionDTO.status.TIMEOUT || isUnwrappingFailed
+  const isFailed =
+    ongoingBridgeTx?.status === UserTransactionDTO.status.TIMEOUT || isUnwrappingFailed || bridgeError !== ''
   const isWrapSuccess = ongoingBridgeTx?.status === UserTransactionDTO.status.SUCCESS
 
-  const decimals = fromNetwork.name === 'Tari' ? 6 : 18
-  const feesData = useBridgeFees(amount, decimals)
+  const decimals = isWrapping ? asset.tariDecimals : asset.evmDecimals
+  const feeBps = isWrapping ? asset.wrapFeeBps : asset.unwrapFeeBps
+  const feesData = useBridgeFees(amount, decimals, feeBps, asset.highThreshold)
 
   const fetchUserTransactions = useCallback(async () => {
     if (tariAccount) {
@@ -68,6 +79,7 @@ export default function Home() {
   }, [getUserBackendBridgeTxs, tariAccount])
 
   const onNetworkChange = useEffectEvent(() => setRemainingDailyLimit(undefined))
+  const onOotleAccountReady = useEffectEvent(() => fetchUserTransactions())
   const onFetchedParams = useEffectEvent((hasFetched: boolean) => setHasFetchedParams(hasFetched))
 
   useEffect(() => {
@@ -112,13 +124,28 @@ export default function Home() {
   }, [isConnected, isModalOpen, modalStep, ongoingBridgeTx, showModalDetailedTx, showModalOngoingTx, unwrapSuccess])
 
   useEffect(() => {
-    if (fromNetwork.name === 'Tari') {
+    if (isWrapping) {
       onNetworkChange()
       return
     }
-    const interval = setInterval(fetchDailyLimit, REFETCH_LIMIT_INTERVAL)
+    const interval = setInterval(async () => setRemainingDailyLimit(await fetchDailyLimit()), REFETCH_LIMIT_INTERVAL)
     return () => clearInterval(interval)
-  }, [fetchDailyLimit, fromNetwork.name])
+  }, [fetchDailyLimit, isWrapping])
+
+  // The Ootle account loads after the first fetch; fetch again to include its transactions.
+  const ootleAddress = ootleAccount?.address
+  useEffect(() => {
+    if (ootleAddress) onOotleAccountReady()
+  }, [ootleAddress])
+
+  // Finish an Ootle wrap whose deposit was sent before the last reload.
+  useEffect(() => {
+    if (!ootleWrapToResume || !ootleAccount) return
+    clearOotleWrapToResume()
+    finishOotleWrap(ootleWrapToResume).catch((error) =>
+      console.error('[ TAPPLET-BRIDGE ] Failed to resume the Ootle wrap:', errorSummary(error)),
+    )
+  }, [finishOotleWrap, ootleAccount, ootleWrapToResume])
 
   const handleSetOngoingModalOpen = (open: boolean) => {
     setIsModalOpen(open)
@@ -127,6 +154,7 @@ export default function Home() {
   const handleCloseModal = () => {
     resetField('amount', { defaultValue: '' })
     setUnwrapFailed(false)
+    setBridgeError('')
     handleSetOngoingModalOpen(false)
     setModalStep(1)
   }
@@ -143,7 +171,7 @@ export default function Home() {
             step={modalStep}
             amount={amount}
             ethereumAddress={ethAddress}
-            tariWalletAddress={tariAccount?.address}
+            tariWalletAddress={tariSideAddress}
             feesData={feesData}
             closeModalAction={handleCloseModal}
             type={ongoingBridgeTx?.type || 'wrap'}
