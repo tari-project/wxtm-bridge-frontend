@@ -19,7 +19,7 @@ export const useBridgeToTari = (ethAddress: `0x${string}`, chain: DeployedChains
     functionName: 'eip712Domain',
     args: [],
   })
-  const { mutateAsync: writeContract, isPending, isSuccess, isError, error } = useWriteContract()
+  const { mutateAsync: writeContract, isPending, isSuccess, isError, error, reset } = useWriteContract()
   const { data: signer } = useWalletClient({
     account: ethAddress,
     chainId: chain,
@@ -80,6 +80,7 @@ export const useBridgeToTari = (ethAddress: `0x${string}`, chain: DeployedChains
   }
 
   const bridgeToTari = async (amount: string, ethAddress: `0x${string}`, tariAddress: string) => {
+    reset()
     try {
       const limitMicro = await TokensUnwrappedService.getRemainingDailyLimit()
       const limitXtm = microXtmToXtm(limitMicro)

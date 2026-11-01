@@ -16,7 +16,7 @@ import { useBridgeTransaction } from '@/hooks/use-bridge-transaction'
 import { setDetailedTx, setLastOngoingBridgeTx, useTariAccountStore } from '@/store/account'
 import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
 import { FooterText } from '@/components/main/footer-text'
-import { setUnwrapFailed, useBridgeStore } from '@/store/bridge'
+import { setUnwrapFailed, setUnwrapSuccess, useBridgeStore } from '@/store/bridge'
 import { useFetchDailyLimit } from '@/hooks/use-fetch-daily-limit'
 import { setIsModalOpen, setModalStep, useModalStore } from '@/store/modal'
 
@@ -125,8 +125,11 @@ export default function Home() {
     if (ongoingBridgeTx) setLastOngoingBridgeTx({ ...ongoingBridgeTx, showModal: false })
   }
   const handleCloseModal = () => {
-    resetField('amount', { defaultValue: '' })
+    if (!isFailed && modalStep !== 1) {
+      resetField('amount', { defaultValue: '' })
+    }
     setUnwrapFailed(false)
+    setUnwrapSuccess(false)
     handleSetOngoingModalOpen(false)
     setModalStep(1)
   }
