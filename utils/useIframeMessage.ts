@@ -42,6 +42,8 @@ export type IframeMessage = SignerCallMessage | ResizeMessage | SetLanguageMessa
 // Hook to listen for messages from the parent window
 export function useIframeMessage() {
   const handleMessage = useCallback((event: MessageEvent<IframeMessage>) => {
+    if (!event?.data || typeof event.data !== 'object') return
+
     switch (event.data.type) {
       case MessageType.SET_THEME:
         const theme = event?.data?.payload?.theme

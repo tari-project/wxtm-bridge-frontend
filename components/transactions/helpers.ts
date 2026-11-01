@@ -70,7 +70,11 @@ function isBridgeTransaction(
 function isTransactionInfo(
   transaction: TransactionInfo | CombinedBridgeTransaction,
 ): transaction is TransactionInfo {
-  return 'tx_id' in transaction && typeof transaction.tx_id === 'string'
+  return (
+    'tx_id' in transaction &&
+    (typeof transaction.tx_id === 'number' ||
+      typeof transaction.tx_id === 'string')
+  )
 }
 
 const getStatusInfo = (

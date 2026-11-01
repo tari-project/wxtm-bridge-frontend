@@ -2,11 +2,12 @@ import { config } from '@/config'
 import { utils } from 'ethers'
 
 export function parseWxtmTokenAmount(amount: string): string {
-  if (amount.split('.')[1] && amount.split('.')[1][0].length > 6) {
+  const sanitizedAmount = amount.replace(/,/g, '')
+  const [, decimals] = sanitizedAmount.split('.')
+
+  if (decimals && decimals.length > 6) {
     throw new Error('Invalid amount: more than 6 decimal places')
   }
-
-  const sanitizedAmount = amount.replace(/,/g, '')
 
   const parsed = utils.parseUnits(sanitizedAmount, 6)
   return parsed.toString()
@@ -37,5 +38,7 @@ export function parseToMaxAllowed(
 }
 
 export const microXtmToXtm = (microXtm: string | bigint): number => {
-  return Number(BigInt(microXtm) / BigInt(config.MICRO_XTM_PER_XTM))
+  const value = BigInt(microXtm)
+  const base = BigInt(config.MICRO_XTM_PER_XTM)
+  return Number(value / base) + Number(value % base) / config.MICRO_XTM_PER_XTM
 }

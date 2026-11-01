@@ -7,7 +7,7 @@ import useTariSigner from '@/store/signer'
 import { parseWxtmTokenAmount } from '@/utils/parse-wxtm-token-amount'
 import { stringifyProperties } from '@/utils/stringifyProperties'
 import { useBridgeTransaction } from './use-bridge-transaction'
-import { setLastOngoingBridgeTx, useTariAccountStore } from '@/store/account'
+import { removeOngoingTransaction, setLastOngoingBridgeTx, useTariAccountStore } from '@/store/account'
 
 export const useBridgeToEthereum = () => {
   const createTransaction = useMutation({
@@ -67,6 +67,13 @@ export const useBridgeToEthereum = () => {
       paymentId: paymentId,
     })
 
+    if (!isSend) {
+      console.error('[ TAPPLET-BRIDGE ] send one sided failed')
+      removeOngoingTransaction()
+      await getUserBackendBridgeTxs()
+      return
+    }
+
     // add this line to store ongoing tx also in the TU to check on tapplet reload
     // if any previous tx was finished with success/fail status to display it to a user
     await signer?.setOngoingBridgeTx({
@@ -78,10 +85,6 @@ export const useBridgeToEthereum = () => {
 
     // get user txs to update history immediately after the tx starts
     await getUserBackendBridgeTxs()
-
-    if (!isSend) {
-      console.error('[ TAPPLET-BRIDGE ] send one sided failed')
-    }
 
     const baseNodeStatusAfter = await signer?.getBaseNodeStatus()
     const { success } = await confirmTokenSent.mutateAsync({
