@@ -57,7 +57,10 @@ export default function Home() {
   const { control, resetField } = methods
   const amount = useWatch({ control, name: 'amount' })
 
-  const [hasFetchedParams, setHasFetchedParams] = useState(false)
+  // Derived, not mirrored into state: true once the store actually carries
+  // the bridge params (cold wallet address or fee), however they got there.
+  const hasFetchedParams = Boolean(tariColdWalletAddress?.length || wrapTokenFeePercentageBps)
+  const [hasCompletedInitialFetch, setHasCompletedInitialFetch] = useState(false)
   const [remainingDailyLimit, setRemainingDailyLimit] = useState<number | undefined>(undefined)
 
   // Prevent main modal from showing when transaction details modal is active
@@ -83,14 +86,14 @@ export default function Home() {
 
   const onNetworkChange = useEffectEvent(() => setRemainingDailyLimit(undefined))
   const onOotleAccountReady = useEffectEvent(() => fetchUserTransactions())
-  const onFetchedParams = useEffectEvent((hasFetched: boolean) => setHasFetchedParams(hasFetched))
+  const onInitialFetchDone = useEffectEvent(() => setHasCompletedInitialFetch(true))
 
   useEffect(() => {
-    if (!tariAccount || hasFetchedParams) return
+    if (!tariAccount || hasFetchedParams || hasCompletedInitialFetch) return
     const fetchBridgeTxParams = async () => {
       try {
         await getBridgeTxParams()
-        setHasFetchedParams(true)
+        onInitialFetchDone()
       } catch (error) {
         console.error('[ TAPPLET-BRIDGE ] Failed to get bridge transaction params:', error)
       }
@@ -99,12 +102,7 @@ export default function Home() {
     fetchBridgeTxParams().then(
       async () => await fetchUserTransactions(), //initial
     )
-  }, [fetchUserTransactions, getBridgeTxParams, hasFetchedParams, tariAccount])
-
-  useEffect(() => {
-    const hasFetched = Boolean(!!tariColdWalletAddress?.length || !!wrapTokenFeePercentageBps)
-    onFetchedParams(hasFetched)
-  }, [tariColdWalletAddress?.length, wrapTokenFeePercentageBps])
+  }, [fetchUserTransactions, getBridgeTxParams, hasCompletedInitialFetch, hasFetchedParams, tariAccount])
 
   useEffect(() => {
     // Poll every 5 min
@@ -130,12 +128,18 @@ export default function Home() {
     }
   }, [isConnected, isModalOpen, modalStep, ongoingBridgeTx, showModalDetailedTx, showModalOngoingTx, unwrapSuccess])
 
+  const refreshDailyLimit = useEffectEvent(async () => setRemainingDailyLimit(await fetchDailyLimit()))
+
   useEffect(() => {
     if (isWrapping) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-shot reset when entering wrap mode; the lint rule cannot see through useEffectEvent, and the value must clear before the wrap form reads it
       onNetworkChange()
       return
     }
-    const interval = setInterval(async () => setRemainingDailyLimit(await fetchDailyLimit()), REFETCH_LIMIT_INTERVAL)
+    // Fetch immediately, then poll; without the first call the limit stayed
+    // empty for a full interval (30s) after mount or a route change.
+    refreshDailyLimit()
+    const interval = setInterval(() => refreshDailyLimit(), REFETCH_LIMIT_INTERVAL)
     return () => clearInterval(interval)
   }, [fetchDailyLimit, isWrapping])
 
