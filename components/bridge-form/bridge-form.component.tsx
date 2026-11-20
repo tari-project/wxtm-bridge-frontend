@@ -22,6 +22,7 @@ import { useTariAccountStore } from '@/store/account'
 import useTariSigner from '@/store/signer'
 import { useBridgeOotleToEvm } from '@/hooks/use-bridge-ootle-to-evm'
 import { errorSummary } from '@/utils/error-summary'
+import { computeInputAvailableBalance } from './helpers'
 
 export const BridgeForm = ({ remainingDailyLimit }: MainComponentProps) => {
   const { t } = useTranslation('main', { useSuspense: false })
@@ -154,7 +155,7 @@ export const BridgeForm = ({ remainingDailyLimit }: MainComponentProps) => {
   }
 
   const inputAvailableBalance = () =>
-    isWrapping ? availableBalance / 1000000 : (Number(balanceRes) ?? 0) / Math.pow(10, 18)
+    computeInputAvailableBalance(isWrapping, availableBalance, balanceRes)
 
   return (
     <div className="bg-white/50 backdrop-blur-sm shadow-xl rounded-2xl p-4 mx-auto min-h-[130px] fixed-box mb-5">
