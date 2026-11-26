@@ -48,8 +48,8 @@ export const Providers = ({ children }: { children: ReactNode }) => {
 
     const initializeSignerAndAccount = async () => {
       if (!signer && !cancelled) {
-        // Whoever frames the tapplet answers its signer calls, so only run under Universe. Without
-        // ancestorOrigins the parent can't be checked here; isFromUniverse still checks every message.
+        // Whoever frames the tapplet answers its signer calls, so only run under Universe. A parent
+        // that can't be verified (no ancestorOrigins) is refused too.
         // The dev server runs the tapplet standalone, so the check is skipped there.
         if (process.env.NODE_ENV !== 'development') {
           const host = checkTappletHost(
@@ -57,7 +57,7 @@ export const Providers = ({ children }: { children: ReactNode }) => {
             window.location.ancestorOrigins,
             appConfig.UNIVERSE_ORIGINS,
           )
-          if (host === 'untrusted') {
+          if (host !== 'trusted') {
             console.error('[ TAPPLET-BRIDGE ] Not framed by Tari Universe; the signer is disabled')
             setOutsideUniverse(true)
             initializedSignerRef.current = true
