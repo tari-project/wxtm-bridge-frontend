@@ -103,6 +103,8 @@ export default function Home() {
 
   useEffect(() => {
     const hasFetched = Boolean(!!tariColdWalletAddress?.length || !!wrapTokenFeePercentageBps)
+    // shortcut: eslint-plugin-react-hooks 7.1 flags setState via useEffectEvent; derive this state when page.tsx is refactored
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     onFetchedParams(hasFetched)
   }, [tariColdWalletAddress?.length, wrapTokenFeePercentageBps])
 
@@ -132,6 +134,8 @@ export default function Home() {
 
   useEffect(() => {
     if (isWrapping) {
+      // shortcut: same react-hooks 7.1 rule as above; reset during render when page.tsx is refactored
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       onNetworkChange()
       return
     }
