@@ -31,7 +31,8 @@ const initialState: State = {
   bridgeAPI: '',
   theme: 'light',
   hideWalletBalance: false,
-  isMainNet: true,
+  // Stays false unless Universe confirms mainnet.
+  isMainNet: false,
   network: '',
   ethereumNodes: [],
 }
@@ -80,7 +81,9 @@ export const setAppConfig = async () => {
       return
     }
 
-    const network = await signer.getNetwork()
+    // The dev server has no Universe to ask.
+    const network =
+      process.env.NODE_ENV === 'development' ? (process.env.NEXT_PUBLIC_TARI_NETWORK ?? '') : await signer.getNetwork()
     const isMainNet = network === 'mainnet'
 
     const envs =
