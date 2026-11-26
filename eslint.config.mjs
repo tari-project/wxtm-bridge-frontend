@@ -30,11 +30,15 @@ const eslintConfig = [
       'no-restricted-syntax': [
         'error',
         {
-          selector: "CallExpression[callee.property.name='postMessage'] > Literal[value='*']",
-          message: "Use postToUniverse: a '*' target origin lets any frame read the message.",
+          selector: "CallExpression[callee.property.name='postMessage']",
+          message: 'Use postToUniverse, which never posts to a wildcard origin.',
         },
       ],
     },
+  },
+  {
+    files: ['utils/universe.ts'],
+    rules: { 'no-restricted-syntax': 'off' },
   },
   {
     ignores: ['node_modules/**', '.next/**', 'out/**', 'build/**', 'next-env.d.ts'],

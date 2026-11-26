@@ -276,6 +276,8 @@ export function sendSignerCall(
   args: unknown[],
   timeoutMs = SIGNER_CALL_TIMEOUT_MS,
 ): Promise<unknown> {
+  // Only the standalone dev server gets here; there is no Universe to answer, so don't wait for a timeout.
+  if (window.parent === window) return Promise.reject(new Error(`No Tari Universe parent for signer call ${methodName}`))
   if (!listening) {
     window.addEventListener('message', onSignerReply)
     listening = true

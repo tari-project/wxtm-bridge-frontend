@@ -111,6 +111,15 @@ describe('sendSignerCall', () => {
     expect(call.status).toBe('pending')
   })
 
+  it('rejects at once without posting when there is no parent frame', async () => {
+    ;(window as unknown as { parent: unknown }).parent = window
+    const call = track(signerModule.sendSignerCall('getNetwork', []))
+    await flush()
+    expect(call.status).toBe('rejected')
+    expect(call.value).not.toBeInstanceOf(signerModule.SignerTimeoutError)
+    expect(parent.postMessage).not.toHaveBeenCalled()
+  })
+
   it('rejects after its timeout and ignores a later reply', async () => {
     const call = track(signerModule.sendSignerCall('getOotleAccount', [], 1000))
     const id = lastCallId()
