@@ -95,7 +95,7 @@ export const BridgeInput = ({ route, availableBalance, remainingDailyLimit }: Br
           if (amount > maxAmount) {
             return `Max amount is ${maxAmount} ${fromToken}`
           }
-          if (amount > availableBalance) {
+          if (!Number.isFinite(availableBalance) || amount > availableBalance) {
             return `Not enough ${fromToken}`
           }
           if (remainingDailyLimit !== undefined && amount > remainingDailyLimit) {
