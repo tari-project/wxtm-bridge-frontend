@@ -113,9 +113,8 @@ export const useBridgeToEthereum = () => {
 
     // the amount is parsed in TU in the `send_one_sided_to_stealth_address` function
     // so here it is necessary to pass the value entered by the user as is
-    let isSend
     try {
-      isSend = await signer?.sendOneSided({
+      await signer.sendOneSided({
         amount: amount,
         address: tariColdWalletAddress,
         paymentId: paymentId,
@@ -132,10 +131,6 @@ export const useBridgeToEthereum = () => {
 
     // get user txs to update history immediately after the tx starts
     await getUserBackendBridgeTxs()
-
-    if (!isSend) {
-      console.error('[ TAPPLET-BRIDGE ] send one sided failed')
-    }
 
     const baseNodeStatusAfter = await signer?.getBaseNodeStatus()
     const { success } = await confirmTokenSent.mutateAsync({

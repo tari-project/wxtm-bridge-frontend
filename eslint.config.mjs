@@ -27,6 +27,13 @@ const eslintConfig = [
       // DISABLED UNTIL APP IS REFACTORED TO USE TRANSLATIONS STRINGS
       // 'i18next/no-literal-string': ['error', { markupOnly: true }],
       'i18next/no-literal-string': 'off',
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "CallExpression[callee.property.name='postMessage'] > Literal[value='*']",
+          message: "Use postToUniverse: a '*' target origin lets any frame read the message.",
+        },
+      ],
     },
   },
   {

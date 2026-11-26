@@ -1,5 +1,7 @@
 import { useCallback, useEffect } from 'react'
 import { setLanguage, setTheme } from '@/store/app'
+import { resolveI18nLanguage } from '@/app/i18initializer'
+import { isFromUniverse } from '@/utils/universe'
 
 export enum MessageType {
   SIGNER_CALL = 'signer-call',
@@ -42,14 +44,15 @@ export type IframeMessage = SignerCallMessage | ResizeMessage | SetLanguageMessa
 // Hook to listen for messages from the parent window
 export function useIframeMessage() {
   const handleMessage = useCallback((event: MessageEvent<IframeMessage>) => {
+    if (!isFromUniverse(event, [MessageType.SET_THEME, MessageType.SET_LANGUAGE])) return
     switch (event.data.type) {
       case MessageType.SET_THEME:
         const theme = event?.data?.payload?.theme
         setTheme(theme)
         break
       case MessageType.SET_LANGUAGE:
-        const language = event?.data?.payload?.language
-        void setLanguage(language)
+        const language = resolveI18nLanguage(event.data.payload?.language)
+        if (language) void setLanguage(language)
         break
     }
   }, [])

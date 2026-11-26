@@ -21,6 +21,7 @@ export const Providers = ({ children }: { children: ReactNode }) => {
   const [initialState, setInitialState] = useState<State | undefined>(undefined)
   const initializedRef = useRef(false)
   const initializedSignerRef = useRef(false)
+  const [outsideUniverse, setOutsideUniverse] = useState(false)
 
   const onInitialized = useEffectEvent((cfg: Config, state?: State) => {
     setConfig(cfg)
@@ -47,7 +48,8 @@ export const Providers = ({ children }: { children: ReactNode }) => {
 
     const initializeSignerAndAccount = async () => {
       if (!signer && !cancelled) {
-        // Whoever frames the tapplet answers its signer calls, so only accept Universe.
+        // Whoever frames the tapplet answers its signer calls, so only run under Universe. Without
+        // ancestorOrigins the parent can't be checked here; isFromUniverse still checks every message.
         // The dev server runs the tapplet standalone, so the check is skipped there.
         if (process.env.NODE_ENV !== 'development') {
           const host = checkTappletHost(
@@ -55,11 +57,9 @@ export const Providers = ({ children }: { children: ReactNode }) => {
             window.location.ancestorOrigins,
             appConfig.UNIVERSE_ORIGINS,
           )
-          // A host we can't verify (no ancestorOrigins) is treated as untrusted too.
-          if (host !== 'trusted') {
-            console.error(
-              `[ TAPPLET-BRIDGE ] Not framed by a verified Tari Universe origin (${host}); the signer is disabled`,
-            )
+          if (host === 'untrusted') {
+            console.error('[ TAPPLET-BRIDGE ] Not framed by Tari Universe; the signer is disabled')
+            setOutsideUniverse(true)
             initializedSignerRef.current = true
             return
           }
@@ -88,6 +88,10 @@ export const Providers = ({ children }: { children: ReactNode }) => {
   }, [signer])
 
   useIframeMessage()
+
+  if (outsideUniverse) {
+    return <p className="p-6 text-center">Open the bridge in Tari Universe.</p>
+  }
 
   if (!config) {
     return <div className="h-5 w-5 animate-spin rounded-full border-b-[3px] border-white" />

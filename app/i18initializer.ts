@@ -19,7 +19,7 @@ export enum Language {
 }
 
 // System can have various regional variations for language codes, so we resolve them
-export const resolveI18nLanguage = (languageCode: string): Language => {
+export const resolveI18nLanguage = (languageCode: string): Language | undefined => {
   switch (languageCode) {
     case 'en':
     case 'en-AU':
@@ -84,7 +84,7 @@ export const resolveI18nLanguage = (languageCode: string): Language => {
     case 'de-LU':
       return Language.DE
     default:
-      return Language.EN
+      return undefined
   }
 }
 
@@ -104,7 +104,7 @@ export const LanguageList: Record<Language, string> = {
   [Language.DE]: 'Deutsch', // German
 }
 
-const appLanguage = resolveI18nLanguage(useAppStore.getState().language) // parse to Language enum
+const appLanguage = resolveI18nLanguage(useAppStore.getState().language) ?? Language.EN // parse to Language enum
 
 // Initialize i18n with new supported languages
 i18n

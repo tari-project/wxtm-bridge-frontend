@@ -81,7 +81,7 @@ export const setAppConfig = async () => {
     }
 
     const network = await signer.getNetwork()
-    const isMainNet = network?.toLowerCase() === 'mainnet'
+    const isMainNet = network === 'mainnet'
 
     const envs =
       process.env.NODE_ENV === 'development'
@@ -97,7 +97,7 @@ export const setAppConfig = async () => {
     // Fetch nodes before exposing walletConnectProjectId: setting it triggers the
     // wagmi config build in Providers, which reads ethereumNodes from this store.
     const ethereumNodes = await fetchEthereumNodes()
-    useAppStore.setState({ walletConnectProjectId, bridgeAPI, isMainNet, network: network ?? '', ethereumNodes })
+    useAppStore.setState({ walletConnectProjectId, bridgeAPI, isMainNet, network, ethereumNodes })
 
     const appLanguage = await signer.getAppLanguage()
     if (appLanguage) await setLanguage(appLanguage)

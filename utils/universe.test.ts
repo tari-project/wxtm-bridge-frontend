@@ -31,7 +31,7 @@ describe('UNIVERSE_ORIGINS', () => {
     vi.stubEnv('NEXT_PUBLIC_ALLOW_UNIVERSE_DEV_ORIGIN', '')
     vi.resetModules()
     const { config } = await import('@/config')
-    expect(config.UNIVERSE_ORIGINS).toEqual(['tauri://localhost', 'https://tauri.localhost'])
+    expect(config.UNIVERSE_ORIGINS).toEqual(['tauri://localhost', 'https://tauri.localhost', 'http://tauri.localhost'])
   })
 
   it('adds the Universe dev server only when opted in, also in production builds', async () => {
@@ -39,6 +39,11 @@ describe('UNIVERSE_ORIGINS', () => {
     vi.stubEnv('NEXT_PUBLIC_ALLOW_UNIVERSE_DEV_ORIGIN', 'true')
     vi.resetModules()
     const { config } = await import('@/config')
-    expect(config.UNIVERSE_ORIGINS).toEqual(['tauri://localhost', 'https://tauri.localhost', 'http://localhost:1420'])
+    expect(config.UNIVERSE_ORIGINS).toEqual([
+      'tauri://localhost',
+      'https://tauri.localhost',
+      'http://tauri.localhost',
+      'http://localhost:1420',
+    ])
   })
 })
