@@ -11,8 +11,8 @@ import {
   setUnconfirmedError,
   setWrapTokenFeePercentageBps,
 } from '@/store/bridge'
-import { claimStoredWrap, getUnfinishedOotleWrapError } from './use-bridge-ootle-to-evm'
-import { SignerTimeoutError } from '@/clients/tari-l1-signer'
+import { claimStoredWrap, getUnfinishedOotleWrapError, removeStoredWrap } from './use-bridge-ootle-to-evm'
+import { SignerRefusedError } from '@/clients/tari-l1-signer'
 import i18next from 'i18next'
 import useTariSigner from '@/store/signer'
 import { parseWxtmTokenAmount } from '@/utils/parse-wxtm-token-amount'
@@ -113,17 +113,32 @@ export const useBridgeToEthereum = () => {
 
     // the amount is parsed in TU in the `send_one_sided_to_stealth_address` function
     // so here it is necessary to pass the value entered by the user as is
-    let isSend
     try {
-      isSend = await signer?.sendOneSided({
+      await signer.sendOneSided({
         amount: amount,
         address: tariColdWalletAddress,
         paymentId: paymentId,
       })
     } catch (error) {
-      if (!(error instanceof SignerTimeoutError)) throw error
-      // Universe may still have sent it: don't report a failure, ask the user to check first
-      console.error('[ TAPPLET-BRIDGE ] send one sided timed out')
+      if (error instanceof SignerRefusedError) {
+        // Universe rejected the request before sending, so nothing left the wallet.
+        console.error('[ TAPPLET-BRIDGE ] send one sided refused: ', error)
+        setBridgeError(i18next.getFixedT(null, 'main')('wrap_send_failed'))
+        await removeStoredWrap(signer, paymentId)
+        setLastOngoingBridgeTx({
+          destinationAddress: ethAddress,
+          tokenAmount: parsedAmount,
+          amountAfterFee: parseWxtmTokenAmount(amountAfterFee),
+          status: UserTransactionDTO.status.TIMEOUT,
+          createdAt: new Date().toISOString(),
+          paymentId,
+          showModal: true,
+          type: 'wrap',
+        })
+        return
+      }
+      // A timeout, false or resultError: Universe may still have sent it, so ask the user to check first
+      console.error('[ TAPPLET-BRIDGE ] send one sided unconfirmed: ', error)
       setUnconfirmedError(i18next.getFixedT(null, 'main')('wrap_unconfirmed'), paymentId)
       const ongoing = useTariAccountStore.getState().ongoingBridgeTx
       if (ongoing) setLastOngoingBridgeTx({ ...ongoing, showModal: true })
@@ -132,10 +147,6 @@ export const useBridgeToEthereum = () => {
 
     // get user txs to update history immediately after the tx starts
     await getUserBackendBridgeTxs()
-
-    if (!isSend) {
-      console.error('[ TAPPLET-BRIDGE ] send one sided failed')
-    }
 
     const baseNodeStatusAfter = await signer?.getBaseNodeStatus()
     const { success } = await confirmTokenSent.mutateAsync({

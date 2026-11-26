@@ -1,3 +1,28 @@
+import { config } from '@/config'
+
+// Universe's origin, taken from its first authenticated message.
+let universeOrigin: string | undefined
+
+// Only Universe (the parent window, on an allowed origin) may talk to the tapplet. Another frame that can
+// reach this window, such as Universe's Swap iframe, fails the source or the origin check.
+export function isFromUniverse(event: MessageEvent, types: string[]): boolean {
+  const data: unknown = event.data
+  if (event.source !== window.parent || !config.UNIVERSE_ORIGINS.includes(event.origin)) return false
+  if (typeof data !== 'object' || data === null || !types.includes((data as { type?: unknown }).type as string)) {
+    return false
+  }
+  universeOrigin = event.origin
+  return true
+}
+
+// Never '*'. Until Universe's origin is known, posts once per allowed origin; the browser delivers only
+// to the one that matches the parent.
+export function postToUniverse(message: unknown) {
+  const ancestor = window.location.ancestorOrigins?.[0]
+  const known = universeOrigin ?? (ancestor && config.UNIVERSE_ORIGINS.includes(ancestor) ? ancestor : undefined)
+  for (const origin of known ? [known] : config.UNIVERSE_ORIGINS) window.parent.postMessage(message, origin)
+}
+
 // 'trusted': framed by Universe. 'unverified': framed, but the browser doesn't expose ancestorOrigins.
 // 'untrusted': not framed, or framed by another origin.
 export function checkTappletHost(
@@ -10,15 +35,26 @@ export function checkTappletHost(
   return ancestorOrigins.length > 0 && allowedOrigins.includes(ancestorOrigins[0]) ? 'trusted' : 'untrusted'
 }
 
+// Whoever frames the tapplet answers its signer calls, so it only runs under a verified Universe parent;
+// without ancestorOrigins the parent can't be verified and it refuses too. The dev server runs standalone.
+export function canRunTapplet(
+  isDevelopment: boolean,
+  isFramed: boolean,
+  ancestorOrigins: ArrayLike<string> | undefined,
+  allowedOrigins: string[],
+): boolean {
+  return isDevelopment || checkTappletHost(isFramed, ancestorOrigins, allowedOrigins) === 'trusted'
+}
+
 export const openExternalLink = (url: string, event: React.MouseEvent) => {
   event.preventDefault()
-  window.parent.postMessage({ type: 'open-external-link', url }, '*')
+  postToUniverse({ type: 'open-external-link', url })
 }
 
 export const sendErrorMessage = (message: string) => {
-  window.parent.postMessage({ type: 'ERROR', payload: { message } }, '*')
+  postToUniverse({ type: 'ERROR', payload: { message } })
 }
 
 export const getInitConfig = () => {
-  window.parent.postMessage({ type: 'GET_INIT_CONFIG' }, '*')
+  postToUniverse({ type: 'GET_INIT_CONFIG' })
 }

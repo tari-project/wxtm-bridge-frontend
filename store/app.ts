@@ -31,7 +31,8 @@ const initialState: State = {
   bridgeAPI: '',
   theme: 'light',
   hideWalletBalance: false,
-  isMainNet: true,
+  // Stays false unless Universe confirms mainnet.
+  isMainNet: false,
   network: '',
   ethereumNodes: [],
 }
@@ -80,8 +81,10 @@ export const setAppConfig = async () => {
       return
     }
 
-    const network = await signer.getNetwork()
-    const isMainNet = network?.toLowerCase() === 'mainnet'
+    // The dev server has no Universe to ask.
+    const network =
+      process.env.NODE_ENV === 'development' ? (process.env.NEXT_PUBLIC_TARI_NETWORK ?? '') : await signer.getNetwork()
+    const isMainNet = network === 'mainnet'
 
     const envs =
       process.env.NODE_ENV === 'development'
@@ -97,9 +100,11 @@ export const setAppConfig = async () => {
     // Fetch nodes before exposing walletConnectProjectId: setting it triggers the
     // wagmi config build in Providers, which reads ethereumNodes from this store.
     const ethereumNodes = await fetchEthereumNodes()
-    useAppStore.setState({ walletConnectProjectId, bridgeAPI, isMainNet, network: network ?? '', ethereumNodes })
+    useAppStore.setState({ walletConnectProjectId, bridgeAPI, isMainNet, network, ethereumNodes })
 
-    const appLanguage = await signer.getAppLanguage()
+    // Imported here: i18initializer reads this store when it loads, so a static import would be circular.
+    const { resolveI18nLanguage } = await import('@/app/i18initializer')
+    const appLanguage = resolveI18nLanguage(await signer.getAppLanguage())
     if (appLanguage) await setLanguage(appLanguage)
 
     return walletConnectProjectId

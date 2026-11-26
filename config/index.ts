@@ -1,3 +1,6 @@
+// Builds loaded by a Tari Universe dev build: allows its dev-server origin and an http://localhost backend.
+const UNIVERSE_DEV_BUILD = process.env.NEXT_PUBLIC_ALLOW_UNIVERSE_DEV_ORIGIN === 'true'
+
 export const config = {
   BACKEND_API_URL: process.env.NEXT_PUBLIC_BACKEND_API_URL ?? '',
   WALLET_CONNECT_PROJECT_ID:
@@ -11,11 +14,13 @@ export const config = {
     'https://www.coinspect.com/doc/Coinspect%20-%20Smart%20Contract%20Audit%20-%20Tari%20-%20wXTM%20Bridge%20-%20Fix%20Review%20-%20v250528.pdf',
   MAINNET_EXPLORER_URL: 'https://etherscan.io',
   MICRO_XTM_PER_XTM: 1_000_000,
-  // Tari Universe webview origins allowed to frame the tapplet (Tauri v2 with useHttpsScheme:
-  // tauri://localhost on macOS/Linux, https://tauri.localhost on Windows). Universe's dev server
-  // (http://localhost:1420) only in builds made with NEXT_PUBLIC_ALLOW_UNIVERSE_DEV_ORIGIN=true.
-  UNIVERSE_ORIGINS:
-    process.env.NEXT_PUBLIC_ALLOW_UNIVERSE_DEV_ORIGIN === 'true'
-      ? ['tauri://localhost', 'https://tauri.localhost', 'http://localhost:1420']
-      : ['tauri://localhost', 'https://tauri.localhost'],
+  // The only origins whose messages the tapplet accepts and posts to. Mirrors Tari Universe's
+  // src-tauri/tauri.conf.json: Tauri v2 webview origins with useHttpsScheme (tauri://localhost on
+  // macOS/Linux, https://tauri.localhost on Windows). Only in builds made with
+  // NEXT_PUBLIC_ALLOW_UNIVERSE_DEV_ORIGIN=true: build.devUrl (http://localhost:1420) and
+  // http://tauri.localhost, which Universe releases never use and a local port-80 server could pose as.
+  UNIVERSE_DEV_BUILD,
+  UNIVERSE_ORIGINS: UNIVERSE_DEV_BUILD
+    ? ['tauri://localhost', 'https://tauri.localhost', 'http://tauri.localhost', 'http://localhost:1420']
+    : ['tauri://localhost', 'https://tauri.localhost'],
 }

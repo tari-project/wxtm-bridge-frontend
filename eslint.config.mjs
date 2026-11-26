@@ -27,7 +27,18 @@ const eslintConfig = [
       // DISABLED UNTIL APP IS REFACTORED TO USE TRANSLATIONS STRINGS
       // 'i18next/no-literal-string': ['error', { markupOnly: true }],
       'i18next/no-literal-string': 'off',
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "CallExpression[callee.property.name='postMessage']",
+          message: 'Use postToUniverse, which never posts to a wildcard origin.',
+        },
+      ],
     },
+  },
+  {
+    files: ['utils/universe.ts'],
+    rules: { 'no-restricted-syntax': 'off' },
   },
   {
     ignores: ['node_modules/**', '.next/**', 'out/**', 'build/**', 'next-env.d.ts'],

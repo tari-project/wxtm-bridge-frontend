@@ -10,7 +10,7 @@ import TariL1Signer from '@/clients/tari-l1-signer'
 import { useIframeMessage } from '@/utils/useIframeMessage'
 import useAppStore, { setAppConfig } from '@/store/app'
 import useTariSignerStore, { setSigner } from '@/store/signer'
-import { checkTappletHost, getInitConfig } from '@/utils/universe'
+import { canRunTapplet, getInitConfig } from '@/utils/universe'
 import { config as appConfig } from '@/config'
 import { queryClient } from '@/app/queryClient'
 
@@ -21,6 +21,7 @@ export const Providers = ({ children }: { children: ReactNode }) => {
   const [initialState, setInitialState] = useState<State | undefined>(undefined)
   const initializedRef = useRef(false)
   const initializedSignerRef = useRef(false)
+  const [outsideUniverse, setOutsideUniverse] = useState(false)
 
   const onInitialized = useEffectEvent((cfg: Config, state?: State) => {
     setConfig(cfg)
@@ -47,22 +48,17 @@ export const Providers = ({ children }: { children: ReactNode }) => {
 
     const initializeSignerAndAccount = async () => {
       if (!signer && !cancelled) {
-        // Whoever frames the tapplet answers its signer calls, so only accept Universe.
-        // The dev server runs the tapplet standalone, so the check is skipped there.
-        if (process.env.NODE_ENV !== 'development') {
-          const host = checkTappletHost(
-            window.parent !== window,
-            window.location.ancestorOrigins,
-            appConfig.UNIVERSE_ORIGINS,
-          )
-          // A host we can't verify (no ancestorOrigins) is treated as untrusted too.
-          if (host !== 'trusted') {
-            console.error(
-              `[ TAPPLET-BRIDGE ] Not framed by a verified Tari Universe origin (${host}); the signer is disabled`,
-            )
-            initializedSignerRef.current = true
-            return
-          }
+        const canRun = canRunTapplet(
+          process.env.NODE_ENV === 'development',
+          window.parent !== window,
+          window.location.ancestorOrigins,
+          appConfig.UNIVERSE_ORIGINS,
+        )
+        if (!canRun) {
+          console.error('[ TAPPLET-BRIDGE ] Not framed by a verified Tari Universe; the signer is disabled')
+          setOutsideUniverse(true)
+          initializedSignerRef.current = true
+          return
         }
         try {
           const signerParams: TariL1SignerParameters = { name: 'TariL1Signer', onConnection: setTariAccount }
@@ -88,6 +84,10 @@ export const Providers = ({ children }: { children: ReactNode }) => {
   }, [signer])
 
   useIframeMessage()
+
+  if (outsideUniverse) {
+    return <p className="p-6 text-center">Open the bridge in Tari Universe.</p>
+  }
 
   if (!config) {
     return <div className="h-5 w-5 animate-spin rounded-full border-b-[3px] border-white" />

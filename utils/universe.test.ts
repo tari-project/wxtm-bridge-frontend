@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { checkTappletHost } from './universe'
+import { canRunTapplet, checkTappletHost } from './universe'
 
 const ALLOWED = ['tauri://localhost', 'https://tauri.localhost']
 
@@ -17,6 +17,16 @@ describe('checkTappletHost', () => {
 
   it('cannot verify without ancestorOrigins', () => {
     expect(checkTappletHost(true, undefined, ALLOWED)).toBe('unverified')
+  })
+})
+
+describe('canRunTapplet', () => {
+  it('runs only under a verified Universe parent, or on the dev server', () => {
+    expect(canRunTapplet(false, false, ['tauri://localhost'], ALLOWED)).toBe(false)
+    expect(canRunTapplet(false, true, undefined, ALLOWED)).toBe(false)
+    expect(canRunTapplet(false, true, ['https://evil.example'], ALLOWED)).toBe(false)
+    expect(canRunTapplet(false, true, ['tauri://localhost'], ALLOWED)).toBe(true)
+    expect(canRunTapplet(true, false, undefined, ALLOWED)).toBe(true)
   })
 })
 
@@ -39,6 +49,11 @@ describe('UNIVERSE_ORIGINS', () => {
     vi.stubEnv('NEXT_PUBLIC_ALLOW_UNIVERSE_DEV_ORIGIN', 'true')
     vi.resetModules()
     const { config } = await import('@/config')
-    expect(config.UNIVERSE_ORIGINS).toEqual(['tauri://localhost', 'https://tauri.localhost', 'http://localhost:1420'])
+    expect(config.UNIVERSE_ORIGINS).toEqual([
+      'tauri://localhost',
+      'https://tauri.localhost',
+      'http://tauri.localhost',
+      'http://localhost:1420',
+    ])
   })
 })
