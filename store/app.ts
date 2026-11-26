@@ -102,7 +102,9 @@ export const setAppConfig = async () => {
     const ethereumNodes = await fetchEthereumNodes()
     useAppStore.setState({ walletConnectProjectId, bridgeAPI, isMainNet, network, ethereumNodes })
 
-    const appLanguage = await signer.getAppLanguage()
+    // Imported here: i18initializer reads this store when it loads, so a static import would be circular.
+    const { resolveI18nLanguage } = await import('@/app/i18initializer')
+    const appLanguage = resolveI18nLanguage(await signer.getAppLanguage())
     if (appLanguage) await setLanguage(appLanguage)
 
     return walletConnectProjectId

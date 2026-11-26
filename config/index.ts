@@ -15,11 +15,12 @@ export const config = {
   MAINNET_EXPLORER_URL: 'https://etherscan.io',
   MICRO_XTM_PER_XTM: 1_000_000,
   // The only origins whose messages the tapplet accepts and posts to. Mirrors Tari Universe's
-  // src-tauri/tauri.conf.json: Tauri v2 webview origins (tauri://localhost on macOS/Linux,
-  // https://tauri.localhost on Windows, http://tauri.localhost if useHttpsScheme is turned off) and
-  // build.devUrl (http://localhost:1420) only in builds made with NEXT_PUBLIC_ALLOW_UNIVERSE_DEV_ORIGIN=true.
+  // src-tauri/tauri.conf.json: Tauri v2 webview origins with useHttpsScheme (tauri://localhost on
+  // macOS/Linux, https://tauri.localhost on Windows). Only in builds made with
+  // NEXT_PUBLIC_ALLOW_UNIVERSE_DEV_ORIGIN=true: build.devUrl (http://localhost:1420) and
+  // http://tauri.localhost, which Universe releases never use and a local port-80 server could pose as.
   UNIVERSE_DEV_BUILD,
   UNIVERSE_ORIGINS: UNIVERSE_DEV_BUILD
     ? ['tauri://localhost', 'https://tauri.localhost', 'http://tauri.localhost', 'http://localhost:1420']
-      : ['tauri://localhost', 'https://tauri.localhost', 'http://tauri.localhost'],
+    : ['tauri://localhost', 'https://tauri.localhost'],
 }

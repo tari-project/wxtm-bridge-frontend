@@ -9,6 +9,9 @@ const PAYMENT_ID_FEATURE = 0b100
 const SINGLE_SIZE = 35
 const DUAL_SIZE = 67
 const MAX_PAYMENT_ID_SIZE = 256
+// INTERNAL_SINGLE_MIN_BASE58_SIZE and INTERNAL_DUAL_BASE58_MAX_SIZE; also keeps the quadratic decode bounded.
+const MIN_BASE58_LENGTH = 45
+const MAX_BASE58_LENGTH = 443
 // dammsum with coefficients [4, 3, 1]
 const DAMMSUM_MASK = 0b11011
 
@@ -47,9 +50,11 @@ function isRistrettoPoint(bytes: number[]): boolean {
 }
 
 // A base58 Tari address (the form Universe's getAccount returns): known network and features, valid
-// checksum and public keys, and a payment id only with the payment-id feature.
+// checksum and public keys, and the payment-id feature only on a dual address that carries a payment id.
 export function isTariAddress(address: unknown): boolean {
-  if (typeof address !== 'string' || address.length < 2) return false
+  if (typeof address !== 'string' || address.length < MIN_BASE58_LENGTH || address.length > MAX_BASE58_LENGTH) {
+    return false
+  }
   const parts = [address.slice(0, 1), address.slice(1, 2), address.slice(2)].map(decodeBase58)
   if (parts.some((part) => !part)) return false
   const bytes = parts.flatMap((part) => part!)
@@ -57,7 +62,7 @@ export function isTariAddress(address: unknown): boolean {
   if (!isSingle && (bytes.length < DUAL_SIZE || bytes.length > DUAL_SIZE + MAX_PAYMENT_ID_SIZE)) return false
   const [network, features] = bytes
   if (dammsum(bytes) !== 0 || !NETWORK_BYTES.includes(network) || (features & ~FEATURE_BITS) !== 0) return false
-  if (isSingle) return isRistrettoPoint(bytes.slice(2, 34))
+  if (isSingle) return !(features & PAYMENT_ID_FEATURE) && isRistrettoPoint(bytes.slice(2, 34))
   if (bytes.length > DUAL_SIZE && !(features & PAYMENT_ID_FEATURE)) return false
   return isRistrettoPoint(bytes.slice(2, 34)) && isRistrettoPoint(bytes.slice(34, 66))
 }

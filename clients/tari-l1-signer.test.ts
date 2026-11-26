@@ -141,7 +141,7 @@ describe('sendSignerCall', () => {
     ancestorOrigins = undefined
     void signerModule.sendSignerCall('getNetwork', []).catch(() => {})
     const origins = parent.postMessage.mock.calls.map((call) => call[1])
-    expect(origins).toEqual(['tauri://localhost', 'https://tauri.localhost', 'http://tauri.localhost'])
+    expect(origins).toEqual(['tauri://localhost', 'https://tauri.localhost'])
 
     reply({ type: 'signer-call', id: lastCallId(), result: 'mainnet' }, { origin: 'https://tauri.localhost' })
     parent.postMessage.mockClear()

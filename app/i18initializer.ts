@@ -19,7 +19,7 @@ export enum Language {
 }
 
 // System can have various regional variations for language codes, so we resolve them
-export const resolveI18nLanguage = (languageCode: string): Language | undefined => {
+export const resolveI18nLanguage = (languageCode: string | undefined): Language | undefined => {
   switch (languageCode) {
     case 'en':
     case 'en-AU':
