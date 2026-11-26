@@ -54,16 +54,19 @@ export const setTariAccount = async () => {
     return
   }
 
+  // Universe's address can be empty until its wallet loads; that must not block the balance or wrap recovery.
   try {
     const account = await signer.getAccount()
+    useTariAccountStore.setState({ tariAccount: { account_id: account.account_id, address: account.address } })
+  } catch (error) {
+    console.error('[ TAPPLET-BRIDGE ] error setting the Tari account: ', error)
+  }
+
+  try {
     const balance = await signer.getTariBalance()
     const ongoingBridgeTx = await signer.getOngoingBridgeTx()
 
     useTariAccountStore.setState({
-      tariAccount: {
-        account_id: account.account_id,
-        address: account.address,
-      },
       availableBalance: balance?.available_balance || 0,
       lastOngoingPaymentIdFromTU: ongoingBridgeTx?.paymentId ?? '',
       ootleWrapToResume:
@@ -72,9 +75,8 @@ export const setTariAccount = async () => {
           : undefined,
     })
 
-    return
   } catch (error) {
-    console.error('[ TAPPLET-BRIDGE ] error setting the Tari account: ', error)
+    console.error('[ TAPPLET-BRIDGE ] error loading the Tari balance and ongoing bridge tx: ', error)
   }
 }
 

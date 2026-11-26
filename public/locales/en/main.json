@@ -97,5 +97,5 @@
   "ootle_chain_check_failed": "We could not confirm that {{chain}} is accepting unwraps. Nothing was burned; please try again.",
   "ootle_deposits_unavailable": "Ootle deposits are temporarily unavailable. Nothing was sent; please try again later.",
   "bridge_start_in_progress": "Another bridge is still starting. Please wait for it to finish.",
-  "wrap_send_failed": "Tari Universe did not send your deposit. Your XTM has not been sent; please try again."
+  "wrap_send_failed": "Tari Universe rejected the deposit request, so your XTM was not sent. Please try again."
 }

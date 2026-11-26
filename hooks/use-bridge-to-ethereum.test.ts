@@ -42,9 +42,11 @@ const { useTariAccountStore } = await import('@/store/account')
 const { setSigner } = await import('@/store/signer')
 const { useBridgeToEthereum } = await import('./use-bridge-to-ethereum')
 
+const { SignerRefusedError, SignerTimeoutError } = await import('@/clients/tari-l1-signer')
+
 const PAYMENT_ID = 'payment-1'
 
-describe('useBridgeToEthereum when Universe does not send', () => {
+describe('useBridgeToEthereum when the send is not confirmed', () => {
   let stored: { paymentId: string } | undefined
   const signer = {
     getBaseNodeStatus: vi.fn(async () => ({})),
@@ -57,13 +59,14 @@ describe('useBridgeToEthereum when Universe does not send', () => {
       stored = undefined
       return true
     }),
-    sendOneSided: vi.fn(async () => {
-      throw new Error('Universe did not send the transaction')
-    }),
+    sendOneSided: vi.fn(),
   }
+
+  const WRAP = { amount: '10', ethAddress: '0x1', amountAfterFee: '9' } as const
 
   beforeEach(() => {
     stored = undefined
+    vi.clearAllMocks()
     vi.spyOn(console, 'error').mockImplementation(() => {})
     vi.spyOn(console, 'debug').mockImplementation(() => {})
     mocks.createWrapTokenTransaction.mockResolvedValue({ paymentId: PAYMENT_ID })
@@ -72,8 +75,9 @@ describe('useBridgeToEthereum when Universe does not send', () => {
     useBridgeStore.setState({ bridgeError: '', tariColdWalletAddress: 'cold-wallet' })
   })
 
-  it('shows an error, fails the ongoing tx, clears the stored wrap and does not confirm', async () => {
-    await useBridgeToEthereum().bridgeToEthereum({ amount: '10', ethAddress: '0x1', amountAfterFee: '9' })
+  it('fails the wrap and clears the stored record when Universe refused the request', async () => {
+    signer.sendOneSided.mockRejectedValue(new SignerRefusedError('Invalid arguments'))
+    await useBridgeToEthereum().bridgeToEthereum(WRAP)
 
     expect(useBridgeStore.getState().bridgeError).toBe('wrap_send_failed')
     expect(useTariAccountStore.getState().ongoingBridgeTx).toMatchObject({
@@ -83,6 +87,21 @@ describe('useBridgeToEthereum when Universe does not send', () => {
     })
     expect(signer.removeOngoingBridgeTx).toHaveBeenCalled()
     expect(stored).toBeUndefined()
+    expect(mocks.updateToTokensSent).not.toHaveBeenCalled()
+  })
+
+  it.each([
+    ['Universe returned false', new Error('Universe did not send the transaction')],
+    ['the call timed out', new SignerTimeoutError('timed out')],
+    ['Universe answered with a resultError', 'Error: wallet failure'],
+  ])('keeps the stored record and asks the user to check when %s', async (_, error) => {
+    signer.sendOneSided.mockRejectedValue(error)
+    await useBridgeToEthereum().bridgeToEthereum(WRAP)
+
+    expect(useBridgeStore.getState().bridgeError).toBe('wrap_unconfirmed')
+    expect(useTariAccountStore.getState().ongoingBridgeTx?.status).toBe(UserTransactionDTO.status.PENDING)
+    expect(signer.removeOngoingBridgeTx).not.toHaveBeenCalled()
+    expect(stored).toMatchObject({ paymentId: PAYMENT_ID })
     expect(mocks.updateToTokensSent).not.toHaveBeenCalled()
   })
 })

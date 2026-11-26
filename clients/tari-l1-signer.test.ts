@@ -56,6 +56,7 @@ beforeEach(async () => {
 afterEach(() => {
   vi.useRealTimers()
   vi.unstubAllGlobals()
+  vi.unstubAllEnvs()
 })
 
 describe('sendSignerCall', () => {
@@ -159,8 +160,19 @@ describe('TariL1Signer replies', () => {
     [['project', 'not a url']],
     [['project']],
     [{ walletconnect_id: 'project', backend_api: 'https://bridge.example' }],
-  ])('rejects bridge envs %j outside development', async (envs) => {
+  ])('rejects bridge envs %j in a release build', async (envs) => {
     expect((await callWith((s) => s.getBridgeEnvs(), envs)).status).toBe('rejected')
+  })
+
+  it('accepts an http://localhost backend only in builds for a Universe dev build', async () => {
+    const envs = ['project', 'http://localhost:3001']
+    expect((await callWith((s) => s.getBridgeEnvs(), envs)).status).toBe('rejected')
+
+    vi.stubEnv('NEXT_PUBLIC_ALLOW_UNIVERSE_DEV_ORIGIN', 'true')
+    vi.resetModules()
+    signerModule = await import('./tari-l1-signer')
+    expect((await callWith((s) => s.getBridgeEnvs(), envs)).status).toBe('resolved')
+    expect((await callWith((s) => s.getBridgeEnvs(), ['project', 'http://bridge.example'])).status).toBe('rejected')
   })
 
   it('accepts a Tari address and rejects anything else', async () => {

@@ -1,3 +1,6 @@
+// Builds loaded by a Tari Universe dev build: allows its dev-server origin and an http://localhost backend.
+const UNIVERSE_DEV_BUILD = process.env.NEXT_PUBLIC_ALLOW_UNIVERSE_DEV_ORIGIN === 'true'
+
 export const config = {
   BACKEND_API_URL: process.env.NEXT_PUBLIC_BACKEND_API_URL ?? '',
   WALLET_CONNECT_PROJECT_ID:
@@ -15,8 +18,8 @@ export const config = {
   // src-tauri/tauri.conf.json: Tauri v2 webview origins (tauri://localhost on macOS/Linux,
   // https://tauri.localhost on Windows, http://tauri.localhost if useHttpsScheme is turned off) and
   // build.devUrl (http://localhost:1420) only in builds made with NEXT_PUBLIC_ALLOW_UNIVERSE_DEV_ORIGIN=true.
-  UNIVERSE_ORIGINS:
-    process.env.NEXT_PUBLIC_ALLOW_UNIVERSE_DEV_ORIGIN === 'true'
-      ? ['tauri://localhost', 'https://tauri.localhost', 'http://tauri.localhost', 'http://localhost:1420']
+  UNIVERSE_DEV_BUILD,
+  UNIVERSE_ORIGINS: UNIVERSE_DEV_BUILD
+    ? ['tauri://localhost', 'https://tauri.localhost', 'http://tauri.localhost', 'http://localhost:1420']
       : ['tauri://localhost', 'https://tauri.localhost', 'http://tauri.localhost'],
 }

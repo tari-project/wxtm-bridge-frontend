@@ -10,6 +10,7 @@ import {
 } from '../types/tapplet'
 import { isFromUniverse, postToUniverse } from '@/utils/universe'
 import { isTariAddress } from '@/utils/tari-address'
+import { config } from '@/config'
 
 export interface SendOneSidedRequest {
   amount: string
@@ -67,7 +68,7 @@ export class TariL1Signer {
     const result = await sendSignerCall(req.methodName, req.args, timeoutMs)
     // Universe reports unsupported methods and bad arguments as { error } in the result.
     if (typeof result === 'object' && result !== null && 'error' in result) {
-      throw new Error(`Signer call ${req.methodName} failed: ${String(result.error)}`)
+      throw new SignerRefusedError(`Signer call ${req.methodName} refused: ${String(result.error)}`)
     }
     return result as SignerReturnType<MethodName>
   }
@@ -235,7 +236,7 @@ function isBackendApiUrl(value: unknown): value is string {
     return false
   }
   if (url.protocol === 'https:') return true
-  return process.env.NODE_ENV === 'development' && url.protocol === 'http:' && url.hostname === 'localhost'
+  return config.UNIVERSE_DEV_BUILD && url.protocol === 'http:' && url.hostname === 'localhost'
 }
 
 // Every signer client shares this one postMessage channel. Ids are random so another frame can't guess
@@ -263,6 +264,8 @@ function onSignerReply(event: MessageEvent<SignerResponse<SignerMethodNames>>) {
 
 // Universe didn't answer in time; the call may still have run there.
 export class SignerTimeoutError extends Error {}
+// Universe rejected the call ({ error } result: unsupported method or bad arguments) before running it.
+export class SignerRefusedError extends Error {}
 
 const SIGNER_CALL_TIMEOUT_MS = 60_000
 // Sends wait for the user to enter their PIN in Universe.
