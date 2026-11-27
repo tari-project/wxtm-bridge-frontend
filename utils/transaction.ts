@@ -5,12 +5,14 @@ import { UserTransactionDTO, UserUnwrappedTransactionDTO } from '@tari-project/w
 import { utils } from 'ethers'
 import i18n from 'i18next'
 
-// A finished-but-failed bridge: a wrap that timed out, or an unwrap the backend rejected (ERROR).
+// A finished-but-failed bridge: a wrap that timed out, or an unwrap that failed (ERROR) or whose burn
+// cannot be paid as recorded (REJECTED).
 export function isFailedTransaction(tx: Pick<OngoingUserTransaction, 'type' | 'status'> | undefined): boolean {
   if (!tx) return false
   return tx.type === 'wrap'
     ? tx.status === UserTransactionDTO.status.TIMEOUT
-    : tx.status === UserUnwrappedTransactionDTO.status.ERROR
+    : tx.status === UserUnwrappedTransactionDTO.status.ERROR ||
+        tx.status === UserUnwrappedTransactionDTO.status.REJECTED
 }
 
 export function getTransactionAmount(tx: OngoingUserTransaction): {
@@ -71,6 +73,8 @@ export function getWrapModalTitle(
           direction: type === 'wrap' ? t('from') : t('to'),
         }),
       }
+    // Held for review by the bridge operators; shown as still processing.
+    case UserTransactionDTO.status.ON_HOLD:
     case UserTransactionDTO.status.PROCESSING:
       return {
         title: t('processing_title'),

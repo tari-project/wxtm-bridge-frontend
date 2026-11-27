@@ -22,9 +22,13 @@ describe('isSameTransaction', () => {
     expect(isSameTransaction(ootleWrapRow, REFERENCE)).toBe(true)
   })
 
-  it('matches other rows by paymentId only', () => {
+  it('matches a wXTM wrap row by the reference of the local paymentId (SEC-20)', () => {
+    expect(isSameTransaction({ type: 'wrap', paymentId: REFERENCE }, PAYMENT_ID)).toBe(true)
+  })
+
+  it('matches unwrap rows by paymentId only', () => {
     expect(isSameTransaction({ type: 'wrap', paymentId: PAYMENT_ID }, PAYMENT_ID)).toBe(true)
-    expect(isSameTransaction({ type: 'wrap', paymentId: REFERENCE }, PAYMENT_ID)).toBe(false)
+    expect(isSameTransaction({ type: 'unwrap', paymentId: REFERENCE }, REFERENCE)).toBe(true)
     expect(isSameTransaction({ type: 'unwrap', paymentId: REFERENCE, ootleChainId: 1 }, PAYMENT_ID)).toBe(false)
   })
 

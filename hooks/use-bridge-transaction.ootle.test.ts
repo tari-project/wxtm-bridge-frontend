@@ -1,6 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { baseSepolia } from 'viem/chains'
-import { OotleUserWrapTransactionDTO, OotleWrapDetailsDTO } from '@tari-project/wxtm-bridge-backend-api'
+import {
+  OotleUserUnwrapTransactionDTO,
+  OotleUserWrapTransactionDTO,
+  OotleWrapDetailsDTO,
+} from '@tari-project/wxtm-bridge-backend-api'
 
 const mocks = vi.hoisted(() => ({ list: vi.fn(), listUnwraps: vi.fn(), lookup: vi.fn() }))
 vi.mock('@tari-project/wxtm-bridge-backend-api', async (importOriginal) => ({
@@ -85,5 +89,39 @@ describe('Ootle wrap history (M2)', () => {
     const { wraps } = await getOotleTransactions(ME)
     expect(wraps.every((w) => w.detailsHidden)).toBe(true)
     expect(JSON.stringify(logged.mock.calls)).not.toContain('secret-token')
+  })
+})
+
+describe('Ootle unwrap history (SEC-20)', () => {
+  const unwrap = (reference: string, status: OotleUserUnwrapTransactionDTO.status): OotleUserUnwrapTransactionDTO => ({
+    reference,
+    chainId: baseSepolia.id,
+    destinationAddress: '',
+    amount: '1000',
+    amountAfterFee: '990',
+    feeAmount: '10',
+    createdAt: '2026-11-10T10:00:00.000Z',
+    transactionHash: '0xburn',
+    blockTimestamp: '2026-11-10T10:00:00.000Z',
+    status,
+  })
+
+  it('keys unwraps by reference and adds the burns rejected under the burner address', async () => {
+    const BURNER = '0x1111111111111111111111111111111111111111'
+    mocks.listUnwraps.mockImplementation(async (address: string) => ({
+      transactions:
+        address === BURNER
+          ? [unwrap('ref-rejected', OotleUserUnwrapTransactionDTO.status.REJECTED)]
+          : [unwrap('ref-held', OotleUserUnwrapTransactionDTO.status.ON_HOLD)],
+      total: 1,
+    }))
+
+    const { unwraps } = await getOotleTransactions(ME, BURNER)
+
+    expect(mocks.listUnwraps).toHaveBeenCalledWith(BURNER, expect.any(Number), 0)
+    expect(unwraps).toEqual([
+      expect.objectContaining({ paymentId: 'ref-held', status: 'ON_HOLD', ootleChainId: baseSepolia.id }),
+      expect.objectContaining({ paymentId: 'ref-rejected', status: 'REJECTED' }),
+    ])
   })
 })

@@ -145,7 +145,8 @@ const HistoryBaseItem = memo(function HistoryBaseItem({
       transactionType === 'wrap' &&
       (status === UserTransactionDTO.status.PENDING ||
         status === UserTransactionDTO.status.PROCESSING ||
-        status === UserTransactionDTO.status.TOKENS_RECEIVED)
+        status === UserTransactionDTO.status.TOKENS_RECEIVED ||
+        status === UserTransactionDTO.status.ON_HOLD)
     ) {
       return (
         <div className="flex flex-[1] p-3">
