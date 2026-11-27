@@ -96,7 +96,7 @@ async function lookupOotleWrapDetails(ootleAddress: string): Promise<Map<string,
 
 function fromOotleUnwrap(tx: OotleUserUnwrapTransactionDTO): BackendUnwrapTransaction {
   return {
-    paymentId: tx.reference,
+    paymentId: keyedByReference(tx).paymentId,
     amount: tx.amount,
     amountAfterFee: tx.amountAfterFee,
     feeAmount: tx.feeAmount,

@@ -161,4 +161,13 @@ describe('Ootle unwrap history (SEC-20)', () => {
     expect(second.wraps).toEqual([])
     expect(second.unwraps).toEqual([expect.objectContaining({ paymentId: 'ref-rejected' })])
   })
+
+  it('keeps the paymentId of an Ootle unwrap from a backend that does not send reference yet', async () => {
+    const { reference: _, ...old } = unwrap('unused', OotleUserUnwrapTransactionDTO.status.SUCCESS)
+    mocks.listUnwraps.mockResolvedValue({ transactions: [{ ...old, paymentId: PAYMENT_ID }], total: 1 })
+
+    const { unwraps } = await getOotleTransactions(ME)
+
+    expect(unwraps).toEqual([expect.objectContaining({ paymentId: PAYMENT_ID, status: 'SUCCESS' })])
+  })
 })
