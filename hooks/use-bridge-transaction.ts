@@ -225,6 +225,12 @@ export const useBridgeTransaction = () => {
       })
       // Read at call time: callers run this right after changing the ongoing tx.
       const { ongoingBridgeTx, lastOngoingPaymentIdFromTU } = useTariAccountStore.getState()
+      // The listing has only the reference; prefer the real paymentId a row was matched by, which the
+      // stored record in Universe is removed by (after a restart only lastOngoingPaymentIdFromTU has it).
+      const realPaymentId = (row: CombinedBridgeTransaction) =>
+        [ongoingBridgeTx?.paymentId, lastOngoingPaymentIdFromTU].find(
+          (id) => id !== row.paymentId && isSameTransaction(row, id),
+        ) ?? row.paymentId
 
       if (ongoing) {
         // A wrap row is keyed by its reference; keep the local record (real paymentId, failed state).
@@ -241,14 +247,15 @@ export const useBridgeTransaction = () => {
           }
           return useTariAccountStore.getState().ongoingBridgeTx ?? null
         }
+        const ongoingTransaction: OngoingUserTransaction = { ...ongoing, paymentId: realPaymentId(ongoing) }
         if (
-          (ongoing.paymentId !== ongoingBridgeTx?.paymentId || ongoing.status !== ongoingBridgeTx?.status) &&
+          (ongoingTransaction.paymentId !== ongoingBridgeTx?.paymentId ||
+            ongoingTransaction.status !== ongoingBridgeTx?.status) &&
           (!ongoingBridgeTx || new Date(ongoing.createdAt).getTime() > new Date(ongoingBridgeTx?.createdAt).getTime())
         ) {
-          const ongoingTransaction: OngoingUserTransaction = ongoing
           setLastOngoingBridgeTx(ongoingTransaction)
         }
-        return ongoing
+        return ongoingTransaction
       }
 
       // If no pending tx found, but previously had one, check if it succeeded/failed
@@ -273,17 +280,11 @@ export const useBridgeTransaction = () => {
       })
 
       if (ongoingCompleted) {
-        // The listing has only the reference; keep the real paymentId it was matched by, which the
-        // stored record in Universe is removed by.
-        const paymentId =
-          [ongoingBridgeTx?.paymentId, lastOngoingPaymentIdFromTU].find((id) =>
-            isSameTransaction(ongoingCompleted, id),
-          ) ?? ongoingCompleted.paymentId
         // A row without details only contributes its status to the local record's amounts and destination.
         const ongoingTransaction: OngoingUserTransaction =
           ongoingCompleted.type === 'wrap' && ongoingCompleted.detailsHidden && localTx?.type === 'wrap'
             ? { ...localTx, status: ongoingCompleted.status, showModal: true }
-            : { ...ongoingCompleted, paymentId, showModal: true }
+            : { ...ongoingCompleted, paymentId: realPaymentId(ongoingCompleted), showModal: true }
         setLastOngoingBridgeTx(ongoingTransaction)
         return ongoingTransaction
       }

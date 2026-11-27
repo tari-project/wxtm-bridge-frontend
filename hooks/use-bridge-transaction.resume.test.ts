@@ -74,4 +74,37 @@ describe('wXTM history keyed by reference (SEC-20)', () => {
 
     expect(ongoing).toMatchObject({ paymentId: PAYMENT_ID, status: UserTransactionDTO.status.ON_HOLD })
   })
+
+  describe('after a restart, with only the id Universe stored', () => {
+    beforeEach(() => {
+      useTariAccountStore.setState({ ongoingBridgeTx: undefined, lastOngoingPaymentIdFromTU: PAYMENT_ID })
+    })
+
+    it('stores an in-progress wrap under its real paymentId', async () => {
+      mocks.wraps.mockResolvedValue({ transactions: [listed(UserTransactionDTO.status.PENDING)], total: 1 })
+
+      await useBridgeTransaction().getUserBackendBridgeTxs()
+
+      expect(useTariAccountStore.getState().ongoingBridgeTx).toMatchObject({ paymentId: PAYMENT_ID })
+    })
+
+    it('completes the wrap under its real paymentId, even once one was stored under the reference', async () => {
+      useTariAccountStore.setState({
+        ongoingBridgeTx: {
+          type: 'wrap',
+          paymentId: ootleWrapReference(PAYMENT_ID),
+          tokenAmount: '1000',
+          amountAfterFee: '997',
+          createdAt: '2026-11-10T10:00:00.000Z',
+          status: UserTransactionDTO.status.PENDING,
+          destinationAddress: '0x1',
+        },
+      })
+      mocks.wraps.mockResolvedValue({ transactions: [listed(UserTransactionDTO.status.SUCCESS)], total: 1 })
+
+      const ongoing = await useBridgeTransaction().getUserBackendBridgeTxs()
+
+      expect(ongoing).toMatchObject({ paymentId: PAYMENT_ID, status: UserTransactionDTO.status.SUCCESS })
+    })
+  })
 })
