@@ -93,6 +93,10 @@ const getStatusInfo = (
       showIcon: true,
     }
   }
+  // Held for review by the bridge operators (same value in both enums).
+  if (status === UserTransactionDTO.status.ON_HOLD) {
+    return { statusType: 'pending' as const, text: 'On hold', showIcon: true }
+  }
   if (
     status === UserTransactionDTO.status.SUCCESS ||
     status === UserUnwrappedTransactionDTO.status.SUCCESS
@@ -107,6 +111,8 @@ const getStatusInfo = (
     return { statusType: 'timeout' as const, text: 'Timeout', showIcon: false }
   } else if (status === UserUnwrappedTransactionDTO.status.ERROR) {
     return { statusType: 'error' as const, text: 'Error', showIcon: false }
+  } else if (status === UserUnwrappedTransactionDTO.status.REJECTED) {
+    return { statusType: 'error' as const, text: 'Rejected', showIcon: false }
   }
   return { statusType: 'default' as const, text: status, showIcon: false }
 }

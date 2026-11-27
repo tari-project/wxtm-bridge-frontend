@@ -2,6 +2,7 @@ import {
   UserTransactionDTO,
   UserUnwrappedTransactionDTO,
 } from '@tari-project/wxtm-bridge-backend-api'
+import { Keyed } from '@/types/transactions'
 
 export interface AccountData {
   account_id: number
@@ -21,8 +22,8 @@ export interface PendingBridgeTx {
 
 // Discriminated by `type`, never by which amount fields happen to be present.
 export type OngoingUserTransaction = (
-  | (Omit<UserTransactionDTO, 'feeAmount'> & { type: 'wrap' })
-  | (Omit<UserUnwrappedTransactionDTO, 'feeAmount'> & { type: 'unwrap' })
+  | (Omit<Keyed<UserTransactionDTO>, 'feeAmount'> & { type: 'wrap' })
+  | (Omit<Keyed<UserUnwrappedTransactionDTO>, 'feeAmount'> & { type: 'unwrap' })
 ) & {
   showModal?: boolean
   // set only for Ootle (TARI <-> wTARI) transactions

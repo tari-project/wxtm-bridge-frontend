@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { isSameTransaction, ootleWrapReference } from './ootle-wrap-reference'
+import { isSameTransaction, keyedByReference, ootleWrapReference } from './ootle-wrap-reference'
 
 const PAYMENT_ID = '9b2f4c1e-3a5d-4e6f-8a7b-1c2d3e4f5a6b'
 // node -e 'crypto.createHash("sha256").update("ootle-wrap-reference:" + id).digest("hex").slice(0, 16)'
@@ -22,9 +22,13 @@ describe('isSameTransaction', () => {
     expect(isSameTransaction(ootleWrapRow, REFERENCE)).toBe(true)
   })
 
-  it('matches other rows by paymentId only', () => {
+  it('matches a wXTM wrap row by the reference of the local paymentId (SEC-20)', () => {
+    expect(isSameTransaction({ type: 'wrap', paymentId: REFERENCE }, PAYMENT_ID)).toBe(true)
+  })
+
+  it('matches unwrap rows by paymentId only', () => {
     expect(isSameTransaction({ type: 'wrap', paymentId: PAYMENT_ID }, PAYMENT_ID)).toBe(true)
-    expect(isSameTransaction({ type: 'wrap', paymentId: REFERENCE }, PAYMENT_ID)).toBe(false)
+    expect(isSameTransaction({ type: 'unwrap', paymentId: REFERENCE }, REFERENCE)).toBe(true)
     expect(isSameTransaction({ type: 'unwrap', paymentId: REFERENCE, ootleChainId: 1 }, PAYMENT_ID)).toBe(false)
   })
 
@@ -32,5 +36,27 @@ describe('isSameTransaction', () => {
     expect(isSameTransaction(ootleWrapRow, 'another-payment-id')).toBe(false)
     expect(isSameTransaction(ootleWrapRow, undefined)).toBe(false)
     expect(isSameTransaction(ootleWrapRow, '')).toBe(false)
+  })
+})
+
+describe('keyedByReference', () => {
+  it('keys a listing row (e.g. from Universe) by its reference, so it matches the stored paymentId', () => {
+    const row = keyedByReference({ reference: REFERENCE, status: 'PENDING' })
+    expect(row).toEqual({ paymentId: REFERENCE, status: 'PENDING' })
+    expect(isSameTransaction({ ...row, type: 'wrap' }, PAYMENT_ID)).toBe(true)
+  })
+})
+
+describe('compatibility (SEC-20)', () => {
+  it('matches nothing without a known id, even a row without its own key', () => {
+    const row = { type: 'wrap' as const, paymentId: undefined as unknown as string }
+    expect(isSameTransaction(row, undefined)).toBe(false)
+    expect(isSameTransaction(row, '')).toBe(false)
+  })
+
+  it('keeps the paymentId of a row from an older backend, which has no reference', () => {
+    const row = keyedByReference({ paymentId: PAYMENT_ID, status: 'PENDING' } as unknown as { reference: string })
+    expect(row).toMatchObject({ paymentId: PAYMENT_ID })
+    expect(isSameTransaction({ ...row, type: 'wrap' }, PAYMENT_ID)).toBe(true)
   })
 })

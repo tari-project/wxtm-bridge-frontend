@@ -1,5 +1,3 @@
-import { useMutation } from '@tanstack/react-query'
-
 import {
   OotleTokensUnwrappedService,
   OotleUserUnwrapTransactionDTO,
@@ -11,9 +9,10 @@ import {
   UserUnwrappedTransactionDTO,
   WrapTokenService,
 } from '@tari-project/wxtm-bridge-backend-api'
+import { useConnection } from 'wagmi'
 
 import { OngoingUserTransaction } from '@/types/tapplet'
-import { isSameTransaction } from '@/utils/ootle-wrap-reference'
+import { isSameTransaction, keyedByReference } from '@/utils/ootle-wrap-reference'
 import { loadOotleWrapCapabilities } from '@/utils/ootle-wrap-capabilities'
 import { errorSummary } from '@/utils/error-summary'
 import useAppStore from '@/store/app'
@@ -28,16 +27,16 @@ import {
   useTariAccountStore,
 } from '@/store/account'
 
-const OOTLE_PAGE_LIMIT = 100
+const PAGE_LIMIT = 100
 // Stops a misbehaving backend from keeping this loop going.
-const OOTLE_MAX_PAGES = 50
+const MAX_PAGES = 50
 
 export async function fetchAllPages<T>(
   fetchPage: (limit: number, offset: number) => Promise<{ transactions: T[]; total: number }>,
 ): Promise<T[]> {
   const all: T[] = []
-  for (let i = 0; i < OOTLE_MAX_PAGES; i++) {
-    const page = await fetchPage(OOTLE_PAGE_LIMIT, all.length)
+  for (let i = 0; i < MAX_PAGES; i++) {
+    const page = await fetchPage(PAGE_LIMIT, all.length)
     all.push(...page.transactions)
     const total = Number(page.total)
     if (page.transactions.length === 0 || !Number.isFinite(total) || all.length >= total) break
@@ -45,8 +44,8 @@ export async function fetchAllPages<T>(
   return all
 }
 
-// Ootle wrap listings carry a display reference instead of the paymentId; it stands in as the key.
-// The public listing has no amounts, destination or transaction hash; those come only from the
+// Listings carry a display reference instead of the paymentId; it stands in as the key.
+// The public Ootle wrap listing has no amounts, destination or transaction hash; those come only from the
 // clientToken-gated lookup. Without them the row is marked detailsHidden and shows chain, time and
 // status only (the amount fields are placeholders that must not be displayed).
 export function fromOotleWrap(
@@ -97,7 +96,7 @@ async function lookupOotleWrapDetails(ootleAddress: string): Promise<Map<string,
 
 function fromOotleUnwrap(tx: OotleUserUnwrapTransactionDTO): BackendUnwrapTransaction {
   return {
-    paymentId: tx.paymentId,
+    paymentId: keyedByReference(tx).paymentId,
     amount: tx.amount,
     amountAfterFee: tx.amountAfterFee,
     feeAmount: tx.feeAmount,
@@ -110,37 +109,48 @@ function fromOotleUnwrap(tx: OotleUserUnwrapTransactionDTO): BackendUnwrapTransa
   }
 }
 
+const ootleUnwrapsOf = (address: string) =>
+  fetchAllPages((limit, offset) => OotleTokensUnwrappedService.getOotleUserUnwrapTransactions(address, limit, offset))
+
+// A burn rejected for its target has no Ootle address to be listed under, so the backend lists it
+// under the EVM address that burned it. Fetched on its own, so a failure here loses nothing else.
+async function rejectedBurnsOf(burnerAddress: string | undefined): Promise<BackendUnwrapTransaction[]> {
+  if (!burnerAddress) return []
+  try {
+    return (await ootleUnwrapsOf(burnerAddress)).map(fromOotleUnwrap)
+  } catch (error) {
+    console.error('[ TAPPLET-BRIDGE ] failed to get rejected Ootle burns:', error)
+    return []
+  }
+}
+
 export async function getOotleTransactions(
   ootleAddress: string | undefined,
+  // The connected EVM wallet, whatever the Ootle account.
+  burnerAddress?: string,
 ): Promise<{ wraps: BackendBridgeTransaction[]; unwraps: BackendUnwrapTransaction[] }> {
-  if (!ootleAddress) return { wraps: [], unwraps: [] }
+  const rejected = await rejectedBurnsOf(burnerAddress)
+  if (!ootleAddress) return { wraps: [], unwraps: rejected }
   try {
     const wraps = await fetchAllPages((limit, offset) =>
       OotleWrapTokenService.getOotleUserWrapTransactions(ootleAddress, limit, offset),
     )
-    const unwraps = await fetchAllPages((limit, offset) =>
-      OotleTokensUnwrappedService.getOotleUserUnwrapTransactions(ootleAddress, limit, offset),
-    )
+    const unwraps = await ootleUnwrapsOf(ootleAddress)
     const details = await lookupOotleWrapDetails(ootleAddress)
     return {
       wraps: wraps.map((tx) => fromOotleWrap(tx, details.get(tx.reference))),
-      unwraps: unwraps.map(fromOotleUnwrap),
+      unwraps: [...unwraps.map(fromOotleUnwrap), ...rejected],
     }
   } catch (error) {
     console.error('[ TAPPLET-BRIDGE ] failed to get Ootle transactions:', error)
-    return { wraps: [], unwraps: [] }
+    return { wraps: [], unwraps: rejected }
   }
 }
 
 export const useBridgeTransaction = () => {
   const tariAccount = useTariAccountStore((s) => s.tariAccount)
   const ootleAccount = useTariAccountStore((s) => s.ootleAccount)
-  const getUserWrapTxs = useMutation({
-    mutationFn: WrapTokenService.getUserTransactions,
-  })
-  const getUserUnwrapTxs = useMutation({
-    mutationFn: TokensUnwrappedService.getUserTransactions,
-  })
+  const { address: evmAddress } = useConnection()
 
   /**
    * Fetch user bridge transactions and update the store's ongoing transaction state.
@@ -165,12 +175,20 @@ export const useBridgeTransaction = () => {
         type: 'wrap' as const,
       }))
     } else {
-      const wrapResult = await getUserWrapTxs.mutateAsync(walletAddress)
-      const unwrapResult = await getUserUnwrapTxs.mutateAsync(walletAddress)
-      const ootle = await getOotleTransactions(ootleAccount?.address)
+      // The first page without paging parameters: a backend from before paging refuses them, and
+      // answers with every row and no total, which ends the paging.
+      const wraps = await fetchAllPages((limit, offset) =>
+        offset
+          ? WrapTokenService.getUserTransactions(walletAddress, limit, offset)
+          : WrapTokenService.getUserTransactions(walletAddress),
+      )
+      const unwraps = await fetchAllPages((limit, offset) =>
+        TokensUnwrappedService.getUserTransactions(walletAddress, limit, offset),
+      )
+      const ootle = await getOotleTransactions(ootleAccount?.address, evmAddress)
 
-      wrapTransactions = [...wrapResult.transactions, ...ootle.wraps]
-      unwrapTransactions = [...unwrapResult.transactions, ...ootle.unwraps]
+      wrapTransactions = [...wraps.map(keyedByReference), ...ootle.wraps]
+      unwrapTransactions = [...unwraps.map(keyedByReference), ...ootle.unwraps]
 
       setBackendBridgeTxs(wrapTransactions)
       setBackendUnwrapTxs(unwrapTransactions)
@@ -200,23 +218,38 @@ export const useBridgeTransaction = () => {
           return (
             tx.status === UserTransactionDTO.status.PENDING ||
             tx.status === UserTransactionDTO.status.PROCESSING ||
-            tx.status === UserTransactionDTO.status.TOKENS_RECEIVED
+            tx.status === UserTransactionDTO.status.TOKENS_RECEIVED ||
+            tx.status === UserTransactionDTO.status.ON_HOLD
           )
         } else {
           return (
             tx.status === UserUnwrappedTransactionDTO.status.PENDING ||
-            tx.status === UserUnwrappedTransactionDTO.status.PROCESSING
+            tx.status === UserUnwrappedTransactionDTO.status.PROCESSING ||
+            tx.status === UserUnwrappedTransactionDTO.status.ON_HOLD
           )
         }
       })
       // Read at call time: callers run this right after changing the ongoing tx.
       const { ongoingBridgeTx, lastOngoingPaymentIdFromTU } = useTariAccountStore.getState()
+      // The listing has only the reference; prefer the real paymentId a row was matched by, which the
+      // stored record in Universe is removed by (after a restart only lastOngoingPaymentIdFromTU has it).
+      const realPaymentId = (row: CombinedBridgeTransaction) =>
+        [ongoingBridgeTx?.paymentId, lastOngoingPaymentIdFromTU].find(
+          (id) => id !== row.paymentId && isSameTransaction(row, id),
+        ) ?? row.paymentId
+
+      // A burn submitted here has no paymentId ('') until a listing row takes its place, and one
+      // rejected for its target is never pending: it is recognised by its burn transaction hash.
+      const isLocalBurn = (tx: CombinedBridgeTransaction) =>
+        tx.type === 'unwrap' &&
+        ongoingBridgeTx?.type === 'unwrap' &&
+        !!ongoingBridgeTx.transactionHash &&
+        tx.transactionHash?.toLowerCase() === ongoingBridgeTx.transactionHash.toLowerCase()
 
       if (ongoing) {
-        // An Ootle wrap row is keyed by its reference; keep the local record (real paymentId, failed state).
+        // A wrap row is keyed by its reference; keep the local record (real paymentId, failed state).
         if (
           ongoing.type === 'wrap' &&
-          ongoing.ootleChainId !== undefined &&
           ongoingBridgeTx?.type === 'wrap' &&
           isSameTransaction(ongoing, ongoingBridgeTx.paymentId)
         ) {
@@ -228,21 +261,24 @@ export const useBridgeTransaction = () => {
           }
           return useTariAccountStore.getState().ongoingBridgeTx ?? null
         }
+        const ongoingTransaction: OngoingUserTransaction = { ...ongoing, paymentId: realPaymentId(ongoing) }
         if (
-          (ongoing.paymentId !== ongoingBridgeTx?.paymentId || ongoing.status !== ongoingBridgeTx?.status) &&
+          (ongoingTransaction.paymentId !== ongoingBridgeTx?.paymentId ||
+            ongoingTransaction.status !== ongoingBridgeTx?.status) &&
           (!ongoingBridgeTx || new Date(ongoing.createdAt).getTime() > new Date(ongoingBridgeTx?.createdAt).getTime())
         ) {
-          const ongoingTransaction: OngoingUserTransaction = ongoing
           setLastOngoingBridgeTx(ongoingTransaction)
         }
-        return ongoing
+        return ongoingTransaction
       }
 
       // If no pending tx found, but previously had one, check if it succeeded/failed
       // check also with the paymentId from the TU to display modal after the bridge relaunch
       const ongoingCompleted = candidates.find((tx) => {
         const hasValidPaymentId =
-          isSameTransaction(tx, ongoingBridgeTx?.paymentId) || isSameTransaction(tx, lastOngoingPaymentIdFromTU)
+          isSameTransaction(tx, ongoingBridgeTx?.paymentId) ||
+          isSameTransaction(tx, lastOngoingPaymentIdFromTU) ||
+          isLocalBurn(tx)
 
         if (tx.type === 'wrap') {
           return (
@@ -253,7 +289,8 @@ export const useBridgeTransaction = () => {
           return (
             hasValidPaymentId &&
             (tx.status === UserUnwrappedTransactionDTO.status.SUCCESS ||
-              tx.status === UserUnwrappedTransactionDTO.status.ERROR)
+              tx.status === UserUnwrappedTransactionDTO.status.ERROR ||
+              tx.status === UserUnwrappedTransactionDTO.status.REJECTED)
           )
         }
       })
@@ -263,7 +300,7 @@ export const useBridgeTransaction = () => {
         const ongoingTransaction: OngoingUserTransaction =
           ongoingCompleted.type === 'wrap' && ongoingCompleted.detailsHidden && localTx?.type === 'wrap'
             ? { ...localTx, status: ongoingCompleted.status, showModal: true }
-            : { ...ongoingCompleted, showModal: true }
+            : { ...ongoingCompleted, paymentId: realPaymentId(ongoingCompleted), showModal: true }
         setLastOngoingBridgeTx(ongoingTransaction)
         return ongoingTransaction
       }

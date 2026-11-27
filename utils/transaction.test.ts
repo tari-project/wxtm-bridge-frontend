@@ -38,6 +38,8 @@ describe('getTransactionAmount', () => {
 describe('isFailedTransaction (C23)', () => {
   it('ends the pending state for a rejected unwrap and a timed-out wrap only', () => {
     expect(isFailedTransaction({ type: 'unwrap', status: UserUnwrappedTransactionDTO.status.ERROR })).toBe(true)
+    expect(isFailedTransaction({ type: 'unwrap', status: UserUnwrappedTransactionDTO.status.REJECTED })).toBe(true)
+    expect(isFailedTransaction({ type: 'unwrap', status: UserUnwrappedTransactionDTO.status.ON_HOLD })).toBe(false)
     expect(isFailedTransaction({ type: 'wrap', status: UserTransactionDTO.status.TIMEOUT })).toBe(true)
     expect(isFailedTransaction({ type: 'unwrap', status: UserUnwrappedTransactionDTO.status.PENDING })).toBe(false)
     expect(isFailedTransaction({ type: 'unwrap', status: UserUnwrappedTransactionDTO.status.PROCESSING })).toBe(false)

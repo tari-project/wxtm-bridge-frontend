@@ -73,8 +73,12 @@ export interface BridgeHistoryListItemProps {
   setDetailedTx?: (item: CombinedBridgeTransaction | null) => void
 }
 
+// The public listings return a display reference, never the paymentId. Rows are keyed by
+// paymentId: the reference for a listed row, the real paymentId for one this tapplet created.
+export type Keyed<T> = Omit<T, 'reference'> & { paymentId: string }
+
 // ootleChainId is set only for Ootle (TARI <-> wTARI) transactions.
-export interface BackendBridgeTransaction extends UserTransactionDTO {
+export interface BackendBridgeTransaction extends Keyed<UserTransactionDTO> {
   sourceAddress?: string
   mined_in_block_height?: number
   ootleChainId?: number
@@ -83,7 +87,7 @@ export interface BackendBridgeTransaction extends UserTransactionDTO {
   detailsHidden?: boolean
 }
 
-export interface BackendUnwrapTransaction extends UserUnwrappedTransactionDTO {
+export interface BackendUnwrapTransaction extends Keyed<UserUnwrappedTransactionDTO> {
   sourceAddress?: string
   mined_in_block_height?: number
   ootleChainId?: number

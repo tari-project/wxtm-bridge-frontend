@@ -9,6 +9,7 @@ import { AssetConfig, getOotleAssets } from '@/utils/bridge-route'
 import { setOotleConfig, setOotleUnavailable } from './bridge'
 import useAppStore from './app'
 import { isOotleAddress, isOotleParamsForNetwork } from '@/utils/ootle-address'
+import { keyedByReference } from '@/utils/ootle-wrap-reference'
 
 interface TariL1WalletStoreState {
   tariAccount?: AccountData
@@ -97,7 +98,7 @@ export const getBackendBridgeTxsFromTU = async () => {
       console.error('[ TAPPLET-BRIDGE ] signer undefined')
       return []
     }
-    const backendBridgeTxs = await signer.getBackendBridgeTxs()
+    const backendBridgeTxs = (await signer.getBackendBridgeTxs()).map(keyedByReference)
 
     useTariAccountStore.setState({
       backendBridgeTxs: backendBridgeTxs,
