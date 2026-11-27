@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { isSameTransaction, ootleWrapReference } from './ootle-wrap-reference'
+import { isSameTransaction, keyedByReference, ootleWrapReference } from './ootle-wrap-reference'
 
 const PAYMENT_ID = '9b2f4c1e-3a5d-4e6f-8a7b-1c2d3e4f5a6b'
 // node -e 'crypto.createHash("sha256").update("ootle-wrap-reference:" + id).digest("hex").slice(0, 16)'
@@ -36,5 +36,13 @@ describe('isSameTransaction', () => {
     expect(isSameTransaction(ootleWrapRow, 'another-payment-id')).toBe(false)
     expect(isSameTransaction(ootleWrapRow, undefined)).toBe(false)
     expect(isSameTransaction(ootleWrapRow, '')).toBe(false)
+  })
+})
+
+describe('keyedByReference', () => {
+  it('keys a listing row (e.g. from Universe) by its reference, so it matches the stored paymentId', () => {
+    const row = keyedByReference({ reference: REFERENCE, status: 'PENDING' })
+    expect(row).toEqual({ paymentId: REFERENCE, status: 'PENDING' })
+    expect(isSameTransaction({ ...row, type: 'wrap' }, PAYMENT_ID)).toBe(true)
   })
 })

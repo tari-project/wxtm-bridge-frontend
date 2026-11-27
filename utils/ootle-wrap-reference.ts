@@ -15,3 +15,13 @@ export function isSameTransaction(
   if (!id || row.type !== 'wrap') return false
   return row.paymentId === ootleWrapReference(id)
 }
+
+// A listing row keyed by its reference, the only id the public listings carry.
+export function keyedByReference<T extends { reference: string }>({
+  reference,
+  ...tx
+}: T): Omit<T, 'reference'> & {
+  paymentId: string
+} {
+  return { ...tx, paymentId: reference }
+}

@@ -1,4 +1,4 @@
-import { BackendBridgeTransaction } from '@/types/transactions'
+import { UserTransactionDTO } from '@tari-project/wxtm-bridge-backend-api'
 import {
   TariL1SignerParameters,
   SignerMethodNames,
@@ -208,7 +208,8 @@ export class TariL1Signer {
    * @description get Tari Account bridge transactions from backend
    * @returns Bridge transactions
    */
-  public async getBackendBridgeTxs(): Promise<BackendBridgeTransaction[]> {
+  // Universe's copy of the wXTM listing: keyed by reference, not paymentId.
+  public async getBackendBridgeTxs(): Promise<UserTransactionDTO[]> {
     return this.sendRequest({
       methodName: 'getBackendBridgeTxs',
       args: [],

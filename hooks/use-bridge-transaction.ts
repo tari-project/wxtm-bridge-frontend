@@ -12,7 +12,7 @@ import {
 import { useConnection } from 'wagmi'
 
 import { OngoingUserTransaction } from '@/types/tapplet'
-import { isSameTransaction } from '@/utils/ootle-wrap-reference'
+import { isSameTransaction, keyedByReference } from '@/utils/ootle-wrap-reference'
 import { loadOotleWrapCapabilities } from '@/utils/ootle-wrap-capabilities'
 import { errorSummary } from '@/utils/error-summary'
 import useAppStore from '@/store/app'
@@ -107,15 +107,6 @@ function fromOotleUnwrap(tx: OotleUserUnwrapTransactionDTO): BackendUnwrapTransa
     status: tx.status as string as UserUnwrappedTransactionDTO.status,
     ootleChainId: tx.chainId,
   }
-}
-
-function keyedByReference<T extends { reference: string }>({
-  reference,
-  ...tx
-}: T): Omit<T, 'reference'> & {
-  paymentId: string
-} {
-  return { ...tx, paymentId: reference }
 }
 
 const ootleUnwrapsOf = (address: string) =>
