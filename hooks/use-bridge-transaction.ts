@@ -175,8 +175,12 @@ export const useBridgeTransaction = () => {
         type: 'wrap' as const,
       }))
     } else {
+      // The first page without paging parameters: a backend from before paging refuses them, and
+      // answers with every row and no total, which ends the paging.
       const wraps = await fetchAllPages((limit, offset) =>
-        WrapTokenService.getUserTransactions(walletAddress, limit, offset),
+        offset
+          ? WrapTokenService.getUserTransactions(walletAddress, limit, offset)
+          : WrapTokenService.getUserTransactions(walletAddress),
       )
       const unwraps = await fetchAllPages((limit, offset) =>
         TokensUnwrappedService.getUserTransactions(walletAddress, limit, offset),

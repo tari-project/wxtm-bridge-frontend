@@ -69,7 +69,7 @@ describe('wXTM history keyed by reference (SEC-20)', () => {
 
     const ongoing = await useBridgeTransaction().getUserBackendBridgeTxs()
 
-    expect(mocks.wraps).toHaveBeenCalledWith('tari-me', 100, 0)
+    expect(mocks.wraps).toHaveBeenCalledWith('tari-me')
     expect(ongoing).toMatchObject({ paymentId: PAYMENT_ID, status: UserTransactionDTO.status.SUCCESS })
   })
 
@@ -161,5 +161,18 @@ describe('wXTM history keyed by reference (SEC-20)', () => {
       showModal: true,
     })
     mocks.evm.address = undefined
+  })
+
+  it('reads the wrap list of a backend from before paging in one call', async () => {
+    // No reference and no total: an older backend.
+    const { reference, ...old } = listed(UserTransactionDTO.status.SUCCESS)
+    mocks.wraps.mockResolvedValue({ transactions: [{ ...old, paymentId: PAYMENT_ID }] })
+
+    const ongoing = await useBridgeTransaction().getUserBackendBridgeTxs()
+
+    expect(reference).toBeDefined()
+    expect(mocks.wraps).toHaveBeenCalledTimes(1)
+    expect(mocks.wraps).toHaveBeenCalledWith('tari-me')
+    expect(ongoing).toMatchObject({ paymentId: PAYMENT_ID, status: UserTransactionDTO.status.SUCCESS })
   })
 })
