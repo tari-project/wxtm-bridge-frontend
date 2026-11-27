@@ -121,27 +121,38 @@ function keyedByReference<T extends { reference: string }>({
 const ootleUnwrapsOf = (address: string) =>
   fetchAllPages((limit, offset) => OotleTokensUnwrappedService.getOotleUserUnwrapTransactions(address, limit, offset))
 
+// A burn rejected for its target has no Ootle address to be listed under, so the backend lists it
+// under the EVM address that burned it. Fetched on its own, so a failure here loses nothing else.
+async function rejectedBurnsOf(burnerAddress: string | undefined): Promise<BackendUnwrapTransaction[]> {
+  if (!burnerAddress) return []
+  try {
+    return (await ootleUnwrapsOf(burnerAddress)).map(fromOotleUnwrap)
+  } catch (error) {
+    console.error('[ TAPPLET-BRIDGE ] failed to get rejected Ootle burns:', error)
+    return []
+  }
+}
+
 export async function getOotleTransactions(
   ootleAddress: string | undefined,
-  // The connected EVM wallet: a burn rejected for its target has no Ootle address to be listed under,
-  // so the backend lists it under the address that burned it.
+  // The connected EVM wallet, whatever the Ootle account.
   burnerAddress?: string,
 ): Promise<{ wraps: BackendBridgeTransaction[]; unwraps: BackendUnwrapTransaction[] }> {
-  if (!ootleAddress) return { wraps: [], unwraps: [] }
+  const rejected = await rejectedBurnsOf(burnerAddress)
+  if (!ootleAddress) return { wraps: [], unwraps: rejected }
   try {
     const wraps = await fetchAllPages((limit, offset) =>
       OotleWrapTokenService.getOotleUserWrapTransactions(ootleAddress, limit, offset),
     )
     const unwraps = await ootleUnwrapsOf(ootleAddress)
-    const rejected = burnerAddress ? await ootleUnwrapsOf(burnerAddress) : []
     const details = await lookupOotleWrapDetails(ootleAddress)
     return {
       wraps: wraps.map((tx) => fromOotleWrap(tx, details.get(tx.reference))),
-      unwraps: [...unwraps, ...rejected].map(fromOotleUnwrap),
+      unwraps: [...unwraps.map(fromOotleUnwrap), ...rejected],
     }
   } catch (error) {
     console.error('[ TAPPLET-BRIDGE ] failed to get Ootle transactions:', error)
-    return { wraps: [], unwraps: [] }
+    return { wraps: [], unwraps: rejected }
   }
 }
 
@@ -232,6 +243,14 @@ export const useBridgeTransaction = () => {
           (id) => id !== row.paymentId && isSameTransaction(row, id),
         ) ?? row.paymentId
 
+      // A burn submitted here has no paymentId ('') until a listing row takes its place, and one
+      // rejected for its target is never pending: it is recognised by its burn transaction hash.
+      const isLocalBurn = (tx: CombinedBridgeTransaction) =>
+        tx.type === 'unwrap' &&
+        ongoingBridgeTx?.type === 'unwrap' &&
+        !!ongoingBridgeTx.transactionHash &&
+        tx.transactionHash?.toLowerCase() === ongoingBridgeTx.transactionHash.toLowerCase()
+
       if (ongoing) {
         // A wrap row is keyed by its reference; keep the local record (real paymentId, failed state).
         if (
@@ -262,7 +281,9 @@ export const useBridgeTransaction = () => {
       // check also with the paymentId from the TU to display modal after the bridge relaunch
       const ongoingCompleted = candidates.find((tx) => {
         const hasValidPaymentId =
-          isSameTransaction(tx, ongoingBridgeTx?.paymentId) || isSameTransaction(tx, lastOngoingPaymentIdFromTU)
+          isSameTransaction(tx, ongoingBridgeTx?.paymentId) ||
+          isSameTransaction(tx, lastOngoingPaymentIdFromTU) ||
+          isLocalBurn(tx)
 
         if (tx.type === 'wrap') {
           return (

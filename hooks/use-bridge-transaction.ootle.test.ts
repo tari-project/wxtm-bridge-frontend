@@ -124,4 +124,41 @@ describe('Ootle unwrap history (SEC-20)', () => {
       expect.objectContaining({ paymentId: 'ref-rejected', status: 'REJECTED' }),
     ])
   })
+
+  it('lists rejected burns for an EVM wallet without an Ootle account', async () => {
+    mocks.listUnwraps.mockResolvedValue({
+      transactions: [unwrap('ref-rejected', OotleUserUnwrapTransactionDTO.status.REJECTED)],
+      total: 1,
+    })
+
+    const { unwraps } = await getOotleTransactions(undefined, '0x1111111111111111111111111111111111111111')
+
+    expect(unwraps).toEqual([expect.objectContaining({ paymentId: 'ref-rejected', status: 'REJECTED' })])
+    expect(mocks.list).not.toHaveBeenCalled()
+  })
+
+  it('keeps the other Ootle history when the burner list fails, and the burner list when the rest fails', async () => {
+    const BURNER = '0x1111111111111111111111111111111111111111'
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    mocks.listUnwraps.mockImplementation(async (address: string) => {
+      if (address === BURNER) throw new Error('burner list down')
+      return { transactions: [unwrap('ref-held', OotleUserUnwrapTransactionDTO.status.ON_HOLD)], total: 1 }
+    })
+
+    const first = await getOotleTransactions(ME, BURNER)
+
+    expect(first.wraps).toHaveLength(2)
+    expect(first.unwraps).toEqual([expect.objectContaining({ paymentId: 'ref-held' })])
+
+    mocks.list.mockRejectedValue(new Error('wrap list down'))
+    mocks.listUnwraps.mockResolvedValue({
+      transactions: [unwrap('ref-rejected', OotleUserUnwrapTransactionDTO.status.REJECTED)],
+      total: 1,
+    })
+
+    const second = await getOotleTransactions(ME, BURNER)
+
+    expect(second.wraps).toEqual([])
+    expect(second.unwraps).toEqual([expect.objectContaining({ paymentId: 'ref-rejected' })])
+  })
 })

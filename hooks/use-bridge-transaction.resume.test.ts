@@ -1,7 +1,12 @@
 // Drives the real history hook outside React: the wXTM listings carry only a reference (SEC-20).
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const mocks = vi.hoisted(() => ({ wraps: vi.fn(), unwraps: vi.fn() }))
+const mocks = vi.hoisted(() => ({
+  wraps: vi.fn(),
+  unwraps: vi.fn(),
+  ootleUnwraps: vi.fn(),
+  evm: { address: undefined as string | undefined },
+}))
 
 vi.mock('zustand', async () => {
   const { createStore } = await import('zustand/vanilla')
@@ -16,14 +21,15 @@ vi.mock('zustand', async () => {
       },
   }
 })
-vi.mock('wagmi', () => ({ useConnection: () => ({ address: undefined }) }))
+vi.mock('wagmi', () => ({ useConnection: () => mocks.evm }))
 vi.mock('@tari-project/wxtm-bridge-backend-api', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@tari-project/wxtm-bridge-backend-api')>()),
   WrapTokenService: { getUserTransactions: mocks.wraps },
   TokensUnwrappedService: { getUserTransactions: mocks.unwraps },
+  OotleTokensUnwrappedService: { getOotleUserUnwrapTransactions: mocks.ootleUnwraps },
 }))
 
-const { UserTransactionDTO } = await import('@tari-project/wxtm-bridge-backend-api')
+const { UserTransactionDTO, UserUnwrappedTransactionDTO } = await import('@tari-project/wxtm-bridge-backend-api')
 const { useTariAccountStore } = await import('@/store/account')
 const { ootleWrapReference } = await import('@/utils/ootle-wrap-reference')
 const { useBridgeTransaction } = await import('./use-bridge-transaction')
@@ -106,5 +112,54 @@ describe('wXTM history keyed by reference (SEC-20)', () => {
 
       expect(ongoing).toMatchObject({ paymentId: PAYMENT_ID, status: UserTransactionDTO.status.SUCCESS })
     })
+  })
+
+  it('shows a burn rejected for its target as failed, found by its transaction hash (SEC-20)', async () => {
+    const BURNER = '0x1111111111111111111111111111111111111111'
+    mocks.evm.address = BURNER
+    mocks.wraps.mockResolvedValue({ transactions: [], total: 0 })
+    mocks.ootleUnwraps.mockResolvedValue({
+      transactions: [
+        {
+          reference: 'ref-rejected',
+          chainId: 84532,
+          destinationAddress: '',
+          amount: '1000',
+          amountAfterFee: '0',
+          feeAmount: '0',
+          createdAt: '2026-11-10T10:05:00.000Z',
+          transactionHash: '0xabcdef',
+          blockTimestamp: '2026-11-10T10:00:00.000Z',
+          status: 'REJECTED',
+        },
+      ],
+      total: 1,
+    })
+    useTariAccountStore.setState({
+      ootleAccount: undefined,
+      lastOngoingPaymentIdFromTU: '',
+      ongoingBridgeTx: {
+        type: 'unwrap',
+        paymentId: '',
+        amount: '1000',
+        amountAfterFee: '990',
+        createdAt: '2026-11-10T10:00:00.000Z',
+        transactionHash: '0xABCDEF',
+        blockTimestamp: '',
+        status: UserUnwrappedTransactionDTO.status.PENDING,
+        destinationAddress: 'otl_bad',
+        ootleChainId: 84532,
+      },
+    })
+
+    const ongoing = await useBridgeTransaction().getUserBackendBridgeTxs()
+
+    expect(mocks.ootleUnwraps).toHaveBeenCalledWith(BURNER, 100, 0)
+    expect(ongoing).toMatchObject({
+      type: 'unwrap',
+      status: UserUnwrappedTransactionDTO.status.REJECTED,
+      showModal: true,
+    })
+    mocks.evm.address = undefined
   })
 })
