@@ -11,17 +11,20 @@ export function isSameTransaction(
   row: { type: 'wrap' | 'unwrap'; paymentId: string; ootleChainId?: number },
   id: string | undefined,
 ): boolean {
+  // No known id matches nothing, even a row whose own key is missing.
+  if (!id) return false
   if (row.paymentId === id) return true
-  if (!id || row.type !== 'wrap') return false
+  if (row.type !== 'wrap') return false
   return row.paymentId === ootleWrapReference(id)
 }
 
-// A listing row keyed by its reference, the only id the public listings carry.
+// A listing row keyed by its reference, the only id the public listings carry. An older backend
+// sends paymentId and no reference; its rows keep their paymentId.
 export function keyedByReference<T extends { reference: string }>({
   reference,
   ...tx
 }: T): Omit<T, 'reference'> & {
   paymentId: string
 } {
-  return { ...tx, paymentId: reference }
+  return { ...tx, paymentId: reference ?? (tx as unknown as { paymentId: string }).paymentId }
 }

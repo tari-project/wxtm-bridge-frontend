@@ -46,3 +46,17 @@ describe('keyedByReference', () => {
     expect(isSameTransaction({ ...row, type: 'wrap' }, PAYMENT_ID)).toBe(true)
   })
 })
+
+describe('compatibility (SEC-20)', () => {
+  it('matches nothing without a known id, even a row without its own key', () => {
+    const row = { type: 'wrap' as const, paymentId: undefined as unknown as string }
+    expect(isSameTransaction(row, undefined)).toBe(false)
+    expect(isSameTransaction(row, '')).toBe(false)
+  })
+
+  it('keeps the paymentId of a row from an older backend, which has no reference', () => {
+    const row = keyedByReference({ paymentId: PAYMENT_ID, status: 'PENDING' } as unknown as { reference: string })
+    expect(row).toMatchObject({ paymentId: PAYMENT_ID })
+    expect(isSameTransaction({ ...row, type: 'wrap' }, PAYMENT_ID)).toBe(true)
+  })
+})
