@@ -54,7 +54,7 @@ export function getSafeExplorerUrl(chainId: number, paramsUrl: string): string {
   return knownUrl
 }
 
-// wXTM follows the connected wallet's chain when it has a wXTM deployment, as before.
+// wXTM follows the connected wallet's chain when it has a wXTM deployment on the same side of the mainnet line.
 export function getWxtmAsset(
   connectedChainId: number | undefined,
   isMainNet: boolean,
@@ -62,7 +62,11 @@ export function getWxtmAsset(
   unwrapFeeBps: number,
 ): AssetConfig {
   let chainId: number = isMainNet ? mainnet.id : sepolia.id
-  if (connectedChainId !== undefined && getDeployments(connectedChainId).wXTM) {
+  if (
+    connectedChainId !== undefined &&
+    (connectedChainId === mainnet.id) === isMainNet &&
+    getDeployments(connectedChainId).wXTM
+  ) {
     chainId = connectedChainId
   }
   const deployments = getDeployments(chainId)

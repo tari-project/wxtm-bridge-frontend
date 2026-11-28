@@ -193,6 +193,13 @@ describe('getWxtmAsset', () => {
   it('follows the wallet onto a wXTM chain, even one that also has wTARI', () => {
     expect(getWxtmAsset(baseSepolia.id, false, 50, 50).chainId).toBe(baseSepolia.id)
   })
+
+  it('does not cross the mainnet/testnet boundary when following the connected wallet chain', () => {
+    expect(getWxtmAsset(mainnet.id, false, 50, 50).chainId).toBe(sepolia.id)
+    expect(getWxtmAsset(sepolia.id, true, 50, 50).chainId).toBe(mainnet.id)
+    expect(getWxtmAsset(baseSepolia.id, true, 50, 50).chainId).toBe(mainnet.id)
+    expect(getWxtmAsset(mainnet.id, true, 50, 50).chainId).toBe(mainnet.id)
+  })
 })
 
 describe('wXTM and wTARI on the same chain', () => {
